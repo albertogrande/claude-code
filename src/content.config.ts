@@ -16,7 +16,7 @@ const radar = defineCollection({
     date: z.coerce.date(),
     // What kind of item this is — drives the category chip.
     kind: z
-      .enum(['news', 'tweet', 'release', 'workflow', 'discussion', 'tip', 'note'])
+      .enum(['news', 'release', 'workflow', 'discussion', 'tip', 'note'])
       .default('news'),
     summary: z.string(),
     // The editorial point of view — rendered as a "The take" callout.

@@ -16,21 +16,26 @@ You maintain this site — a living, power-user field guide to Claude Code. Your
 
 ## 1. Research (official sources first)
 
-Use WebSearch and WebFetch. A radar post can be **news, a release, a notable tweet or thread, a workflow or tip, or a community discussion** — anything a Claude Code power user would want to know. Always capture a link to the original so the reader can check it.
+Use WebSearch and WebFetch. A radar post can be **news, a release, a workflow or tip, or a community discussion** — anything a Claude Code power user would want to know. Always capture a link to the original so the reader can check it. Use only **public, fetchable** sources; skip anything behind a login wall (we are not using X/Twitter for now).
 
 **Primary / official:**
 
 - `https://code.claude.com/docs/en/changelog` — the release changelog (start here).
 - `https://code.claude.com/docs/` — Claude Code docs (models, modes, skills, plugins, MCP, hooks, desktop, remote-control, routines).
-- `https://platform.claude.com/docs/` — API/model/effort/fast-mode reference.
+- `https://platform.claude.com/docs/` — API / model / effort / fast-mode reference.
 - `https://www.anthropic.com/news` and the Anthropic engineering blog — announcements.
+- `https://github.com/anthropics/claude-code/releases` — release notes and public discussion.
 
-**Community / trends** (for tweets, workflows, discussions — verify claims before repeating them):
+**Community & discussion** — public endpoints that fetch reliably. Verify every claim against a primary source before repeating it:
 
-- X/Twitter threads from Anthropic and well-known Claude Code users.
-- Hacker News, the r/ClaudeAI subreddit, and dev newsletters.
+- **Hacker News** (Algolia API, always fetchable): `https://hn.algolia.com/api/v1/search_by_date?query=claude%20code&tags=story` for newest, `https://hn.algolia.com/api/v1/search?query=claude%20code&tags=story` for top. Follow through to the linked post and the comment thread.
+- **Reddit** (public JSON): `https://www.reddit.com/r/ClaudeAI/search.json?q=claude%20code&sort=new&restrict_sr=1&limit=25`; also scan r/ClaudeCode, r/ChatGPTCoding, r/LocalLLaMA "new".
+- **Lobsters**: `https://lobste.rs/search?q=claude+code&what=stories&order=newest`.
+- **Bluesky** (public API, no login): `https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=claude%20code&sort=latest`.
+- **Independent writers & newsletters** (fetch the page directly): Simon Willison `https://simonwillison.net/tags/claude-code/`, Latent Space `https://www.latent.space/`, The Pragmatic Engineer, TLDR AI, Ben's Bites.
+- **Broad sweep**: a `WebSearch` for `"Claude Code"` posts from the last day or two, to catch anything the lists above miss.
 
-Look for anything since the last radar date worth a power user's attention: new or renamed models, effort/fast-mode changes, new modes/commands, skills/plugins/MCP/hooks, desktop/iOS/cloud (routines, remote control, dispatch) updates — and the sharp workflows or takes the community has surfaced.
+Look for anything since the last radar date worth a power user's attention: new or renamed models, effort/fast-mode changes, new modes/commands, skills/plugins/MCP/hooks, desktop/iOS/cloud (routines, remote control, dispatch) updates — and the sharp workflows, guides, or takes the community has surfaced. Favour a mix: a quiet changelog day should not mean an empty radar when the community is talking.
 
 **Be conservative and accurate.** If you cannot confirm a claim in a primary source, do not publish it. Distinguish shipped features from research previews. If nothing material changed since the last sweep, it is fine to publish a short "quiet stretch" entry or to skip publishing entirely — say so in your final message.
 
@@ -42,7 +47,7 @@ Each post is a shared item **plus your point of view**. Create `src/content/rada
 ---
 title: Short, specific headline
 date: <today, YYYY-MM-DD>
-kind: news        # one of: news, tweet, release, workflow, discussion, tip, note
+kind: news        # one of: news, release, workflow, discussion, tip, note
 summary: One or two sentences — what it is and why it matters.
 take: Your point of view in 1–3 sentences — an opinion, not a recap.
 tags: [models, apps]                     # 2–4 lowercase tags
