@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { withBase, isoDate } from '../../lib/site';
+
+const radar = (await getCollection('radar')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+<BaseLayout
+  title="Radar"
+  description="Dated updates on what's changing in Claude Code — models, modes, features, and workflow shifts."
+>
+  <div class="page-head">
+    <div class="kicker"><span class="prompt" aria-hidden="true">&gt;</span> radar</div>
+    <h1 class="page-title">The radar</h1>
+    <p class="dek">
+      What's changing in Claude Code, newest first. Each entry is dated and
+      sourced. An autonomous agent sweeps the official docs and appends here.
+    </p>
+  </div>
+
+  <ul class="ar-list">
+    {radar.map((d) => (
+      <li class="ar-row">
+        <span class="ar-date">{isoDate(d.data.date)}</span>
+        <div class="ar-main">
+          <a href={withBase(`/radar/${d.id}`)} class="ar-title">{d.data.title}</a>
+          <span class="ar-meta">{d.data.summary}</span>
+          {d.data.tags.length > 0 && (
+            <ul class="tags" style="margin-top:8px">
+              {d.data.tags.map((t) => (
+                <li><span class="tag">{t}</span></li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

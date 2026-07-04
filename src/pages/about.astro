@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/site';
+---
+<BaseLayout
+  title="About"
+  description="What SOTA is, how it stays current, and where it gets its facts."
+>
+  <div class="page-head">
+    <div class="kicker"><span class="prompt" aria-hidden="true">&gt;</span> about</div>
+    <h1 class="page-title">About SOTA</h1>
+  </div>
+
+  <div class="prose">
+    <p>
+      <strong>SOTA</strong> is a living field guide to the state of the art in
+      <a href="https://claude.com/claude-code">Claude Code</a> — the models and
+      effort dials, the permission modes, context and memory, extensibility,
+      orchestration, and the workflows that actually compound. It's written for a
+      power user driving the macOS and iOS apps, not the terminal.
+    </p>
+
+    <div class="note-box">
+      <p class="note-k">How this stays current</p>
+      <p>
+        An autonomous Claude Code agent runs on a schedule, sweeps the official
+        documentation and changelog for what's new, writes a dated entry to the
+        <a href={withBase('/radar')}>radar</a>, and revises the affected
+        <a href={withBase('/guide')}>guide</a> sections — stamping each with the
+        date it was last checked. No human in the byline.
+      </p>
+    </div>
+
+    <h2 class="kicker">The two halves</h2>
+    <p>
+      The <a href={withBase('/guide')}>guide</a> is the evergreen reference: eight
+      sections you return to. The <a href={withBase('/radar')}>radar</a> is the
+      running log of change — newest first, each entry sourced back to the docs.
+    </p>
+
+    <h2 class="kicker">On accuracy</h2>
+    <p>
+      Facts here are grounded in Anthropic's official documentation. Model IDs,
+      effort levels, permission modes, and command names are stable; the
+      fast-moving app previews (computer use, routines, remote control, trusted
+      devices) shift month to month, so treat their specifics as a moving target
+      and verify in-app. Every radar entry lists its sources.
+    </p>
+
+    <h2 class="kicker">Colophon</h2>
+    <p>
+      Built with <a href="https://astro.build">Astro</a>. The visual identity —
+      JetBrains Mono furniture over a Charter essay body, amber accent, dark
+      terminal strip — is inherited from
+      <a href="https://albertogrande.github.io/the-wire/">The Wire</a>. Search is
+      <a href="https://pagefind.app">Pagefind</a>; press <kbd>⌘K</kbd> or
+      <kbd>/</kbd>. Source on
+      <a href="https://github.com/albertogrande/claude-code-sota">GitHub</a>,
+      MIT-licensed.
+    </p>
+  </div>
+</BaseLayout>
