@@ -13,7 +13,7 @@ Built with [Astro](https://astro.build). Visual identity inherited from [The Wir
 ## How it works
 
 - The **radar-scan skill** (`.claude/skills/radar-scan/SKILL.md`) is the playbook: sweep the official docs and changelog, publish a dated entry to `src/content/radar/`, and refresh any affected `src/content/guide/` sections.
-- The **Radar workflow** (`.github/workflows/radar.yml`) runs that skill weekly via [claude-code-action](https://github.com/anthropics/claude-code-action) and commits the result.
+- The **Radar workflow** (`.github/workflows/radar.yml`) runs that skill daily via [claude-code-action](https://github.com/anthropics/claude-code-action) and commits the result.
 - The **Deploy workflow** builds the site and publishes it to GitHub Pages — on push and after each radar sweep.
 
 Content is frontmatter-driven (see `src/content.config.ts`) so the agent can write it deterministically.
@@ -53,7 +53,7 @@ The autonomous updater needs a Claude Code OAuth token:
 1. `claude setup-token` (logged into Claude Code with a Max/Pro plan) → copy the token.
 2. Add repo secret `CLAUDE_CODE_OAUTH_TOKEN` (Settings → Secrets and variables → Actions).
 3. Enable Pages: Settings → Pages → Source → **GitHub Actions**.
-4. The Radar workflow runs Mondays 07:00 UTC, or trigger it manually: Actions → Radar → Run workflow.
+4. The Radar workflow runs daily at 05:00 UTC, or trigger it manually: Actions → Radar → Run workflow.
 
 ## License
 

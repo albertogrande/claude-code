@@ -10,8 +10,9 @@ name: Radar
 
 on:
   schedule:
-    # Weekly, Monday 07:00 UTC.
-    - cron: "0 7 * * 1"
+    # Daily at 05:00 UTC (night in Madrid) — a signal feed, not a weekly digest.
+    # The off-peak slot keeps it from competing with interactive Max usage.
+    - cron: "0 5 * * *"
   workflow_dispatch:
     inputs:
       focus:
