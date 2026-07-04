@@ -30,7 +30,7 @@ This is the workflow the apps are built for:
 
 > Kick off a long job on the Mac in **Auto** mode → close the lid → get a **push notification** on your phone when it needs a decision or finishes → open the session on your phone, steer or approve → walk back to the Mac and it's all one continuous thread.
 
-Enable pushes in `/config`.
+Enable pushes in `/config`. As of 2.1.200, a question Claude asks mid-run (`AskUserQuestion`) waits for your real answer by default instead of auto-continuing on a timeout — so the notification you get really is the decision point, not a race against a clock you can't see. Opt back into an idle timeout via `/config` only for jobs scoped tightly enough that a guessed default is harmless.
 
 ## Reality check
 

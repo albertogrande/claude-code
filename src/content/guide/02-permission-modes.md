@@ -11,7 +11,7 @@ On desktop, cycle permission modes with the mode button or **`Shift+Tab`**. Each
 
 | Mode | Behaviour | Reach for it when… |
 | --- | --- | --- |
-| **Manual** (config value still `default`) | Asks before edits and shell commands. You approve each step. | Learning a codebase, sensitive work, or you want to watch every move. |
+| **Manual** (config value `default`; `manual` works as an alias as of 2.1.200) | Asks before edits and shell commands. You approve each step. | Learning a codebase, sensitive work, or you want to watch every move. |
 | **Accept edits** | Auto-approves file edits and safe filesystem ops; still asks before shell commands. | Trusted project, fast iteration where edits are low-risk. |
 | **Plan** | Explores and proposes a plan *without touching disk*. You approve before any code is written. | Anything touching 3+ files, schema/auth changes, or an unclear approach. |
 | **Auto** | Runs actions with a background safety classifier that blocks risky ones — scope escalation, unknown infrastructure, injected instructions. | Longer unattended runs where you've scoped what's trusted. |
