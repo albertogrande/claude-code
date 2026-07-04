@@ -1,8 +1,15 @@
 ---
 title: The async workflow — Mac, phone, and cloud as one thread
 date: 2026-06-27
+kind: workflow
 summary: Remote Control, Dispatch, and Routines turn Claude Code into an event-driven tool you kick off on the Mac and finish from your pocket.
+take: Stop babysitting sessions. Fire a long job in Auto mode, walk away, and let a push notification decide when you're actually needed — that's the real unlock, not any single feature.
 tags: [apps, remote-control, routines, workflow]
+related:
+  - label: 'Guide — Mac & iOS command center'
+    href: /guide/06-mac-and-ios
+  - label: 'Radar — the state of Claude Code'
+    href: /radar/2026-07-04-state-of-claude-code
 sources:
   - label: 'Claude Code docs — remote control'
     url: 'https://code.claude.com/docs/en/remote-control'

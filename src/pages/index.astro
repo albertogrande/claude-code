@@ -19,7 +19,7 @@ const guide = (await getCollection('guide')).sort(
       <a href={withBase(`/radar/${lead.id}`)} class="fm-box">
         <span class="fm-legend">RADAR</span>
         <div class="fm-kick">
-          <span class="amber"># </span>{fmtMed(lead.data.date)}
+          <span class="amber"># </span><span class="kind-inline">{lead.data.kind}</span> · {fmtMed(lead.data.date)}
           {lead.data.tags.length > 0 && <Fragment> · {lead.data.tags.slice(0, 3).join(' · ')}</Fragment>}
         </div>
         <h1 class="fm-h">{lead.data.title}</h1>
@@ -42,13 +42,12 @@ const guide = (await getCollection('guide')).sort(
               <div class="fm-rowmain">
                 <a href={withBase(`/radar/${d.id}`)} class="fm-row-t">{d.data.title}</a>
                 <p class="fm-row-dek">{d.data.summary}</p>
-                {d.data.tags.length > 0 && (
-                  <div class="fm-row-m">
-                    {d.data.tags.slice(0, 4).map((t, i) => (
-                      <Fragment>{i > 0 && <span class="dim">·</span>}<span>{t}</span></Fragment>
-                    ))}
-                  </div>
-                )}
+                <div class="fm-row-m">
+                  <span class="kind-inline">{d.data.kind}</span>
+                  {d.data.tags.slice(0, 3).map((t) => (
+                    <Fragment><span class="dim">·</span><span>{t}</span></Fragment>
+                  ))}
+                </div>
               </div>
             </li>
           ))}

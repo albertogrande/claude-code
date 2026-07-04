@@ -16,39 +16,58 @@ You maintain this site — a living, power-user field guide to Claude Code. Your
 
 ## 1. Research (official sources first)
 
-Use WebSearch and WebFetch. **Prefer primary sources** and cite exact URLs:
+Use WebSearch and WebFetch. A radar post can be **news, a release, a notable tweet or thread, a workflow or tip, or a community discussion** — anything a Claude Code power user would want to know. Always capture a link to the original so the reader can check it.
+
+**Primary / official:**
 
 - `https://code.claude.com/docs/en/changelog` — the release changelog (start here).
 - `https://code.claude.com/docs/` — Claude Code docs (models, modes, skills, plugins, MCP, hooks, desktop, remote-control, routines).
 - `https://platform.claude.com/docs/` — API/model/effort/fast-mode reference.
 - `https://www.anthropic.com/news` and the Anthropic engineering blog — announcements.
 
-Look for changes since the last radar date: new or renamed models and model IDs, effort/fast-mode changes, new permission modes, new commands, skills/plugins/MCP/hooks changes, and desktop/iOS/cloud (routines, remote control, dispatch) updates.
+**Community / trends** (for tweets, workflows, discussions — verify claims before repeating them):
+
+- X/Twitter threads from Anthropic and well-known Claude Code users.
+- Hacker News, the r/ClaudeAI subreddit, and dev newsletters.
+
+Look for anything since the last radar date worth a power user's attention: new or renamed models, effort/fast-mode changes, new modes/commands, skills/plugins/MCP/hooks, desktop/iOS/cloud (routines, remote control, dispatch) updates — and the sharp workflows or takes the community has surfaced.
 
 **Be conservative and accurate.** If you cannot confirm a claim in a primary source, do not publish it. Distinguish shipped features from research previews. If nothing material changed since the last sweep, it is fine to publish a short "quiet stretch" entry or to skip publishing entirely — say so in your final message.
 
-## 2. Publish a radar entry
+## 2. Publish a radar post
 
-If there's something worth recording, create `src/content/radar/<today>-<slug>.md`. The frontmatter schema is strict (see `src/content.config.ts`) — match it exactly:
+Each post is a shared item **plus your point of view**. Create `src/content/radar/<today>-<slug>.md`. The frontmatter schema is strict (see `src/content.config.ts`) — match it exactly:
 
 ```markdown
 ---
 title: Short, specific headline
 date: <today, YYYY-MM-DD>
-summary: One or two sentences — what changed and why it matters.
-tags: [models, modes, apps, skills, workflow]   # 2–4 lowercase tags
-sources:
+kind: news        # one of: news, tweet, release, workflow, discussion, tip, note
+summary: One or two sentences — what it is and why it matters.
+take: Your point of view in 1–3 sentences — an opinion, not a recap.
+tags: [models, apps]                     # 2–4 lowercase tags
+related:                                  # optional cross-links (base-less paths)
+  - label: Guide — models & effort
+    href: /guide/01-models-and-effort
+  - label: Radar — an earlier post
+    href: /radar/2026-06-27-async-across-surfaces
+sources:                                  # at least one — where to check it
   - label: Human-readable source name
-    url: https://code.claude.com/docs/en/...
+    url: https://...
 ---
 
-Body in Markdown. Do NOT repeat the title as an H1 — the layout renders it.
-Lead with the change, then what it means for a power user on the Mac/iOS apps.
-Use `##` subheads, short paragraphs, and `code` for commands and model IDs.
-Every factual claim should trace to a listed source.
+Body in Markdown: what the item is, in a few short paragraphs. Do NOT repeat the
+title as an H1 — the layout renders the title, the take, the related links, and
+the sources for you. Use `code` for commands and model IDs; keep it tight.
 ```
 
-Rules: `date` must equal today. Give real, resolving `sources` URLs. Keep tags from a small vocabulary (`models`, `modes`, `context`, `skills`, `plugins`, `mcp`, `hooks`, `workflow`, `apps`, `remote-control`, `routines`, `snapshot`). One entry per run unless two clearly independent things shipped.
+Rules:
+
+- `kind` — pick the closest category. Use `note` for editorial / meta pieces.
+- `take` — **always include it.** This is the reason the post exists: give a real opinion, don't just restate the news.
+- `sources` — **at least one**, a real resolving URL to the original (tweet, changelog, blog, thread).
+- `related` — link to relevant guide sections and earlier radar posts. `href` is a base-less site path (`/guide/...`, `/radar/...`) or a full external URL. Do NOT hard-code the `/claude-code` base.
+- `date` must equal today. Keep tags from: `models, modes, context, skills, plugins, mcp, hooks, workflow, apps, remote-control, routines, note`. One post per run unless two clearly independent things landed.
 
 ## 3. Refresh the guide
 

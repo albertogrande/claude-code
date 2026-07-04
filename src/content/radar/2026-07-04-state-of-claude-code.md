@@ -1,8 +1,15 @@
 ---
 title: The state of Claude Code, mid-2026
 date: 2026-07-04
+kind: note
 summary: A snapshot of where Claude Code stands — the model lineup, the effort ladder, the permission modes, and the shift to a desktop-and-mobile command center.
+take: The single highest-leverage habit isn't a prompt trick — it's moving the model and effort dials per task instead of leaving them parked. Everything else compounds from there.
 tags: [models, modes, apps, snapshot]
+related:
+  - label: 'Guide — start here'
+    href: /guide/00-start-here
+  - label: 'Guide — models & effort'
+    href: /guide/01-models-and-effort
 sources:
   - label: 'Claude Code docs — model configuration'
     url: 'https://code.claude.com/docs/en/model-config'

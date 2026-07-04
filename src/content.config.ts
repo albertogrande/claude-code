@@ -14,8 +14,21 @@ const radar = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    // What kind of item this is — drives the category chip.
+    kind: z
+      .enum(['news', 'tweet', 'release', 'workflow', 'discussion', 'tip', 'note'])
+      .default('news'),
     summary: z.string(),
+    // The editorial point of view — rendered as a "The take" callout.
+    take: z.string().optional(),
     tags: z.array(z.string()).default([]),
+    // Cross-links to guide sections or other radar posts. `href` is a
+    // base-less site path (e.g. "/guide/01-models-and-effort" or
+    // "/radar/2026-07-04-...") or a full external URL.
+    related: z
+      .array(z.object({ label: z.string(), href: z.string() }))
+      .default([]),
+    // Where to check the original — tweets, changelog entries, blog posts.
     sources: z
       .array(z.object({ label: z.string(), url: z.string().url() }))
       .default([]),

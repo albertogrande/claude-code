@@ -13,22 +13,41 @@ const { Content } = await render(entry);
 const d = entry.data;
 ---
 <ReadingLayout title={d.title} description={d.summary} deskLabel="Radar" stamp={fmtLong(d.date)}>
-  {d.tags.length > 0 && (
-    <div class="entry-lead" slot="lead">
+  <div class="entry-lead" slot="lead">
+    <span class="kind">{d.kind}</span>
+    {d.tags.length > 0 && (
       <ul class="tags">
         {d.tags.map((t) => (
           <li><span class="tag">{t}</span></li>
         ))}
       </ul>
-    </div>
-  )}
+    )}
+  </div>
 
   <Content />
 
+  {d.take && (
+    <div class="note-box take">
+      <p class="note-k">The take</p>
+      <p>{d.take}</p>
+    </div>
+  )}
+
   <Fragment slot="foot">
+    {d.related.length > 0 && (
+      <p class="related">
+        <span class="related-k">Related</span>
+        {d.related.map((r, i) => (
+          <Fragment>
+            {i > 0 && <span class="sep" aria-hidden="true">·</span>}
+            <a href={r.href.startsWith('http') ? r.href : withBase(r.href)}>{r.label}</a>
+          </Fragment>
+        ))}
+      </p>
+    )}
     {d.sources.length > 0 && (
       <div class="sources">
-        <p class="sources-h">Sources</p>
+        <p class="sources-h">Source{d.sources.length > 1 ? 's' : ''} — check it yourself</p>
         <ol>
           {d.sources.map((s) => (
             <li>
