@@ -1,8 +1,8 @@
 // Small shared helpers: base-path prefixing (GitHub Pages serves under
-// /claude-code-sota) and UTC-stable date formatting.
+// /claude-code) and UTC-stable date formatting.
 
 const RAW_BASE = import.meta.env.BASE_URL ?? '/';
-const BASE = RAW_BASE.replace(/\/$/, ''); // "/claude-code-sota"
+const BASE = RAW_BASE.replace(/\/$/, ''); // "/claude-code"
 
 export function withBase(p: string): string {
   return `${BASE}${p.startsWith('/') ? '' : '/'}${p}`;

@@ -30,4 +30,4 @@ Permission is a dial, cycled with `Shift+Tab`: **default** (ask everything), **a
 
 The biggest change isn't any one feature — it's that Claude Code has become a **desktop-and-mobile command center**. The macOS app is a spatial workspace with parallel worktree-isolated sessions, diff and preview panes, and auto-verification. **Remote Control** lets you steer a running Mac session from your phone; **Dispatch** sends tasks the other way; **Routines** run scheduled agents in the cloud while your laptop is closed. One conversation flows across all three.
 
-The [guide](/claude-code-sota/guide) covers each of these in depth. This radar will track what changes from here.
+The [guide](/claude-code/guide) covers each of these in depth. This radar will track what changes from here.

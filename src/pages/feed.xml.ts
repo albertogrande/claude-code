@@ -5,10 +5,10 @@ import { withBase } from '../lib/site';
 // Atom feed over the radar. Entries dated to their frontmatter date (00:00Z),
 // newest first.
 
-const SITE_TITLE = 'SOTA';
+const SITE_TITLE = 'Claude Code — a power-user field guide';
 const SITE_DESC =
   'The state of the art in Claude Code — kept current by an autonomous agent.';
-const AUTHOR = 'SOTA';
+const AUTHOR = 'Claude Code field guide';
 
 const esc = (s: string) =>
   s

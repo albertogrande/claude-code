@@ -1,10 +1,10 @@
-# SOTA — State of Claude Code
+# Claude Code — a power-user field guide
 
 A living field guide to the state of the art in [Claude Code](https://claude.com/claude-code): models, effort, permission modes, context, extensibility, orchestration, and the workflows that compound — written for a power user on the macOS and iOS apps.
 
 Kept current by an autonomous Claude Code agent. No human in the byline.
 
-- **Live site** — https://albertogrande.github.io/claude-code-sota/
+- **Live site** — https://albertogrande.github.io/claude-code/
 - **The guide** — the evergreen reference, eight sections.
 - **The radar** — dated updates on what's changing, newest first, each sourced.
 
@@ -22,7 +22,7 @@ Content is frontmatter-driven (see `src/content.config.ts`) so the agent can wri
 
 ```
 npm install
-npm run dev      # http://localhost:4321/claude-code-sota
+npm run dev      # http://localhost:4321/claude-code
 ```
 
 - `npm run dev` — hot-reloads `src/`.

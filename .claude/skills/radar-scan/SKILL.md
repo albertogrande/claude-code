@@ -1,10 +1,10 @@
 ---
 name: radar-scan
-description: Sweep the official Claude Code sources for what's new, publish a dated radar entry, and refresh any guide sections that changed. Use when asked to run the radar, update SOTA, or check for Claude Code news.
+description: Sweep the official Claude Code sources for what's new, publish a dated radar entry, and refresh any guide sections that changed. Use when asked to run the radar, update the guide, or check for Claude Code news.
 argument-hint: [optional focus, e.g. "models" or "the desktop app"]
 ---
 
-You maintain **SOTA**, a living field guide to the state of the art in Claude Code. Your job in this run: find what has genuinely changed, record it on the radar, and keep the guide accurate. Write files only — the GitHub Action commits and deploys.
+You maintain this site — a living, power-user field guide to Claude Code. Your job in this run: find what has genuinely changed, record it on the radar, and keep the guide accurate. Write files only — the GitHub Action commits and deploys.
 
 ## 0. Orient
 

@@ -1,7 +1,7 @@
 ---
-// Terminal chrome (inherited from The Wire's mono-grid skin). A `$ sota` mark
-// with a blinking cursor and `--flag` nav. Width follows the page: 760 for the
-// front, --wrap for reading.
+// Terminal chrome (inherited from The Wire's mono-grid skin). A `$ claude code`
+// mark with a blinking cursor and `--flag` nav. Width follows the page: 760 for
+// the front, --wrap for reading.
 import { withBase } from '../lib/site';
 
 interface Props {
@@ -24,7 +24,7 @@ const isCurrent = (url: string) => {
 <div class="chrome" style={`max-width:${max}`}>
   <header class="chrome-head">
     <a href={withBase('/')} class="chrome-mark">
-      <span class="amber">$</span> sota<span class="cur" aria-hidden="true">▌</span>
+      <span class="amber">$</span> claude&nbsp;code<span class="cur" aria-hidden="true">▌</span>
     </a>
     <nav class="chrome-nav" aria-label="Primary">
       {nav.map((n) => (

@@ -10,8 +10,9 @@ const {
   description = 'The state of the art in Claude Code — models, effort, modes, context, orchestration, and the workflows that compound. Kept current by an autonomous agent.',
 } = Astro.props;
 
-const SITE_TITLE = 'SOTA';
-const fullTitle = title === SITE_TITLE ? `${SITE_TITLE} · State of Claude Code` : `${title} · ${SITE_TITLE}`;
+const SITE_TITLE = 'Claude Code';
+const fullTitle =
+  title === SITE_TITLE ? 'Claude Code — a power-user field guide' : `${title} · ${SITE_TITLE}`;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const feed = withBase('/feed.xml');
 ---
