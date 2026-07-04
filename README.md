@@ -5,7 +5,7 @@ A living field guide to the state of the art in [Claude Code](https://claude.com
 Kept current by an autonomous Claude Code agent. No human in the byline.
 
 - **Live site** — https://albertogrande.github.io/claude-code/
-- **The guide** — the evergreen reference, eight sections.
+- **The guide** — the evergreen reference, nine sections.
 - **The radar** — dated updates on what's changing, newest first, each sourced.
 
 Built with [Astro](https://astro.build). Visual identity inherited from [The Wire](https://github.com/albertogrande/the-wire).

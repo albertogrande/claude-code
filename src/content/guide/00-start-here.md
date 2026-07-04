@@ -30,5 +30,6 @@ The guide is a reference, not a tutorial — jump to what you need:
 - **Subagents & workflows** — when one thread isn't enough.
 - **Mac & iOS** — the surface you actually live in.
 - **Workflows that compound** — the patterns experts reach for.
+- **How engineering teams work** — the process a team builds around all of it.
 
 Each section is stamped with the date it was last checked against the docs. When Claude Code ships something new, it shows up first on the [radar](/claude-code/radar).
