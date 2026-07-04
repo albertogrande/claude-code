@@ -4,7 +4,7 @@ description: Sweep the official Claude Code sources for what's new, publish a da
 argument-hint: [optional focus, e.g. "models" or "the desktop app"]
 ---
 
-You maintain this site — a living, power-user field guide to Claude Code. Your job in this run: find what has genuinely changed, record it on the radar, and keep the guide accurate. Write files only — the GitHub Action commits and deploys.
+You maintain this site — a living, power-user field guide to Claude Code. The reader is a **heavy daily Claude Code user working almost entirely in the macOS and iOS apps** (not the terminal). They want **practical, testable** things — a concrete habit, setting, or workflow they can put into practice today ("clear your context after…", "switch to Fable when…", "cap workflow spend by…"). Your job this run: find the single most useful development or tip, write it up as **one** actionable radar post, and keep the guide accurate. Write files only — the GitHub Action commits and deploys.
 
 ## 0. Orient
 
@@ -41,7 +41,7 @@ Look for anything since the last radar date worth a power user's attention: new 
 
 ## 2. Publish a radar post
 
-Each post is a shared item **plus your point of view**. Create `src/content/radar/<today>-<slug>.md`. The frontmatter schema is strict (see `src/content.config.ts`) — match it exactly:
+Publish **exactly one post per day — the single most relevant, most practical item** you found (skip the rest; there's always tomorrow). Each post is a shared item **plus your point of view**. Create `src/content/radar/<today>-<slug>.md`. The frontmatter schema is strict (see `src/content.config.ts`) — match it exactly:
 
 ```markdown
 ---
@@ -69,10 +69,10 @@ the sources for you. Use `code` for commands and model IDs; keep it tight.
 Rules:
 
 - `kind` — pick the closest category. Use `note` for editorial / meta pieces.
-- `take` — **always include it.** This is the reason the post exists: give a real opinion, don't just restate the news.
+- `take` — **always include it, and make it actionable.** Tell the reader what to *do* or *try*, framed for the macOS/iOS apps: e.g. "clear context after a second failed correction", "switch to Fable when a task will run 30+ minutes unattended", "cap a workflow at N agents to bound spend". A tip they can test today beats an observation.
 - `sources` — **at least one**, a real resolving URL to the original (tweet, changelog, blog, thread).
 - `related` — link to relevant guide sections and earlier radar posts. `href` is a base-less site path (`/guide/...`, `/radar/...`) or a full external URL. Do NOT hard-code the `/claude-code` base.
-- `date` must equal today. Keep tags from: `models, modes, context, skills, plugins, mcp, hooks, workflow, apps, remote-control, routines, note`. One post per run unless two clearly independent things landed.
+- `date` must equal today. Keep tags from: `models, modes, context, skills, plugins, mcp, hooks, workflow, apps, remote-control, routines, note`. **One post per day — the most relevant only.** If several items are worthy, pick the most practical and leave the rest for another day.
 
 ## 3. Refresh the guide
 
