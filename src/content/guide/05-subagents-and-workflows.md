@@ -1,7 +1,7 @@
 ---
 title: 'Subagents, parallelism & workflows'
 order: 5
-summary: Three tiers of fan-out — isolated subagents, parallel worktrees, and dynamic multi-agent workflows — and when each earns its cost.
+summary: Three tiers of fan-out — background-by-default subagents, parallel worktrees, and dynamic multi-agent workflows — and when each earns its cost.
 updated: 2026-07-04
 ---
 
@@ -9,7 +9,7 @@ When one context window and one thread aren't enough, Claude Code fans out. Thre
 
 ## Subagents — isolated, disposable helpers
 
-A subagent runs a focused task in its own fresh context, with its own model, and reports a summary back. Two killer uses:
+A subagent runs a focused task in its own fresh context, with its own model, and reports a summary back. As of Claude Code 2.1.198, subagents run **in the background by default** — Claude keeps working while they run and is notified when they finish, rather than waiting on the result. Their permission prompts still surface in your main session, naming which subagent is asking. Set a subagent's `background: false` frontmatter, or export `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1`, to force one to run synchronously. Two killer uses:
 
 - **Research without bloat.** "Investigate how token refresh works and whether we have OAuth utilities to reuse" — the subagent reads dozens of files; your main thread only sees the answer.
 - **Fresh-context review.** A reviewer that didn't just write the code isn't biased toward it. It finds what the author's context hides.
