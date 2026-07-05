@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Full-text search over the built site, powered by Pagefind. The index is
+// generated at build time (`pagefind --site dist`); in `astro dev` the assets
+// don't exist yet, so run a full build to try search locally.
+const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+---
+<BaseLayout title="Search" description="Search the guide, the signal feed, and the articles.">
+  <div class="search-wrap">
+    <div class="kicker"><span class="desk">Search</span><span class="kdot" aria-hidden="true">/</span>guide · signals · articles</div>
+    <h1 class="article-title">Search</h1>
+    <div id="search"></div>
+  </div>
+  <link rel="stylesheet" href={`${base}/pagefind/pagefind-ui.css`} />
+  <script is:inline define:vars={{ base }}>
+    (function () {
+      var s = document.createElement('script');
+      s.src = base + '/pagefind/pagefind-ui.js';
+      s.onload = function () {
+        new PagefindUI({ element: '#search', showSubResults: true, showImages: false });
+      };
+      document.head.appendChild(s);
+    })();
+  </script>
+</BaseLayout>

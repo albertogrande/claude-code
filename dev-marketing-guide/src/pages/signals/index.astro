@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase, fmtMed, byDateDesc } from '../../lib/site';
+
+const signals = (await getCollection('signals')).sort(byDateDesc);
+---
+<BaseLayout title="Signals" description="The daily feed: what moved in developer marketing, DevRel, and developer experience — one sourced, opinionated entry at a time.">
+  <div class="kicker"><span class="desk">Signals</span><span class="kdot" aria-hidden="true">/</span>the daily feed</div>
+  <h1 class="article-title">Signals</h1>
+  <p class="dek">
+    What moved in developer marketing, one entry at a time. Every signal is
+    sourced, carries a take, and — when it earns it — gets promoted into an
+    article and folded back into the guide.
+  </p>
+  <ul class="entry-list" style="margin-top: 22px;">
+    {signals.map((s) => (
+      <li>
+        <div class="when">
+          {fmtMed(s.data.date)}
+          <span class="kind" class:list={{ 'is-promoted': s.data.status === 'promoted' }}>
+            {s.data.status === 'promoted' ? 'promoted' : s.data.kind}
+          </span>
+        </div>
+        <p class="etitle"><a href={withBase(`/signals/${s.id}`)}>{s.data.title}</a></p>
+        <p class="esummary">{s.data.summary}</p>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

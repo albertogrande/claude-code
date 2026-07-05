@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from 'astro:content';
+import ReadingLayout from '../../layouts/ReadingLayout.astro';
+import FootMatter from '../../components/FootMatter.astro';
+import { withBase, fmtLong } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const signals = await getCollection('signals');
+  return signals.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+---
+<ReadingLayout title={d.title} description={d.summary} deskLabel="Signals" stamp={fmtLong(d.date)}>
+  <div class="entry-lead" slot="lead">
+    <span class="kind">{d.kind}</span>
+    {d.tags.length > 0 && (
+      <ul class="tags">
+        {d.tags.map((t) => (
+          <li><span class="tag">{t}</span></li>
+        ))}
+      </ul>
+    )}
+  </div>
+
+  {d.status === 'promoted' && d.promotedTo && (
+    <p class="promoted-note">
+      ↗ This signal grew into an article:
+      <a href={withBase(d.promotedTo)}>read the full piece</a>.
+    </p>
+  )}
+
+  <Content />
+
+  <div class="note-box take">
+    <p class="note-k">The take</p>
+    <p>{d.take}</p>
+  </div>
+
+  <Fragment slot="foot">
+    <FootMatter related={d.related} sources={d.sources} />
+    <nav class="section-nav">
+      <a href={withBase('/signals')}>← all signals</a>
+      <span class="spacer"></span>
+      <a href={withBase('/guide')}>the guide →</a>
+    </nav>
+  </Fragment>
+</ReadingLayout>

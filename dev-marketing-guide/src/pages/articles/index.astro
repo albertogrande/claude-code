@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase, fmtMed, byDateDesc } from '../../lib/site';
+
+const articles = (await getCollection('articles')).sort(byDateDesc);
+---
+<BaseLayout title="Articles" description="Deep dives promoted from the signal feed — long-form, sourced pieces on how developer marketing actually works.">
+  <div class="kicker"><span class="desk">Articles</span><span class="kdot" aria-hidden="true">/</span>deep dives</div>
+  <h1 class="article-title">Articles</h1>
+  <p class="dek">
+    Long-form pieces, published only when a signal earns one. Fewer, better,
+    fully sourced.
+  </p>
+  <ul class="entry-list" style="margin-top: 22px;">
+    {articles.map((a) => (
+      <li>
+        <div class="when">{fmtMed(a.data.date)}</div>
+        <p class="etitle"><a href={withBase(`/articles/${a.id}`)}>{a.data.title}</a></p>
+        <p class="esummary">{a.data.summary}</p>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_NAME, SITE_TAGLINE, withBase, fmtMed, byDateDesc, byOrder } from '../lib/site';
+
+const signals = (await getCollection('signals')).sort(byDateDesc).slice(0, 6);
+const articles = (await getCollection('articles')).sort(byDateDesc).slice(0, 4);
+const guide = (await getCollection('guide')).sort(byOrder);
+---
+<BaseLayout title={SITE_NAME} description={SITE_TAGLINE} home>
+  <div class="hero">
+    <div class="kicker"><span class="desk">dev/market</span><span class="kdot" aria-hidden="true">/</span>a living guide</div>
+    <h1>The state of the art in developer marketing.</h1>
+    <p class="dek">
+      A canonical guide that stays current, a daily signal feed, and the
+      occasional deep dive — for people marketing DevTools to developers.
+    </p>
+  </div>
+
+  <div class="front-grid">
+    <div class="front-col">
+      <h2><a href={withBase('/signals')}>Latest signals</a></h2>
+      <ul class="entry-list">
+        {signals.map((s) => (
+          <li>
+            <div class="when">
+              {fmtMed(s.data.date)}
+              <span class="kind" class:list={{ 'is-promoted': s.data.status === 'promoted' }}>{s.data.kind}</span>
+            </div>
+            <p class="etitle"><a href={withBase(`/signals/${s.id}`)}>{s.data.title}</a></p>
+            <p class="esummary">{s.data.summary}</p>
+          </li>
+        ))}
+      </ul>
+
+      {articles.length > 0 && (
+        <Fragment>
+          <h2><a href={withBase('/articles')}>Articles</a></h2>
+          <ul class="entry-list">
+            {articles.map((a) => (
+              <li>
+                <div class="when">{fmtMed(a.data.date)}</div>
+                <p class="etitle"><a href={withBase(`/articles/${a.id}`)}>{a.data.title}</a></p>
+                <p class="esummary">{a.data.summary}</p>
+              </li>
+            ))}
+          </ul>
+        </Fragment>
+      )}
+    </div>
+
+    <div class="front-col">
+      <h2><a href={withBase('/guide')}>The guide</a></h2>
+      <ol class="toc">
+        {guide.map((g) => (
+          <li>
+            <span class="n">{String(g.data.order).padStart(2, '0')}</span>
+            <span class="t">
+              <a href={withBase(`/guide/${g.id}`)}>{g.data.title}</a>
+              <span class="s">{g.data.summary}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,63 @@
+name: Article
+
+# Weekly articles desk. Claude Code runs the promote-article skill: it reviews
+# the week's signals and queue, and publishes a deep dive only if something
+# clears the promotion bar. "Nothing this week" is a normal, successful run.
+#
+# NOTE: inert while staged as a subdirectory; activates when the project is
+# extracted into its own repository. Requires CLAUDE_CODE_OAUTH_TOKEN.
+
+on:
+  schedule:
+    # Thursdays at 05:00 UTC — late enough in the week to have a real
+    # candidate pool, early enough to land before the weekend reading slot.
+    - cron: "0 5 * * 4"
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "Optional topic or signal slug to evaluate for promotion"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  article:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run the articles desk
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: >
+            Run the promote-article skill (.claude/skills/promote-article/SKILL.md).
+            ${{ github.event.inputs.topic && format('Evaluate this first: {0}.', github.event.inputs.topic) || '' }}
+            Review the week's signals and editorial/queue/, and publish an
+            article under src/content/articles/ only if a candidate passes
+            the promotion tests. Close the loop: back-link the promoted
+            signal, refresh touched guide sections, update editorial memory.
+            Write files only — do not commit or push.
+          show_full_output: true
+          claude_args: >-
+            --model claude-fable-5
+            --max-turns 60
+            --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Grep,Bash(date *),Bash(ls *)"
+
+      - name: Commit changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add src/content/ editorial/
+          if git diff --cached --quiet; then
+            echo "Nothing cleared the bar this week."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Article: weekly desk $(date -u +%Y-%m-%d)"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"

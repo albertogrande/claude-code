@@ -1,0 +1,52 @@
+---
+import { getCollection, render } from 'astro:content';
+import ReadingLayout from '../../layouts/ReadingLayout.astro';
+import FootMatter from '../../components/FootMatter.astro';
+import { withBase, fmtLong, fmtMed, byOrder } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const guide = await getCollection('guide');
+  return guide.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+
+const all = (await getCollection('guide')).sort(byOrder);
+const idx = all.findIndex((e) => e.id === entry.id);
+const prev = idx > 0 ? all[idx - 1] : undefined;
+const next = idx < all.length - 1 ? all[idx + 1] : undefined;
+---
+<ReadingLayout
+  title={d.title}
+  description={d.summary}
+  deskLabel="Guide"
+  stamp={`Section ${String(d.order).padStart(2, '0')} · updated ${fmtLong(d.updated)}`}
+>
+  <Content />
+
+  <Fragment slot="foot">
+    <FootMatter sources={d.sources} />
+    {d.changelog.length > 0 && (
+      <div class="changelog">
+        <p class="sources-h">Section changelog</p>
+        <table>
+          <tbody>
+            {d.changelog.map((c) => (
+              <tr>
+                <td class="cdate">{fmtMed(c.date)}</td>
+                <td class="cnote">{c.note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+    <nav class="section-nav">
+      {prev ? <a href={withBase(`/guide/${prev.id}`)}>← {prev.data.title}</a> : <a href={withBase('/guide')}>← contents</a>}
+      <span class="spacer"></span>
+      {next ? <a href={withBase(`/guide/${next.id}`)}>{next.data.title} →</a> : <a href={withBase('/guide')}>contents →</a>}
+    </nav>
+  </Fragment>
+</ReadingLayout>

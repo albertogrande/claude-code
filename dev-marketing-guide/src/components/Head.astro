@@ -1,0 +1,31 @@
+---
+import { SITE_NAME, SITE_TAGLINE, withBase } from '../lib/site';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = SITE_TAGLINE } = Astro.props;
+const fullTitle = title === SITE_NAME ? title : `${title} · ${SITE_NAME}`;
+---
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href={`data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">📡</text></svg>')}`} />
+  <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href={withBase('/feed.xml')} />
+  <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
+  <script is:inline>
+    // Set theme before first paint to avoid a flash. Persisted by the toggle.
+    (function () {
+      var t;
+      try { t = localStorage.getItem('dm-theme'); } catch (e) {}
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>

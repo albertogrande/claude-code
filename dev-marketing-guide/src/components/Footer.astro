@@ -1,0 +1,13 @@
+---
+import { withBase } from '../lib/site';
+---
+<footer class="footer">
+  <div class="footer-bar">
+    <span>dev/market — a living guide, maintained by an autonomous editorial system.</span>
+    <span>
+      <a href={withBase('/feed.xml')}>rss</a>
+      <span aria-hidden="true"> · </span>
+      <a href={withBase('/about')}>how this site works</a>
+    </span>
+  </div>
+</footer>

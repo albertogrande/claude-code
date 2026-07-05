@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase, fmtMed, byOrder } from '../../lib/site';
+
+const guide = (await getCollection('guide')).sort(byOrder);
+---
+<BaseLayout title="The guide" description="The canonical reference on the state of the art of developer marketing — kept current as the field moves.">
+  <div class="kicker"><span class="desk">Guide</span><span class="kdot" aria-hidden="true">/</span>canonical reference</div>
+  <h1 class="article-title">The developer marketing guide</h1>
+  <p class="dek">
+    The evergreen reference. Signals and articles feed back into these
+    sections, and every section shows when — and why — it last changed.
+  </p>
+  <ol class="toc" style="margin-top: 30px;">
+    {guide.map((g) => (
+      <li>
+        <span class="n">{String(g.data.order).padStart(2, '0')}</span>
+        <span class="t">
+          <a href={withBase(`/guide/${g.id}`)}>{g.data.title}</a>
+          <span class="s">{g.data.summary}</span>
+        </span>
+        <span class="u">upd {fmtMed(g.data.updated)}</span>
+      </li>
+    ))}
+  </ol>
+</BaseLayout>

@@ -1,0 +1,32 @@
+---
+import { withBase } from '../lib/site';
+
+// Masthead + primary nav. `aria-current` is derived from the first path
+// segment after the base, so section index and detail pages both highlight.
+const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+const path = Astro.url.pathname.replace(base, '').replace(/\/$/, '') || '/';
+const section = '/' + (path.split('/')[1] ?? '');
+
+const links = [
+  { href: '/guide', label: 'guide' },
+  { href: '/signals', label: 'signals' },
+  { href: '/articles', label: 'articles' },
+  { href: '/search', label: 'search' },
+  { href: '/about', label: 'about' },
+];
+---
+<header class="masthead">
+  <div class="masthead-bar">
+    <a class="nameplate" href={withBase('/')}>dev<span class="slash">/</span>market</a>
+    <nav class="nav" aria-label="Primary">
+      {links.map((l) => (
+        <a
+          class="nav-link"
+          href={withBase(l.href)}
+          aria-current={section === l.href ? 'page' : undefined}
+        >{l.label}</a>
+      ))}
+      <button id="theme-toggle" class="toggle" type="button" aria-pressed="false" title="Toggle dark mode">◐</button>
+    </nav>
+  </div>
+</header>

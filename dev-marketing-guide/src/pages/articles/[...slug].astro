@@ -1,0 +1,49 @@
+---
+import { getCollection, render } from 'astro:content';
+import ReadingLayout from '../../layouts/ReadingLayout.astro';
+import FootMatter from '../../components/FootMatter.astro';
+import { withBase, fmtLong } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles');
+  return articles.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const stamp = d.updated
+  ? `${fmtLong(d.date)} · revised ${fmtLong(d.updated)}`
+  : fmtLong(d.date);
+---
+<ReadingLayout title={d.title} description={d.summary} deskLabel="Articles" stamp={stamp}>
+  <Fragment slot="lead">
+    {d.dek && <p class="dek">{d.dek}</p>}
+    {d.tags.length > 0 && (
+      <div class="entry-lead">
+        <ul class="tags">
+          {d.tags.map((t) => (
+            <li><span class="tag">{t}</span></li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </Fragment>
+
+  <Content />
+
+  <Fragment slot="foot">
+    {d.fromSignal && (
+      <p class="promoted-note">
+        ↖ Promoted from the feed:
+        <a href={withBase(d.fromSignal)}>the original signal</a>.
+      </p>
+    )}
+    <FootMatter related={d.related} sources={d.sources} />
+    <nav class="section-nav">
+      <a href={withBase('/articles')}>← all articles</a>
+      <span class="spacer"></span>
+      <a href={withBase('/guide')}>the guide →</a>
+    </nav>
+  </Fragment>
+</ReadingLayout>

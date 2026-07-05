@@ -1,0 +1,69 @@
+name: Signal
+
+# Autonomous daily desk. Claude Code runs the daily-signal skill: it sweeps
+# the developer-marketing sources, publishes at most one signal, and keeps
+# the guide honest. Commits with the workflow token; Deploy publishes via
+# its workflow_run trigger.
+#
+# NOTE: these workflows assume this project is the repository root. They are
+# inert while the project is staged as a subdirectory of another repo, and
+# activate when it is extracted into its own repository.
+#
+# Requires repo secret CLAUDE_CODE_OAUTH_TOKEN (from `claude setup-token` on
+# a Claude Max/Pro login). Without it, the run no-ops with an error in the log.
+
+on:
+  schedule:
+    # Daily at 04:30 UTC — off-peak, and before the reader's morning coffee
+    # in Madrid.
+    - cron: "30 4 * * *"
+  workflow_dispatch:
+    inputs:
+      focus:
+        description: "Optional focus for this sweep (e.g. 'launches')"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  signal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run the daily desk
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: >
+            Run the daily-signal skill (.claude/skills/daily-signal/SKILL.md).
+            ${{ github.event.inputs.focus && format('Focus this sweep on: {0}.', github.event.inputs.focus) || '' }}
+            Scout the sources, publish at most one signal under
+            src/content/signals/ if anything clears the bar, record the catch
+            in editorial/queue/, and refresh any guide section the signal
+            touches. Write files only — do not commit or push.
+          show_full_output: true
+          claude_args: >-
+            --model claude-sonnet-5
+            --max-turns 50
+            --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Grep,Bash(date *),Bash(ls *)"
+
+      - name: Commit changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add src/content/ editorial/
+          if git diff --cached --quiet; then
+            echo "No changes this sweep."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Signal: sweep $(date -u +%Y-%m-%d)"
+          # claude-code-action revokes its app token when its step ends, so
+          # push with the workflow token.
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"

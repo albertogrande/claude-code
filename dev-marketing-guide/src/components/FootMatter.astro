@@ -1,0 +1,36 @@
+---
+import { withBase } from '../lib/site';
+
+// Shared foot matter for detail pages: cross-links then sources.
+// Sources render as "check it yourself" links — the site's standing promise
+// that every published claim traces to a public original.
+interface Props {
+  related?: { label: string; href: string }[];
+  sources?: { label: string; url: string }[];
+}
+const { related = [], sources = [] } = Astro.props;
+---
+{related.length > 0 && (
+  <p class="related">
+    <span class="related-k">Related</span>
+    {related.map((r, i) => (
+      <Fragment>
+        {i > 0 && <span class="sep" aria-hidden="true">·</span>}
+        <a href={r.href.startsWith('http') ? r.href : withBase(r.href)}>{r.label}</a>
+      </Fragment>
+    ))}
+  </p>
+)}
+{sources.length > 0 && (
+  <div class="sources">
+    <p class="sources-h">Source{sources.length > 1 ? 's' : ''} — check it yourself</p>
+    <ol>
+      {sources.map((s) => (
+        <li>
+          <span class="arrow" aria-hidden="true">→</span>
+          <a href={s.url} rel="noopener">{s.label}</a>
+        </li>
+      ))}
+    </ol>
+  </div>
+)}

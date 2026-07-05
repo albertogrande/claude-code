@@ -1,0 +1,26 @@
+name: CI
+
+# Guards the build. A plain Astro build + Pagefind index on every PR and
+# push; no Claude, no quota. Schema violations in content frontmatter fail
+# the build here (zod validates at build time), so a bad autonomous write
+# can't reach Pages. Inert while staged as a subdirectory (see signal.yml).
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
