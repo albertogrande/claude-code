@@ -127,6 +127,57 @@ de DevRel y developer experience. Recopilados y verificados el 2026-07-05.
   con pinzas.
 - Cargos cambian rápido (Lee ya pasó de Vercel a Cursor). Verificar al publicar.
 
+## 5b. Comparativa de arquitecturas: `the-wire` vs `claude-code`
+
+Ambos son sitios **Astro + SCSS + GitHub Pages** mantenidos por agentes Claude
+Code autónomos. `claude-code` es una **versión simplificada** de `the-wire`;
+`the-wire` es el original y tiene el sistema de señales/memoria más completo.
+
+### `the-wire` (el original, "newsroom" autónoma) — más avanzado
+
+- **Propósito:** publicación autónoma con 9 "beats" editoriales (AI, tech, DevRel,
+  economía, política…). Agentes que investigan, escriben, editan y fact-checkean.
+- **Stack:** Astro + SCSS + TypeScript + **algo de Python** (validadores).
+- **Estructura de carpetas:**
+  - `signals/` — capturas diarias de "inteligencia" en crudo, organizadas por
+    **semana ISO** (ej. `2026-W23`). Es "The Feed".
+  - `reports/` — contenido publicado: semanales (`2026-W23.md`),
+    `reports/deep-dives/`, `reports/quarters/` (retros trimestrales),
+    `reports/MEMORY.md` (threads + ledger de predicciones + Brier), `TASTE.md`
+    (preferencias del lector).
+  - `_data/` — `predictions.yml`, `threads.yml`.
+  - `scripts/` — validadores (`check_predictions.py`, `check_threads.py`).
+  - `.claude/skills/` — un playbook por "desk".
+  - `usage/ledger.csv` — coste de cada run.
+- **Crons (varios, hora de Madrid):**
+  - `daily-scout.yml` — diario 00:00: commitea señales crudas al feed.
+  - `daily-dive.yml` — mar–dom 01:00: columnistas rotatorios / abre issues de deep-dive.
+  - `weekly-news.yml` — lunes 02:00: ensayo semanal + mailbag.
+  - `prediction-watch.yml` — diario: flaggea predicciones que vencen.
+  - `ci.yml` — en cada PR: valida build, links, integridad de datos.
+- **Sistemas diferenciales:** predicciones con **Brier score**, **memoria/threads**
+  persistente para evitar redundancia entre números, y **separación scout→writer**
+  (recolección de señal separada de la redacción).
+
+### `claude-code` (esta field guide) — versión destilada
+
+- Un solo dominio (Claude Code), un solo lector power-user.
+- **Una** skill (`radar-scan`) y **un** cron diario que hace scout + publish + refresh
+  de guía en una sola pasada (no separa scout de writer).
+- Colecciones: `guide/` + `radar/` + `deep-dives/`. Sin predicciones/Brier ni
+  sistema de threads/memoria.
+
+### Implicaciones para el proyecto de developer marketing
+
+- El patrón `the-wire` de **scout diario → feed de señales por semana ISO →
+  escritura** encaja perfecto con "signals diarias + artículos cuando la señal es
+  relevante + guía canónica que compone".
+- Decidir cuánto adoptar de `the-wire` (memoria/threads, predicciones/Brier,
+  separación scout/writer, `usage/ledger.csv`) vs. arrancar del molde más simple de
+  `claude-code`. Recomendación preliminar: partir del esqueleto de `claude-code`
+  (guide + signals + deep-dives) e incorporar de `the-wire` el **scout separado** y
+  el **feed por semana ISO**; dejar predicciones/Brier como opción posterior.
+
 ## 6. Decisiones abiertas / siguientes pasos (aún NO ejecutar)
 
 - [ ] Revisar `albertogrande/the-wire` (crons y estructura de señales avanzada).
