@@ -12,6 +12,10 @@ const recent = radar.slice(1, 6);
 const guide = (await getCollection('guide')).sort(
   (a, b) => a.data.order - b.data.order
 );
+
+const dives = (await getCollection('deep-dives')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
 ---
 <BaseLayout title="Claude Code" home>
   <div class="fm">
@@ -56,6 +60,35 @@ const guide = (await getCollection('guide')).sort(
       </Fragment>
     )}
 
+    {dives.length > 0 && (
+      <Fragment>
+        <div class="fm-sec">
+          <span class="amber">##</span><span class="fm-sec-l">deep dives</span>
+          <span class="fm-rule" aria-hidden="true"></span>
+          <span class="dim">{String(dives.length).padStart(2, '0')}</span>
+        </div>
+        <ul class="fm-list">
+          {dives.slice(0, 4).map((d) => (
+            <li class="fm-row">
+              <span class="fm-ln">{isoDate(d.data.date).slice(5)}</span>
+              <div class="fm-rowmain">
+                <a href={withBase(`/deep-dives/${d.id}`)} class="fm-row-t">{d.data.title}</a>
+                <p class="fm-row-dek">{d.data.summary}</p>
+                {d.data.tags.length > 0 && (
+                  <div class="fm-row-m">
+                    {d.data.tags.slice(0, 3).map((t, i) => (
+                      <Fragment>{i > 0 && <span class="dim">·</span>}<span>{t}</span></Fragment>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+        <a href={withBase('/deep-dives')} class="more">all deep dives →</a>
+      </Fragment>
+    )}
+
     <div class="fm-sec">
       <span class="amber">##</span><span class="fm-sec-l">the guide</span>
       <span class="fm-rule" aria-hidden="true"></span>
@@ -78,6 +111,7 @@ const guide = (await getCollection('guide')).sort(
     <footer class="fm-keys">
       <a href={withBase('/guide')}><b>g</b> guide</a>
       <a href={withBase('/radar')}><b>r</b> radar</a>
+      <a href={withBase('/deep-dives')}><b>d</b> deep dives</a>
       <a href={withBase('/about')}><b>?</b> about</a>
       <a href={withBase('/feed.xml')}><b>≋</b> feed</a>
     </footer>

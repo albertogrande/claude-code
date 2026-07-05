@@ -45,4 +45,27 @@ const guide = defineCollection({
   }),
 });
 
-export const collections = { radar, guide };
+// deepDives/ — long-form, researched articles. One file per piece:
+// YYYY-MM-DD-slug.md. Like radar entries they are dated and sourced, but they
+// are standalone deep dives rather than one-item updates.
+const deepDives = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/deep-dives' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    // Optional revision stamp for when a dive is refreshed after publication.
+    updated: z.coerce.date().optional(),
+    summary: z.string(),
+    // A longer standfirst rendered under the title.
+    dek: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    related: z
+      .array(z.object({ label: z.string(), href: z.string() }))
+      .default([]),
+    sources: z
+      .array(z.object({ label: z.string(), url: z.string().url() }))
+      .default([]),
+  }),
+});
+
+export const collections = { radar, guide, 'deep-dives': deepDives };
