@@ -10,8 +10,8 @@ One line per published piece, newest first: date · surface · slug · one-phras
 topic. This is the anti-redundancy check — don't re-cover a topic without new
 information.
 
-- 2026-07-05 · article · the-lee-robinson-playbook — DX-led marketing, Vercel→Cursor
-- 2026-07-05 · signal · 2026-07-05-markepear-dev-marketing-job-map — Markepear's map of dev-marketing work
+- 2026-07-05 · article · 2026-07-05-ai-changed-the-audience-not-the-rules — AI-era diff of the dev-marketing playbook (Min/Palmer vs Robinson/Frankl/PostHog)
+- 2026-07-05 · signal · 2026-07-05-dev-marketing-age-of-ai — Min × Palmer AI-era playbook update (promoted)
 - 2026-07-05 · guide · 00–02 seeded — start-here, developer audience, positioning
 
 ## Open threads
