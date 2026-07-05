@@ -2,7 +2,7 @@
 title: 'Your Mac & iOS command center'
 order: 6
 summary: The desktop app as a workspace, the phone as a remote, the cloud as an overnight worker — and the one continuous thread that flows across all three.
-updated: 2026-07-04
+updated: 2026-07-05
 ---
 
 Claude Code is no longer terminal-first. The desktop app is a spatial workspace; your phone is a remote control; the cloud runs jobs while you sleep. The feature that ties it together is that **one conversation flows across all three surfaces**.
@@ -15,6 +15,7 @@ The **Code** tab gives you draggable panes — chat, a file-by-file **diff viewe
 - **Diff & review** — click the +/− stats for a full diff; drop inline comments on lines and submit them as a batch; let Claude auto-review its own diff before you look.
 - **Preview + auto-verify** — the preview pane runs your dev server; Claude can screenshot its own UI, click through it, and fix what's off, closing the visual loop without you.
 - **Model & mode at hand** — the picker and permission mode sit by the composer; swap mid-session. A usage ring shows context and plan headroom.
+- **Artifacts** — ask for a page instead of a wall of terminal text ("build a dashboard artifact of last week's deploy failures"); Claude publishes a live, self-contained page to a private claude.ai URL that updates as the session continues, and `Ctrl+]` reopens the latest one. Available on Pro and Max now, not just Team/Enterprise — on those two it's private to you, no sharing control.
 
 ## The three surfaces, and how work moves between them
 
