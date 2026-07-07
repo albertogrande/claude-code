@@ -2,7 +2,7 @@
 title: 'Subagents, parallelism & workflows'
 order: 5
 summary: Three tiers of fan-out — background-by-default subagents, parallel worktrees, and dynamic multi-agent workflows — and when each earns its cost.
-updated: 2026-07-04
+updated: 2026-07-07
 ---
 
 When one context window and one thread aren't enough, Claude Code fans out. Three tiers, escalating in power and cost.
@@ -25,6 +25,8 @@ On desktop, each local session can spin up its own **git worktree**, so two sess
 For genuinely large work — a framework migration, a codebase-wide audit — Claude can write a script that orchestrates **tens to hundreds of subagents**, deterministically fanning out and verifying results before anything reaches you. The control flow lives in the *script's variables*, not the model's memory, which is why it holds together at that scale.
 
 **Opting in.** Workflows are powerful and can burn a lot of tokens, so they're explicit opt-in. Add the keyword `ultracode` to a substantive request, or ask directly: "use a workflow to migrate our test suite from Jest to Vitest across all packages." For anything smaller, a single session or a couple of subagents is the cheaper right answer.
+
+**Bounding the size.** As of 2.1.202, a **Dynamic workflow size** setting in `/config` (`unrestricted`/`small`/`medium`/`large`) tells Claude to aim for a smaller agent count — small means under 5, medium under 15, large under 50 — when it writes the script. It's advice sent to the model, not an enforced ceiling, so a broad enough prompt can still override it; the runtime's hard caps (16 concurrent agents, 1,000 per run) are the only real backstop. Gauge cost on a narrow slice before widening the setting or the prompt.
 
 ## Choosing a tier
 
