@@ -2,7 +2,7 @@
 title: 'Your Mac & iOS command center'
 order: 6
 summary: The desktop app as a workspace, the phone as a remote, the cloud as an overnight worker — and the one continuous thread that flows across all three.
-updated: 2026-07-05
+updated: 2026-07-08
 ---
 
 Claude Code is no longer terminal-first. The desktop app is a spatial workspace; your phone is a remote control; the cloud runs jobs while you sleep. The feature that ties it together is that **one conversation flows across all three surfaces**.
@@ -11,7 +11,7 @@ Claude Code is no longer terminal-first. The desktop app is a spatial workspace;
 
 The **Code** tab gives you draggable panes — chat, a file-by-file **diff viewer**, an embedded **preview** browser, a terminal, a plan pane, a tasks pane. Wire a few affordances into muscle memory:
 
-- **Parallel sessions** — spin up several local sessions in the sidebar, each auto-isolated in its own worktree; split-view two side by side. Each carries its own model and permission mode.
+- **Parallel sessions** — spin up several local sessions in the sidebar, each auto-isolated in its own worktree; split-view two side by side. Each carries its own model and permission mode. Opening or switching background sessions used to stall 15–20 seconds on macOS from a false low-memory detection (a 2.1.196 regression); fixed as of 2.1.203.
 - **Diff & review** — click the +/− stats for a full diff; drop inline comments on lines and submit them as a batch; let Claude auto-review its own diff before you look.
 - **Preview + auto-verify** — the preview pane runs your dev server; Claude can screenshot its own UI, click through it, and fix what's off, closing the visual loop without you.
 - **Model & mode at hand** — the picker and permission mode sit by the composer; swap mid-session. A usage ring shows context and plan headroom.

@@ -2,7 +2,7 @@
 title: 'Subagents, parallelism & workflows'
 order: 5
 summary: Three tiers of fan-out — background-by-default subagents, parallel worktrees, and dynamic multi-agent workflows — and when each earns its cost.
-updated: 2026-07-07
+updated: 2026-07-08
 ---
 
 When one context window and one thread aren't enough, Claude Code fans out. Three tiers, escalating in power and cost.
@@ -15,6 +15,8 @@ A subagent runs a focused task in its own fresh context, with its own model, and
 - **Fresh-context review.** A reviewer that didn't just write the code isn't biased toward it. It finds what the author's context hides.
 
 Define custom subagents in `.claude/agents/` with their own tools and model — a read-only `security-reviewer` on Opus, a `test-runner` limited to `Bash(npm test)`.
+
+Check on running subagents from the `claude agents` list freely — as of 2.1.203, navigating back to that view no longer stops a running subagent and re-runs its prompt from scratch (a bug present through 2.1.202). Work in flight now carries over across the switch.
 
 ## Worktrees & background sessions — true parallelism
 
