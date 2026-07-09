@@ -39,7 +39,7 @@ const stamp = `Section ${String(d.order).padStart(2, '0')}`;
     {next ? (
       <a href={withBase(`/guide/${next.id}`)}>{next.data.title} →</a>
     ) : (
-      <a href={withBase('/radar')}>the radar →</a>
+      <a href={withBase('/weekly')}>the week →</a>
     )}
   </nav>
 </ReadingLayout>

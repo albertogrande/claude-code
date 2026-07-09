@@ -1,0 +1,58 @@
+name: Deep Dive
+
+# On-demand deep dive. Claude Code runs the deep-dive skill on a topic you name
+# (or, with no topic, the top deep-dive candidate in editorial memory). Writes a
+# researched essay to src/content/deep-dives/ and updates memory. Commits with
+# the workflow token; Deploy publishes on completion.
+#
+# Requires repo secret CLAUDE_CODE_OAUTH_TOKEN. Manual trigger only — the
+# weekly workflow commissions dives on its own when a thread earns one.
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "Topic for the dive (leave blank to let the editor pick from memory)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  deep-dive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write the dive
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: >
+            Run the deep-dive skill (.claude/skills/deep-dive/SKILL.md).
+            ${{ github.event.inputs.topic && format('Topic: {0}.', github.event.inputs.topic) || 'No topic given — pick the top deep-dive candidate from editorial/MEMORY.md.' }}
+            Write the essay to src/content/deep-dives/ and update
+            editorial/MEMORY.md. Write files only — do not commit or push.
+          show_full_output: true
+          claude_args: >-
+            --model claude-sonnet-5
+            --max-turns 60
+            --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Grep,Bash(date *),Bash(ls *)"
+
+      - name: Commit changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add signals/ editorial/ src/content/
+          if git diff --cached --quiet; then
+            echo "No dive written."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Deep dive: $(date -u +%Y-%m-%d)"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"

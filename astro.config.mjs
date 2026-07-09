@@ -5,7 +5,7 @@ import mdx from '@astrojs/mdx';
 
 // A GitHub Pages project site: a power-user field guide to Claude Code.
 // Content is frontmatter-driven (see src/content.config.ts) so the autonomous
-// radar agent can append dated entries reliably.
+// editorial agents (scout, weekly, deep-dive) can write entries reliably.
 export default defineConfig({
   site: 'https://albertogrande.github.io',
   base: '/claude-code',

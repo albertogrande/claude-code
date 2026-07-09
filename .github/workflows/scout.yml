@@ -1,17 +1,18 @@
-name: Radar
+name: Scout
 
-# Autonomous updater. On a schedule, Claude Code runs the radar-scan skill:
-# it sweeps the official docs/changelog, publishes a dated radar entry, and
-# refreshes any guide sections that changed. Commits with the workflow token;
-# the Deploy workflow then publishes via its workflow_run trigger.
+# Daily signals capture. Claude Code runs the daily-scout skill: it sweeps the
+# official docs/changelog/releases and community for what's new, appends dated
+# one-liners to signals/<week>.md, patches the guide when a hard fact changed,
+# and lightly updates editorial memory. Commits with the workflow token; the
+# Deploy workflow then publishes via its workflow_run trigger.
 #
 # Requires repo secret CLAUDE_CODE_OAUTH_TOKEN (from `claude setup-token` on a
 # Claude Max/Pro login). Without it, the run no-ops with an error in the log.
 
 on:
   schedule:
-    # Daily at 05:00 UTC (night in Madrid) — a signal feed, not a weekly digest.
-    # The off-peak slot keeps it from competing with interactive Max usage.
+    # Daily at 05:00 UTC (night in Madrid). Off-peak so it doesn't compete with
+    # interactive Max usage.
     - cron: "0 5 * * *"
   workflow_dispatch:
     inputs:
@@ -25,23 +26,23 @@ permissions:
   id-token: write
 
 jobs:
-  radar:
+  scout:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
-      - name: Sweep for what's new
+      - name: Capture today's signals
         id: claude
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: >
-            Run the radar-scan skill (.claude/skills/radar-scan/SKILL.md).
+            Run the daily-scout skill (.claude/skills/daily-scout/SKILL.md).
             ${{ github.event.inputs.focus && format('Focus this sweep on: {0}.', github.event.inputs.focus) || '' }}
-            Research the latest Claude Code changes from the official docs and
-            changelog, publish a dated radar entry under src/content/radar/ if
-            anything material changed, and refresh any affected guide sections.
+            Sweep the last ~24h of Claude Code sources, append dated one-liners
+            to signals/<week>.md, patch any guide section under src/content/guide/
+            whose facts a change disproved, and update editorial/MEMORY.md lightly.
             Write files only — do not commit or push.
           show_full_output: true
           claude_args: >-
@@ -53,14 +54,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add src/content/
+          git add signals/ editorial/ src/content/
           if git diff --cached --quiet; then
             echo "No changes this sweep."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Radar: sweep $(date -u +%Y-%m-%d)"
+          git commit -m "Scout: signals $(date -u +%Y-%m-%d)"
           # claude-code-action revokes its app token when its step ends, so push
           # with the workflow token.
           git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"

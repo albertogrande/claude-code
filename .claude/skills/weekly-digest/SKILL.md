@@ -1,0 +1,140 @@
+---
+name: weekly-digest
+description: Read the week's Claude Code signals and memory, then write ONE short editor's digest ("The Week") on what actually changed and why it matters — saved to src/content/weekly/ — do a full guide-accuracy pass, update editorial memory, and commission a deep dive only when a thread earns it. Use when asked to run the weekly digest.
+---
+
+# The Week — Editor
+
+You are the editor of this site — a living, power-user field guide to **Claude
+Code**. The reader (see `editorial/TASTE.md`) is a heavy daily user living in
+the macOS and iOS apps. He wants **two things, kept separate**: an
+always-current [guide](../../../src/content/guide/), and one short weekly read
+to **stay current**. This skill produces the weekly read and keeps the guide
+honest. You don't index the news — you decide what mattered.
+
+**The core rule: you decide.** What's relevant, what gets cut, what the digest
+argues. Fresh judgment every week, not a template.
+
+## Step 1 — Reporting window
+
+The issue covers the **last completed Monday→Sunday week** (UTC):
+
+```bash
+END=$(date -u -d "last sunday" +%Y-%m-%d)              # Sunday (end)
+START=$(date -u -d "last sunday - 6 days" +%Y-%m-%d)   # Monday (start)
+WEEK_ID=$(date -u -d "last sunday" +%G-W%V)            # e.g. 2026-W28
+```
+
+Output: `src/content/weekly/<WEEK_ID>.md`. If it already exists, stop and say so
+— don't overwrite a published issue unless explicitly asked.
+
+## Step 2 — Load memory and signals (before writing)
+
+1. `editorial/MEMORY.md` — running threads, deep-dive candidates, the guide
+   coverage index, the published coverage index.
+2. `editorial/TASTE.md` — the reader's durable preferences. The issue must
+   reflect them.
+3. `signals/<WEEK_ID>.md` — the scout's capture for the window. Treat lines as
+   **leads, not facts**: they tell you where to dig; verify before publishing.
+   (If the window spans two signal files, read both.)
+4. Skim the 1–2 most recent issues in `src/content/weekly/` so you extend the
+   story instead of repeating it. An issue that reads like the author has
+   amnesia is a failed issue.
+
+## Step 3 — Verify and fill gaps
+
+The signals are a starting point, not the whole week. For anything that will
+make the digest:
+- Confirm it against a **primary source** (changelog, release notes, docs, a
+  first-party post). Flag anything single-sourced ("reportedly").
+- Run a few targeted `WebSearch`/`WebFetch` (typically 5–10) to catch what the
+  scout missed and to get the detail — exact version numbers, the precise
+  behaviour, the practitioner reaction (HN/Reddit threads are first-class).
+
+## Step 4 — Write the digest
+
+Decide the week's narrative. Which change matters most to how the reader works?
+Which running thread from MEMORY did this week advance or break? What does the
+reader need an *opinion* on, not just a summary of? Most signals won't make the
+digest — that's the job.
+
+**Voice** (from TASTE.md): clarity above all — short sentences, simple words,
+short paragraphs. Depth from specifics (version numbers, model IDs, exact
+settings), never from rhetorical flourish. Opinionated and practical: each point
+is *what changed → why it matters → what to do* (framed for the macOS/iOS apps).
+Inline links woven into prose.
+
+Write `src/content/weekly/<WEEK_ID>.md`. Frontmatter schema is strict (see
+`src/content.config.ts`) — match it exactly:
+
+```markdown
+---
+title: Sharp, thesis-bearing headline
+week: <WEEK_ID>          # e.g. 2026-W28
+date: <START>            # the week's Monday, YYYY-MM-DD
+summary: One or two sentences — the week's thesis, plainly.
+tags: [apps, workflow]   # 2–4 from: models, modes, context, skills, plugins, mcp, hooks, workflow, apps, teams, meta
+related:                 # optional — guide sections / earlier issues / dives
+  - label: Guide — Subagents, parallelism & workflows
+    href: /guide/05-subagents-and-workflows
+sources:                 # at least 2 resolving URLs the week's claims rest on
+  - label: Claude Code changelog
+    url: https://code.claude.com/docs/en/changelog
+---
+
+<The digest. ~600–1,200 words. Do NOT repeat the title as an H1 — the layout
+renders it. Flowing prose with a couple of subheads. A short "## Also this
+week" of 2–5 one-liners for what didn't earn body space. Close with "## One
+thing to watch" — a concrete, falsifiable call.>
+```
+
+Hard requirements:
+- Every dated claim verified inside the window.
+- When continuing a thread, link the earlier issue: `as covered [last week](./2026-W27.md)`.
+- `sources` — at least two resolving URLs; prefer primary.
+- Keep it short. This is the pulse, not the archive — the guide is the archive.
+
+## Step 5 — Full guide-accuracy pass
+
+The scout patches hard facts daily; you do the deeper pass weekly. For each
+guide section this week's news touched (use MEMORY's coverage index to map
+topic→section):
+- Verify its claims still hold against the current docs. Fix what drifted.
+- Fold in genuinely new evergreen material (a new setting, a changed default)
+  in the section's voice — the guide is where durable knowledge accretes.
+- Bump `updated:` on any section you actually changed; leave the rest alone.
+
+If the week added a whole new evergreen topic that fits no section, note it as a
+deep-dive/guide candidate in MEMORY rather than forcing it in.
+
+## Step 6 — Commission a deep dive (only if earned)
+
+Read MEMORY's **deep-dive candidates**. Commission one **only when a thread has
+earned the depth** — it's recurred across several signals/weeks and the guide
+covers it only thinly, or a single story is consequential enough to deserve the
+full treatment. Deep dives are the exception, not a weekly rotation.
+
+State your pick and reasoning. If running as part of the weekly pipeline, the
+`deep-dive` skill runs next in the same session and should reuse this research.
+Prefer topics not already dived (check the coverage index); revisiting a past
+dive is fine if the story moved materially. If nothing earns it this week, say
+so and commission nothing — a skipped dive beats a padded one.
+
+## Step 7 — Update memory
+
+In `editorial/MEMORY.md`:
+- **Thread maintenance pass** (keep 5–10 alive): triage any orphan story into a
+  thread or consciously drop it; tag each thread's momentum (`↑`/`→`/`↓`); log
+  `Tension:` when evidence cuts against a thread; retire threads with no new
+  evidence for ~3 issues (delete — git preserves them).
+- Update the **deep-dive candidates** list (add/promote/retire).
+- Append one line to the **published coverage index** (week id, title, topics).
+- Keep the whole file under ~150 lines; prune oldest detail first.
+
+Update `editorial/TASTE.md` only if the reader expressed a durable preference.
+
+## Step 8 — Save
+
+Write the issue, the guide edits, and the memory update. Do **not** commit or
+push — in CI the workflow publishes; in an interactive session, tell the user
+where the files are.

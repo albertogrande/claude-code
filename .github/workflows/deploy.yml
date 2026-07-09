@@ -1,14 +1,14 @@
 name: Deploy
 
 # Builds the Astro site and publishes it to GitHub Pages. Runs on push to main,
-# after the Radar workflow finishes (its bot commit does NOT trigger `push`, so
-# the workflow_run trigger is what publishes scheduled updates), and on demand.
-# Pages must be set to "GitHub Actions" as its source.
+# after an editorial workflow finishes (their bot commits do NOT trigger `push`,
+# so the workflow_run trigger is what publishes scheduled updates), and on
+# demand. Pages must be set to "GitHub Actions" as its source.
 on:
   push:
     branches: [main]
   workflow_run:
-    workflows: ["Radar"]
+    workflows: ["Scout", "Weekly", "Deep Dive"]
     types: [completed]
   workflow_dispatch: {}
 

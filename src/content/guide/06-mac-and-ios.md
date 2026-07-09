@@ -35,4 +35,4 @@ Enable pushes in `/config`. As of 2.1.200, a question Claude asks mid-run (`AskU
 
 ## Reality check
 
-The phone is a remote and a monitor, not a primary dev machine — it can't do local edits the way the Mac can, and Remote Control needs the desktop process alive. Several of these surfaces — computer use, trusted-device biometrics, the agent-monitoring view — are research previews and keep shifting, so treat specifics as a moving target and check the in-app state. The [radar](/claude-code/radar) tracks the changes as they land.
+The phone is a remote and a monitor, not a primary dev machine — it can't do local edits the way the Mac can, and Remote Control needs the desktop process alive. Several of these surfaces — computer use, trusted-device biometrics, the agent-monitoring view — are research previews and keep shifting, so treat specifics as a moving target and check the in-app state. [The week](/claude-code/weekly) tracks the changes as they land.

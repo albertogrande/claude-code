@@ -1,0 +1,61 @@
+name: Weekly
+
+# Weekly digest. Claude Code runs the weekly-digest skill: it reads the week's
+# signals and editorial memory, writes one short "The Week" issue to
+# src/content/weekly/, does a full guide-accuracy pass, updates memory, and — if
+# a thread has earned it — commissions and writes a deep dive in the same
+# session. Commits with the workflow token; Deploy publishes on completion.
+#
+# Requires repo secret CLAUDE_CODE_OAUTH_TOKEN.
+
+on:
+  schedule:
+    # Monday 07:00 UTC — after the week (Mon–Sun) has closed and after the
+    # Monday scout run, so the digest sees a complete signals file.
+    - cron: "0 7 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  weekly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write the week
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: >
+            Run the weekly-digest skill (.claude/skills/weekly-digest/SKILL.md)
+            for the last completed Monday–Sunday week. Write the issue to
+            src/content/weekly/<WEEK_ID>.md, do the full guide-accuracy pass, and
+            update editorial/MEMORY.md. If — and only if — the weekly step
+            commissions a deep dive, then run the deep-dive skill
+            (.claude/skills/deep-dive/SKILL.md) in this same session on that
+            commissioned topic, reusing the research. Write files only — do not
+            commit or push.
+          show_full_output: true
+          claude_args: >-
+            --model claude-sonnet-5
+            --max-turns 60
+            --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Grep,Bash(date *),Bash(ls *)"
+
+      - name: Commit changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add signals/ editorial/ src/content/
+          if git diff --cached --quiet; then
+            echo "No changes this week."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Weekly: digest $(date -u +%G-W%V)"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"

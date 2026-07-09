@@ -54,7 +54,7 @@ Headless mode (`claude -p "…"`) is the seam between Claude Code and your pipel
 - **Issue-to-PR.** The Product Design team files a ticket describing a change and Claude proposes the code — *no one opens Claude Code*. Via GitHub Actions, PR comments (formatting, renames, test refactors) get addressed automatically.
 - **Self-verifying runs.** The Claude Code team sets Claude to run builds, tests, and lints on its own output so it catches its own mistakes before a human looks — the [verification loop](/guide/07-workflows-that-compound) turned into an autonomous cron.
 
-One caution for overnight jobs: since 2.1.200, an unanswered `AskUserQuestion` [no longer auto-continues](/radar/2026-07-04-askuserquestion-stops-guessing) — a stalled question is a safer failure mode than a silent guess. Scope unattended work so any reasonable default is harmless, and gate the merge on a real check, not the agent's say-so.
+One caution for overnight jobs: since 2.1.200, an unanswered `AskUserQuestion` no longer auto-continues — a stalled question is a safer failure mode than a silent guess. Scope unattended work so any reasonable default is harmless, and gate the merge on a real check, not the agent's say-so.
 
 ## Guardrails that actually hold
 

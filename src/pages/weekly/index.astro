@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { withBase, isoDate } from '../../lib/site';
+
+const weekly = (await getCollection('weekly')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+<BaseLayout
+  title="The Week"
+  description="A short weekly digest of what changed in Claude Code — the one read to stay current. Newest first, each week sourced."
+>
+  <div class="page-head">
+    <div class="kicker"><span class="prompt" aria-hidden="true">&gt;</span> weekly</div>
+    <h1 class="page-title">The Week</h1>
+    <p class="dek">
+      One short read a week on what actually changed in Claude Code — and what
+      it means for how you work. The running log lives in the
+      <a href={withBase('/guide')}>guide</a>; this is the pulse.
+    </p>
+  </div>
+
+  {weekly.length > 0 ? (
+    <ul class="ar-list">
+      {weekly.map((w) => (
+        <li class="ar-row">
+          <span class="ar-date">{w.data.week}</span>
+          <div class="ar-main">
+            <div class="ar-head">
+              <span class="kind">the week</span>
+              <a href={withBase(`/weekly/${w.id}`)} class="ar-title">{w.data.title}</a>
+            </div>
+            <span class="ar-meta">{w.data.summary}</span>
+            {w.data.tags.length > 0 && (
+              <ul class="tags" style="margin-top:8px">
+                {w.data.tags.map((t) => (
+                  <li><span class="tag">{t}</span></li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="dek">The first issue is in the works. Check back shortly.</p>
+  )}
+</BaseLayout>

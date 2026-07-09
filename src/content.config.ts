@@ -1,39 +1,21 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-// Two collections, both frontmatter-driven so the radar agent can write them
-// deterministically.
+// Three rendered collections, all frontmatter-driven so the editorial agents
+// can write them deterministically.
 //
-//  radar/  — dated updates. One file per entry: YYYY-MM-DD-slug.md
-//  guide/  — the evergreen reference. One file per section: NN-slug.md
+//  guide/    — the evergreen reference. One file per section: NN-slug.md.
+//              This is the product: kept continuously current.
+//  weekly/   — the weekly digest ("The Week"). One file per ISO week:
+//              YYYY-Www.md. A short "what changed" read to stay current.
+//  deep-dives/ — long-form researched pieces, commissioned when a thread
+//              earns it. One file per piece: YYYY-MM-DD-slug.md.
+//
+// Raw daily capture lives in `signals/` (repo root, internal) and editorial
+// memory in `editorial/` — neither is rendered; they feed the collections
+// above. See .claude/skills/ for the playbooks.
 //
 // The entry id is the filename without extension, which becomes the URL slug.
-
-const radar = defineCollection({
-  loader: glob({ pattern: '*.md', base: './src/content/radar' }),
-  schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
-    // What kind of item this is — drives the category chip.
-    kind: z
-      .enum(['news', 'release', 'workflow', 'discussion', 'tip', 'note'])
-      .default('news'),
-    summary: z.string(),
-    // The editorial point of view — rendered as a "The take" callout.
-    take: z.string().optional(),
-    tags: z.array(z.string()).default([]),
-    // Cross-links to guide sections or other radar posts. `href` is a
-    // base-less site path (e.g. "/guide/01-models-and-effort" or
-    // "/radar/2026-07-04-...") or a full external URL.
-    related: z
-      .array(z.object({ label: z.string(), href: z.string() }))
-      .default([]),
-    // Where to check the original — tweets, changelog entries, blog posts.
-    sources: z
-      .array(z.object({ label: z.string(), url: z.string().url() }))
-      .default([]),
-  }),
-});
 
 const guide = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/guide' }),
@@ -45,9 +27,30 @@ const guide = defineCollection({
   }),
 });
 
-// deepDives/ — long-form, researched articles. One file per piece:
-// YYYY-MM-DD-slug.md. Like radar entries they are dated and sourced, but they
-// are standalone deep dives rather than one-item updates.
+const weekly = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/weekly' }),
+  schema: z.object({
+    title: z.string(),
+    // ISO week id, e.g. "2026-W28" — also the filename/slug.
+    week: z.string(),
+    // Publish date (the week's Monday), drives ordering and the feed.
+    date: z.coerce.date(),
+    summary: z.string(),
+    // Optional revision stamp when a digest is corrected after publication.
+    updated: z.coerce.date().optional(),
+    tags: z.array(z.string()).default([]),
+    // Cross-links to guide sections or deep dives. `href` is a base-less site
+    // path (e.g. "/guide/01-models-and-effort") or a full external URL.
+    related: z
+      .array(z.object({ label: z.string(), href: z.string() }))
+      .default([]),
+    // Where to check the week's claims — changelog entries, blog posts, threads.
+    sources: z
+      .array(z.object({ label: z.string(), url: z.string().url() }))
+      .default([]),
+  }),
+});
+
 const deepDives = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/deep-dives' }),
   schema: z.object({
@@ -68,4 +71,4 @@ const deepDives = defineCollection({
   }),
 });
 
-export const collections = { radar, guide, 'deep-dives': deepDives };
+export const collections = { guide, weekly, 'deep-dives': deepDives };
