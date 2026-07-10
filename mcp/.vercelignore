@@ -1,7 +1,7 @@
 # Vercel only needs the serverless function (api/mcp.js) and what it imports
-# (src/server.js, src/data.js). Exclude the standalone Node entry, tests, and
-# docs so Vercel doesn't treat them as build entrypoints.
-src/index.js
+# (src/server.js, src/data.js). Exclude the standalone Node entry (Docker/local
+# only), the tests, and docs so Vercel builds only the function.
+bin/
 test.mjs
 test-vercel.mjs
 Dockerfile
