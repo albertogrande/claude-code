@@ -38,9 +38,11 @@ it can't run this).
 
 ### Recommended: Vercel (push-to-deploy)
 
-Vercel detects `server.js` as a Node server and runs it (it listens on the
-injected `PORT` and handles routing itself — `POST /mcp`, `GET /` health). Three
-clicks:
+`vercel.json` pins the build explicitly: `api/mcp.js` is deployed as a
+`@vercel/node` serverless function and every path is routed to it (`POST /mcp`,
+`GET /` health). The explicit `builds` config bypasses Vercel's framework /
+Node-server auto-detection entirely — the auto-detected "Node server" build is
+what kept failing (`Tsconfig not found`). Three clicks:
 
 1. Vercel → **Add New… → Project** → import the `albertogrande/claude-code` repo.
 2. Set **Root Directory = `mcp`**. Leave the framework as "Other"; no build

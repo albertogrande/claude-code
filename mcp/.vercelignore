@@ -1,4 +1,7 @@
-# Vercel runs server.js (which imports lib.js). Exclude only dev/docs files.
+# Vercel runs api/mcp.js (which imports lib.js). Exclude dev/docs files and the
+# Docker-only entrypoint.
 test.mjs
 Dockerfile
 README.md
+DEPLOY-STATUS.md
+server.js

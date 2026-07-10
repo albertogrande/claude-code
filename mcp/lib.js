@@ -220,47 +220,52 @@ async function dispatch(req, res, body) {
   await transport.handleRequest(req, res, body);
 }
 
-// Returns a Node http server that answers POST /mcp (MCP) and GET / (health).
-// Used both by the standalone/Vercel entrypoint and by the tests.
-export function createHttpServer() {
-  return createServer(async (req, res) => {
-    cors(res);
-    const path = (req.url || '/').split('?')[0];
+// Handles one request: POST /mcp (MCP), GET / (health). Plain (req, res)
+// signature so it works both as an http.Server listener (server.js, Docker,
+// tests) and as a Vercel serverless function (api/mcp.js).
+export async function handleRequest(req, res) {
+  cors(res);
+  const path = (req.url || '/').split('?')[0];
 
-    if (req.method === 'OPTIONS') {
-      res.statusCode = 204;
-      res.end();
-      return;
-    }
+  if (req.method === 'OPTIONS') {
+    res.statusCode = 204;
+    res.end();
+    return;
+  }
 
-    if (path === '/mcp' && req.method === 'POST') {
-      try {
-        // Vercel may pre-parse JSON into req.body; otherwise read the stream.
-        let body = req.body;
-        if (body === undefined) {
-          const chunks = [];
-          for await (const c of req) chunks.push(c);
-          body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : undefined;
-        } else if (typeof body === 'string') {
-          body = body ? JSON.parse(body) : undefined;
-        }
-        await dispatch(req, res, body);
-      } catch (e) {
-        if (!res.headersSent) {
-          res.writeHead(500, { 'content-type': 'application/json' });
-          res.end(JSON.stringify({ jsonrpc: '2.0', error: { code: -32603, message: String(e?.message || e) }, id: null }));
-        }
+  if (path === '/mcp' && req.method === 'POST') {
+    try {
+      // Vercel may pre-parse JSON into req.body; otherwise read the stream.
+      let body = req.body;
+      if (body === undefined) {
+        const chunks = [];
+        for await (const c of req) chunks.push(c);
+        body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : undefined;
+      } else if (typeof body === 'string') {
+        body = body ? JSON.parse(body) : undefined;
       }
-      return;
+      await dispatch(req, res, body);
+    } catch (e) {
+      if (!res.headersSent) {
+        res.writeHead(500, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ jsonrpc: '2.0', error: { code: -32603, message: String(e?.message || e) }, id: null }));
+      }
     }
+    return;
+  }
 
-    if (path === '/' || path === '/health' || path === '/mcp') {
-      res.setHeader('content-type', 'application/json');
-      res.end(JSON.stringify({ ok: true, service: 'claude-code-guide-mcp', guide: BASE, endpoint: '/mcp' }));
-      return;
-    }
+  if (path === '/' || path === '/health' || path === '/mcp') {
+    res.setHeader('content-type', 'application/json');
+    res.end(JSON.stringify({ ok: true, service: 'claude-code-guide-mcp', guide: BASE, endpoint: '/mcp' }));
+    return;
+  }
 
-    res.writeHead(404, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ error: 'not found' }));
-  });
+  res.writeHead(404, { 'content-type': 'application/json' });
+  res.end(JSON.stringify({ error: 'not found' }));
+}
+
+// Returns a Node http server over handleRequest. Used by the standalone
+// entrypoint (server.js — Docker / any Node host) and by the tests.
+export function createHttpServer() {
+  return createServer(handleRequest);
 }

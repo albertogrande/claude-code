@@ -1,71 +1,59 @@
-# MCP deploy status — handoff note
+# MCP deploy status
 
-**State:** the MCP server works locally and against the live guide; the **Vercel
-deploy is blocked** on a build-time module-resolution error. Picking up in a
-later session.
+**State:** fix applied (2026-07-10, second session) — awaiting a deploy to
+confirm. The MCP server itself was never the problem: `npm test` is 10/10
+locally and the data path works against the live guide.
 
-## What works (verified)
+## The fix
 
-- `npm start` → server listens on `:8787`, `GET /` health OK, `GET /mcp` 200.
-- `npm test` → 10/10 end-to-end (5 tools, search/list/get/whats_new) against a
-  local build of `dist/`.
-- Data path verified against **live production** endpoints
-  (`https://albertogrande.github.io/claude-code/practices.json` etc. are 200).
-- Layers 1 (endpoints) and 3 (`plugin/skills/consult-the-guide`) are done and
-  live. Only the Vercel hosting of Layer 2 is stuck.
+Every failed build shared one tell: Vercel's **auto-detected "Node server"
+build** bundled the entrypoint with a resolver that couldn't resolve *any*
+import (relative or npm) and reported `Tsconfig not found`. Instead of feeding
+that detector yet another layout, the build is now pinned explicitly, which
+**bypasses auto-detection altogether**:
 
-## The Vercel blocker
+- `vercel.json` — explicit `builds`: `api/mcp.js` via `@vercel/node`
+  (serverless function, nft-traced deps, no bundler involved), plus a
+  catch-all `routes` entry so `req.url` keeps the original path.
+- `api/mcp.js` — serverless entrypoint; just re-exports `handleRequest`.
+- `lib.js` — the http listener was extracted into `export handleRequest(req,
+  res)`; `createHttpServer()` wraps it. Same code serves Docker/local and
+  Vercel.
+- `server.js` — unchanged role: standalone entrypoint for Docker / any Node
+  host (Vercel no longer uses it; it's in `.vercelignore`).
+- `tsconfig.json` — minimal JS-friendly config, belt-and-suspenders for the
+  literal "Tsconfig not found" in case any detection still runs.
 
-Every Vercel build fails at **module resolution** with the same tell —
-`Tsconfig not found` — regardless of structure. Error progression:
+## How to verify
 
-1. `main: src/index.js` → `Could not resolve './server.js' / './data.js' in src/index.js`.
-2. Removed `main`, `.vercelignore`'d `src/index.js` → same, still built `src/index.js`.
-3. Moved entry to `bin/serve.js` → error jumped to `src/server.js`: `Could not
-   resolve 'zod' / '@modelcontextprotocol/sdk/server/mcp.js' / './data.js'`.
-4. Consolidated into `api/mcp.js`, deleted `src/` → **`No entrypoint found`**
-   (Vercel wants `server.js`/`index.js`/`main`, NOT the `api/` convention).
-5. Current: `server.js` + `lib.js` → `Could not resolve './lib.js' in server.js`
-   — a **sibling relative import** fails. `Tsconfig not found` again.
+1. Vercel dashboard → the new deployment for this branch/commit should build
+   green (Root Directory must still be `mcp`, framework "Other").
+2. `curl https://<deployment>/` → `{"ok":true,...}` health JSON.
+3. `curl -X POST https://<deployment>/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'`
+   → the 5 tools.
+4. Then merge to `main` for the production URL.
 
-**Diagnosis:** Vercel is treating this as a **Node server** (not `api/`
-serverless functions) and its builder bundles the entrypoint with a resolver
-that can't resolve *any* import — relative or npm — and reports `Tsconfig not
-found`. This is a builder/config problem, not our code (the exact graph runs
-fine under plain `node` and in the tests).
+## If it is STILL red
 
-## Next things to try (in order)
-
-1. **Add a minimal `mcp/tsconfig.json`.** The literal error is "Tsconfig not
-   found" — Vercel's bundler may require one even for JS. Cheapest first shot.
-   Try `{ "compilerOptions": { "module": "NodeNext", "moduleResolution":
-   "NodeNext", "target": "ES2022", "allowJs": true }, "include": ["*.js"] }`.
-2. **Check Vercel Project Settings** (dashboard): Framework Preset should be
-   "Other", Build Command empty, Output Directory empty. A stale preset/build
-   command could be forcing the bundler. Consider deleting and re-importing the
-   project fresh with Root Directory `mcp`.
-3. **Try a `vercel.json`** pinning the build, e.g.
-   `{ "builds": [{ "src": "server.js", "use": "@vercel/node" }] }`, or the
-   functions form. (We removed the earlier rewrite-only vercel.json.)
-4. **Try CommonJS** — drop `"type": "module"`, rename to `.cjs`, use `require`.
-   Vercel's builder may handle CJS resolution more reliably than ESM here.
-5. **Fallback that already works: don't use Vercel.** The `Dockerfile` is tested
-   and builds a working image. Deploy it to **Render / Railway / Fly.io** (or a
-   VPS) for an always-warm Node host — sidesteps Vercel's builder entirely. Given
-   how hard Vercel is fighting, this may be the pragmatic answer.
-
-## Current layout (mcp/)
-
-- `server.js` — entrypoint: listens on `PORT`, imports `lib.js`.
-- `lib.js` — data layer + `buildMcpServer()` + `createHttpServer()`.
-- `test.mjs` — hermetic e2e (serves `../dist`, drives the MCP client).
-- `Dockerfile` — working Node image (the fallback host path).
-- `package.json` — `type: module`, `main: server.js`, deps: SDK + zod.
-- `.vercelignore` — excludes `test.mjs`, `Dockerfile`, `README.md`.
+1. Check Project Settings: Root Directory `mcp`, Framework Preset "Other",
+   Build Command empty. If a stale setting persists, delete + re-import the
+   project.
+2. Fallback that already works: the tested `Dockerfile` on Render / Railway /
+   Fly.io — always-warm Node host, sidesteps Vercel entirely.
 
 ## Once it deploys
 
 - Connect: apps → Settings → Connectors → custom connector → `https://<host>/mcp`
   (or `claude mcp add --scope user --transport http claude-code-guide <url>/mcp`).
 - Install `plugin/skills/consult-the-guide/` into `~/.claude/skills/`.
-- Smoke test: `GET /mcp` health, then a real `search_practices` call.
+- Smoke test: `GET /` health, then a real `search_practices` call.
+
+## History (first session, for reference)
+
+The auto-detection error progression that motivated the pin: `main:
+src/index.js` → could not resolve sibling imports; entry at `bin/serve.js` →
+could not resolve `zod` / the MCP SDK either; `api/mcp.js` alone (no
+`vercel.json`) → `No entrypoint found`; `server.js` + `lib.js` → could not
+resolve `./lib.js`, `Tsconfig not found` every time. Diagnosis: the zero-config
+Node-server builder resolves imports against the wrong root when Root
+Directory is a subfolder — a builder problem, not a code problem.
