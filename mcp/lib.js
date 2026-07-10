@@ -35,10 +35,22 @@ const getWeekly = async () => (await getJson('/weekly.json')).issues || [];
 
 // OR-with-ranking: a practice scores for every term it matches, so a multi-term
 // query still surfaces the closest practices instead of requiring all to hit one.
+// Stopwords and short tokens are dropped first — the 2026-07-10 eval showed they
+// let off-topic queries ("center a div with css") match the whole corpus.
+const STOPWORDS = new Set([
+  'a', 'an', 'the', 'i', 'im', 'my', 'me', 'we', 'our', 'you', 'your', 'it', 'its',
+  'is', 'are', 'was', 'be', 'been', 'do', 'does', 'did', 'to', 'of', 'in', 'on',
+  'at', 'by', 'for', 'with', 'and', 'or', 'not', 'no', 'this', 'that', 'these',
+  'those', 'as', 'so', 'if', 'then', 'than', 'too', 'can', 'could', 'should',
+  'would', 'will', 'just', 'about', 'how', 'what', 'which', 'when', 'where',
+  'why', 'who', 'use', 'using', 'after', 'before',
+]);
+
 function scorePractice(p, query) {
   const q = query.toLowerCase().trim();
   if (!q) return 1;
-  const terms = q.split(/\s+/).filter(Boolean);
+  const terms = q.split(/\s+/).filter((t) => t.length >= 3 && !STOPWORDS.has(t));
+  if (!terms.length) return 0;
   const fields = [
     [p.title, 5],
     [p.tags?.join(' '), 4],
@@ -96,11 +108,14 @@ export function buildMcpServer() {
           const want = tags.map((t) => t.toLowerCase());
           practices = practices.filter((p) => (p.tags || []).some((t) => want.includes(t.toLowerCase())));
         }
+        // Score ≥ 2 = at least a title/tags/when/do/why match; a lone section-name
+        // hit (weight 1) is noise. Top 5 keeps a noisy query from dumping the
+        // whole corpus into the caller's context.
         const ranked = practices
           .map((p) => ({ p, s: scorePractice(p, query) }))
-          .filter((x) => x.s > 0)
+          .filter((x) => x.s >= 2)
           .sort((a, b) => b.s - a.s)
-          .slice(0, 8)
+          .slice(0, 5)
           .map((x) => x.p);
         if (!ranked.length) return text(`No practices matched "${query}"${tags?.length ? ` with tags ${tags.join(', ')}` : ''}. Try list_practices to see everything.`);
         return text(ranked.map(formatPractice).join('\n\n'));

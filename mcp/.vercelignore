@@ -4,4 +4,6 @@ test.mjs
 Dockerfile
 README.md
 DEPLOY-STATUS.md
+EVALS.md
+eval/
 server.js

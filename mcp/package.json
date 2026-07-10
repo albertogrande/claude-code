@@ -7,7 +7,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node test.mjs"
+    "test": "node test.mjs",
+    "eval": "node eval/run-evals.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",

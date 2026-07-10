@@ -1,0 +1,29 @@
+{
+  "comment": "Retrieval eval set for the guide MCP. Categories: direct (phrasing near the practice), paraphrase (same intent, different words — how a session actually asks), spanish (user's native language — documents the language gap), offtopic (must NOT return confident noise). expected = practice id, null for offtopic.",
+  "queries": [
+    { "id": "q01", "category": "direct", "query": "long unattended run model", "expected": "switch-to-fable-for-long-unattended-runs" },
+    { "id": "q02", "category": "paraphrase", "query": "which model for an overnight migration", "expected": "switch-to-fable-for-long-unattended-runs" },
+    { "id": "q03", "category": "direct", "query": "overnight job AskUserQuestion idle timeout", "expected": "keep-askuserquestion-non-auto-continue-overnight" },
+    { "id": "q04", "category": "paraphrase", "query": "unattended run stalls waiting for a question", "expected": "keep-askuserquestion-non-auto-continue-overnight" },
+    { "id": "q05", "category": "direct", "query": "permission mode for unattended run", "expected": "use-auto-mode-for-unattended-runs" },
+    { "id": "q06", "category": "paraphrase", "query": "should I use bypass permissions", "expected": "use-auto-mode-for-unattended-runs" },
+    { "id": "q07", "category": "direct", "query": "clear context after failed correction", "expected": "clear-context-after-a-second-failed-correction" },
+    { "id": "q08", "category": "paraphrase", "query": "stuck in a loop correcting the same bug", "expected": "clear-context-after-a-second-failed-correction" },
+    { "id": "q09", "category": "direct", "query": "bound workflow spend", "expected": "cap-dynamic-workflow-size-before-ultracode" },
+    { "id": "q10", "category": "paraphrase", "query": "ultracode too many agents cost", "expected": "cap-dynamic-workflow-size-before-ultracode" },
+    { "id": "q11", "category": "direct", "query": "delegate routine coding subagent", "expected": "delegate-routine-coding-to-a-subagent" },
+    { "id": "q12", "category": "paraphrase", "query": "save tokens on mechanical boilerplate edits", "expected": "delegate-routine-coding-to-a-subagent" },
+    { "id": "q13", "category": "direct", "query": "artifacts instead of pasting long output", "expected": "use-artifacts-instead-of-pasting-long-output" },
+    { "id": "q14", "category": "paraphrase", "query": "share a long PR walkthrough in slack", "expected": "use-artifacts-instead-of-pasting-long-output" },
+    { "id": "q15", "category": "direct", "query": "review the diff with fresh context", "expected": "split-the-writer-from-the-reviewer" },
+    { "id": "q16", "category": "paraphrase", "query": "grade the feature the session just built", "expected": "split-the-writer-from-the-reviewer" },
+    { "id": "q17", "category": "spanish", "query": "qué modelo para una tarea larga desatendida", "expected": "switch-to-fable-for-long-unattended-runs" },
+    { "id": "q18", "category": "spanish", "query": "modo de permisos para ejecución desatendida", "expected": "use-auto-mode-for-unattended-runs" },
+    { "id": "q19", "category": "spanish", "query": "revisar el código con un contexto limpio", "expected": "split-the-writer-from-the-reviewer" },
+    { "id": "q20", "category": "offtopic", "query": "fix TypeError cannot read property of undefined", "expected": null },
+    { "id": "q21", "category": "offtopic", "query": "center a div with css", "expected": null },
+    { "id": "q22", "category": "offtopic", "query": "python pandas groupby aggregate", "expected": null },
+    { "id": "q23", "category": "offtopic", "query": "kubernetes ingress returns 502", "expected": null },
+    { "id": "q24", "category": "offtopic", "query": "write a regex for email validation", "expected": null }
+  ]
+}
