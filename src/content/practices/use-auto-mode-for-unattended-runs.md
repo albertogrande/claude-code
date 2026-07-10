@@ -7,6 +7,7 @@ section: 02-permission-modes
 tags: [modes, workflow]
 since: "2.1.205"
 verify: Docs — permission modes; 2.1.205 changelog entries on auto-mode hardening (transcript-tamper block, rm -rf confirmation).
+probe: { status: diverge, date: 2026-07-10 }
 updated: 2026-07-10
 sources:
   - label: Guide — Permission modes

@@ -5,6 +5,7 @@ do: Switch the session to Fable before you kick it off.
 why: Fable is Opus-class reasoning with faster output, so a long autonomous run finishes sooner without dropping quality. Keep Opus/Sonnet for short interactive work where latency matters less than the marginal reasoning.
 section: 01-models-and-effort
 tags: [models, workflow, apps]
+probe: { status: diverge, date: 2026-07-10 }
 updated: 2026-07-09
 sources:
   - label: Guide — Models & effort

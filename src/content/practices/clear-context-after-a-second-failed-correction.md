@@ -5,6 +5,7 @@ do: Clear or compact the context and restate the problem fresh, rather than addi
 why: A context full of failed attempts biases the next attempt toward the same wrong path. A clean slate with a crisp restatement beats piling on.
 section: 03-context-and-memory
 tags: [context, workflow]
+probe: { status: agree, date: 2026-07-10 }
 updated: 2026-07-09
 sources:
   - label: Guide — Context & memory

@@ -5,6 +5,7 @@ do: Tell Claude to run the routine coding in a subagent on an appropriate lower-
 why: You get more throughput while the lead model's allowance drains slower — the expensive model only spends on decisions, not typing.
 section: 05-subagents-and-workflows
 tags: [models, workflow]
+probe: { status: agree, date: 2026-07-10 }
 updated: 2026-07-09
 sources:
   - label: Simon Willison — Fable's judgement

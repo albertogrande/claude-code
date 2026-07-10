@@ -5,6 +5,7 @@ do: Run /code-review, or spin a fresh subagent that sees only the diff, to grade
 why: A fresh context isn't biased toward code it just wrote, so it catches what the author missed. It's the cheapest way to raise the floor on autonomous output.
 section: 07-workflows-that-compound
 tags: [workflow, teams]
+probe: { status: agree, date: 2026-07-10 }
 updated: 2026-07-09
 sources:
   - label: Guide — Workflows that compound

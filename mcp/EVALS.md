@@ -36,6 +36,12 @@ post-cutoff** it missed or hedged on. Two caveats: the probes ran on Fable
 (the strongest model — Sonnet/Haiku sessions will diverge *more*, so this is a
 lower bound on value), and 8 scenarios is a small n (grow it with the corpus).
 
+*Bookkeeping (2026-07-10 QA pass):* these verdicts are now stamped as
+`probe:` frontmatter on the 8 practices, and the question bank in
+`eval/marginal-probes.md` covers all 11 current practices — the three added
+2026-07-10 (`run-doctor…`, `set-per-server-mcp-timeouts`, `trim-claude-md…`)
+get their first verdicts next quarter.
+
 **Editorial consequence for the guide itself:** new practices should
 prioritize versioned product facts (changed defaults, new settings, current
 lineup) over timeless advice — that's the only class where the MCP beats the

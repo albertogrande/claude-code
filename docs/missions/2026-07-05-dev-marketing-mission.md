@@ -1,3 +1,9 @@
+> **Archived 2026-07-10.** This is the one-shot mission brief that commissioned the
+> `dev-marketing-guide` build (delivered on branch `claude/dev-marketing-fable-build`).
+> Its §3 description of this repo predates the scout/weekly/deep-dive refactor —
+> `radar-scan`, the `radar/` collection, and `radar.yml` no longer exist. Kept for
+> the record; do not execute it against today's repo layout.
+
 # FABLE 5 MISSION — Build the "State of the Art in Developer Marketing" living guide
 
 > **This file is a self-contained mission brief.** It was written by an Opus 4.8

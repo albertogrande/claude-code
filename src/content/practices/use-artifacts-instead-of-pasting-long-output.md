@@ -5,6 +5,7 @@ do: Ask for an artifact ("make an artifact that walks through this PR with the d
 why: An artifact is a live, reopenable page instead of a wall of text — a second screen that updates while a long task runs, and on Pro/Max it stays private to you.
 section: 06-mac-and-ios
 tags: [apps, workflow]
+probe: { status: partial, date: 2026-07-10 }
 updated: 2026-07-09
 sources:
   - label: Claude Code docs — Artifacts

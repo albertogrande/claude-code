@@ -9,7 +9,8 @@ release.
 
 ## Protocol
 
-1. Fetch the current corpus: `https://albertogrande.github.io/claude-code/practices.json`.
+1. Read the current corpus from `src/content/practices/` in the checkout —
+   not from production, which lags the repo until the next deploy.
 2. For **each practice**, pose its underlying decision question to a **fresh
    subagent with no tools** ("Answer from your own knowledge ONLY. Do NOT use
    any tools…"), phrased neutrally — never leading with the practice's answer.
@@ -21,9 +22,9 @@ release.
 4. Stamp each practice's frontmatter in `src/content/practices/` with the
    verdict — `probe: { status: agree|partial|diverge, date: <today> }` — so
    the corpus itself carries its decay state (the weekly editor retires
-   `agree` practices). Then update `mcp/EVALS.md` (Eval 1 table + date), note
-   decayed practices in `editorial/MEMORY.md`, and commit to `main` per repo
-   convention.
+   `agree` practices). Then update `mcp/EVALS.md` (Eval 1 table + date) and
+   note decayed practices in `editorial/MEMORY.md`. The workflow runs the
+   retrieval regression eval as a gated step after you and commits.
 
 Grading guardrails: quote the bare answer's key claim in the table; when in
 doubt between PARTIAL and AGREE, ask "would the user have made the same
@@ -41,9 +42,15 @@ concrete choice?" — outcome-compatible-by-luck is PARTIAL, not AGREE.
 | `delegate-routine-coding-to-a-subagent` | "My task is a multi-file change that's mostly mechanical boilerplate around a few real design decisions. My session runs an expensive top-tier model. How do I keep the token/allowance spend down without losing quality on the decisions?" |
 | `use-artifacts-instead-of-pasting-long-output` | "Claude Code just produced a long PR walkthrough / investigation writeup. I was going to paste it into Slack. Is there a better way to share or keep it in the Claude apps (⟨date⟩)? Is there a keyboard shortcut to reopen the most recent one?" |
 | `split-the-writer-from-the-reviewer` | "My Claude Code session just finished building a nontrivial feature. What's the best way to review/grade that work before I accept it?" |
+| `run-doctor-when-setup-misbehaves` | "Claude Code is acting oddly after an update — a hook isn't firing and an MCP server is missing (⟨date⟩). What's the first thing I should do to diagnose it? Is there a built-in command, and does it fix anything or only report?" |
+| `set-per-server-mcp-timeouts` | "One of my MCP servers does long-running calls and they die at about 60 seconds in fresh Claude Code sessions (⟨date⟩). Is there a per-server setting to raise that limit, and is it actually honored?" |
+| `trim-claude-md-to-what-claude-cannot-derive` | "My checked-in CLAUDE.md has grown to several screens. What should stay in it and what should go — and is there tooling in Claude Code (⟨date⟩) that flags or proposes those trims?" |
+
+The three 2026-07-10 additions enter the bank unprobed — their first verdicts
+come with the next quarterly run.
 
 ## History
 
 | Date | Model probed | AGREE | PARTIAL | DIVERGE/UNKNOWN | Notes |
 |---|---|---|---|---|---|
-| 2026-07-10 | Fable 5 | 3 | 2 | 3 | Baseline. Value concentrated in versioned facts (Fable lineup, auto mode, 2.1.200 default, workflow-size setting, Ctrl+]). Full table in EVALS.md. |
+| 2026-07-10 | Fable 5 | 3 | 2 | 3 | Baseline over the original 8 practices. Value concentrated in versioned facts (Fable lineup, auto mode, 2.1.200 default, workflow-size setting, Ctrl+]). Full table in EVALS.md. Bookkeeping note: the `probe:` frontmatter stamps for this run were applied late (with the 2026-07-10 QA pass), not by the run itself. |

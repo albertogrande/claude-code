@@ -7,6 +7,7 @@ section: 05-subagents-and-workflows
 tags: [workflow, apps]
 since: "2.1.202"
 verify: /config → Dynamic workflow size shows unrestricted/small/medium/large; /workflows shows the live agent count.
+probe: { status: diverge, date: 2026-07-10 }
 updated: 2026-07-10
 sources:
   - label: Claude Code docs — Dynamic workflows

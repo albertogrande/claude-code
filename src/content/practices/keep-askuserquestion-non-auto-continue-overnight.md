@@ -7,6 +7,7 @@ section: 02-permission-modes
 tags: [modes, apps, workflow]
 since: "2.1.200"
 verify: /config → the AskUserQuestion idle timeout should be off by default.
+probe: { status: partial, date: 2026-07-10 }
 updated: 2026-07-10
 sources:
   - label: Claude Code — Permission modes

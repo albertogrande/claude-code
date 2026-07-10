@@ -41,25 +41,25 @@ src/
   content/
     guide/           # evergreen reference — NN-slug.md, frontmatter: title, order, summary, updated
     weekly/          # weekly digest — YYYY-Www.md, frontmatter: title, week, date, summary, tags, sources
+    practices/       # atomic best-practices — {when, do, why, section, since, verify} — human page at /practices, agents read /practices.json
     deep-dives/      # long-form pieces — YYYY-MM-DD-slug.md, dated + sourced
   content.config.ts  # collection schemas (zod)
   layouts/           # BaseLayout + ReadingLayout
-  components/         # Chrome (nav), Head, Footer, Shortcuts (⌘K palette)
-    practices/       # atomic best-practices — {when, do, why, section} — feed the agent endpoints
-  content.config.ts  # collection schemas (zod)
-  layouts/           # BaseLayout + ReadingLayout
-  components/         # Chrome (nav), Head, Footer, Shortcuts (⌘K palette)
-  pages/             # index, guide/, weekly/, deep-dives/, about, feed.xml.ts
+  components/        # Chrome (nav), Head, Footer, Shortcuts (⌘K palette), TagList, ArticleFoot
+  pages/             # index, guide/, weekly/, deep-dives/, practices/, tags/, about, 404, feed.xml.ts
                      #  + machine endpoints: llms.txt, llms-full.txt, practices.json, guide.json, weekly.json
   styles/main.scss   # design system, inherited from The Wire
-  lib/site.ts        # base-path + date helpers
+  lib/               # site.ts (base-path + dates) + content.ts (shared collection queries)
+scripts/             # build gates: check-refs (internal links), check-contract (endpoints ↔ MCP), check-sources (URL liveness), append-ledger
 signals/             # raw daily capture, one file per ISO week (internal, not rendered)
 editorial/           # MEMORY.md (threads, coverage, dive candidates) + TASTE.md (reader) — internal
-mcp/                 # remote MCP server exposing the guide to your own sessions
+usage/               # ledger.csv — per-run cost/duration, appended by the workflows
+mcp/                 # remote MCP server exposing the guide to your own sessions (+ tests, evals)
 plugin/skills/       # consult-the-guide — tells sessions when to query the MCP
 docs/agent-access.md # design doc for the agent-access model
 .claude/skills/      # daily-scout, weekly-digest, deep-dive — the autonomous desks
-.github/workflows/   # scout (daily), weekly (Mondays), deep-dive (on demand), deploy (Pages), ci (build check)
+.github/workflows/   # scout (daily), weekly (Mondays), deep-dive (dispatched), probes (quarterly), deploy (Pages), ci
+.github/actions/     # commit-and-push (rebase-safe), notify-failure (pipeline-failure issues)
 ```
 
 ## Running it yourself
