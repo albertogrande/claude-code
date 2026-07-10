@@ -1,8 +1,9 @@
 # MCP deploy status
 
-**State:** fix applied (2026-07-10, second session) — awaiting a deploy to
-confirm. The MCP server itself was never the problem: `npm test` is 10/10
-locally and the data path works against the live guide.
+**State:** FIXED — confirmed working on a Vercel preview deploy (2026-07-10).
+Pending only: merge to `main` so Vercel promotes it to production (production
+deploys only build from `main`). The MCP server itself was never the problem:
+`npm test` is 10/10 locally and the data path works against the live guide.
 
 ## The fix
 
