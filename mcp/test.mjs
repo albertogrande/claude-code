@@ -52,7 +52,7 @@ const main = async () => {
   check('practices.json served', pj.count > 0, `count=${pj.count}`);
 
   // 2. MCP server (import AFTER env is set)
-  const { createHttpServer } = await import('./src/server.js');
+  const { createHttpServer } = await import('./api/mcp.js');
   const mcp = createHttpServer();
   const mcpPort = await listen(mcp);
 
