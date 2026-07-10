@@ -1,9 +1,9 @@
 # MCP deploy status
 
-**State:** FIXED — confirmed working on a Vercel preview deploy (2026-07-10).
-Pending only: merge to `main` so Vercel promotes it to production (production
-deploys only build from `main`). The MCP server itself was never the problem:
-`npm test` is 10/10 locally and the data path works against the live guide.
+**State:** LIVE IN PRODUCTION (2026-07-10) — `https://claude-code-mcp.vercel.app/mcp`.
+Verified end-to-end against production: `GET /` health OK, `tools/list` returns
+the 5 tools, and a real `search_practices` call returns practices from the live
+guide. Remaining steps are client-side only (connect + install the skill, below).
 
 ## The fix
 

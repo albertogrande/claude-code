@@ -49,7 +49,7 @@ what kept failing (`Tsconfig not found`). Three clicks:
    command needed. Deploy.
 3. Every push to `main` redeploys automatically (Vercel's GitHub integration).
 
-Your MCP endpoint is then `https://<project>.vercel.app/mcp`.
+The live production endpoint is `https://claude-code-mcp.vercel.app/mcp`.
 
 Optional env (Project → Settings → Environment Variables): `GUIDE_BASE_URL`
 (default `https://albertogrande.github.io/claude-code`), `GUIDE_CACHE_TTL_MS`.
@@ -66,13 +66,14 @@ Put it behind HTTPS on Render / Railway / Fly.io / a VPS. Endpoint:
 
 ## Connect it to Claude Code
 
-Once it's live at `https://<your-host>/mcp`:
+Live at `https://claude-code-mcp.vercel.app/mcp` (substitute your own host if
+you deployed elsewhere):
 
 **CLI**
 
 ```bash
 # user scope → available in every project
-claude mcp add --scope user --transport http claude-code-guide https://<your-host>/mcp
+claude mcp add --scope user --transport http claude-code-guide https://claude-code-mcp.vercel.app/mcp
 ```
 
 **macOS / iOS apps** — Settings → Connectors → Add custom connector → paste the
