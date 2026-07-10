@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "description": "Remote MCP server exposing the Claude Code field guide (practices, sections, what's new) to agent sessions.",
-  "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
     "test": "node test.mjs",
