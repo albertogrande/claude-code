@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
 import { withBase, isoDate } from '../lib/site';
+import { getWeeklySorted } from '../lib/content';
 
 // Recent weekly digests — the source for the MCP `whats_new` tool.
 
@@ -8,9 +8,7 @@ export const GET: APIRoute = async (context) => {
   const site = context.site!;
   const abs = (p: string) => new URL(withBase(p), site).href;
 
-  const weekly = (await getCollection('weekly')).sort(
-    (a, b) => b.data.date.getTime() - a.data.date.getTime()
-  );
+  const weekly = await getWeeklySorted();
 
   const issues = weekly.map((w) => ({
     id: w.id,

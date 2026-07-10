@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
 import { withBase, isoDate } from '../lib/site';
+import { getPracticesSorted } from '../lib/content';
 
 // Machine-readable best-practices for agent consumption (and the MCP server).
 // Deterministic: the `updated` field is the newest practice date, not build time.
@@ -9,9 +9,7 @@ export const GET: APIRoute = async (context) => {
   const site = context.site!;
   const abs = (p: string) => new URL(withBase(p), site).href;
 
-  const practices = (await getCollection('practices')).sort((a, b) =>
-    a.data.section.localeCompare(b.data.section) || a.id.localeCompare(b.id)
-  );
+  const practices = await getPracticesSorted();
 
   const items = practices.map((p) => ({
     id: p.id,

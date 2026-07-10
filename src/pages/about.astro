@@ -46,6 +46,18 @@ import { withBase } from '../lib/site';
       and the week don't have to.
     </p>
 
+    <h2 class="kicker">For agents</h2>
+    <p>
+      The guide is also a product for agents. The
+      <a href={withBase('/practices')}>practices</a> are its atomic form — one
+      <em>when X → do Y (because Z)</em> unit each, versioned and verifiable —
+      served as <a href={withBase('/practices.json')}><code>practices.json</code></a>,
+      <a href={withBase('/llms.txt')}><code>llms.txt</code></a>, and through a
+      remote MCP server, so a Claude Code session can consult the current state
+      of the art instead of guessing. A quarterly probe retires practices that
+      bare models have caught up on.
+    </p>
+
     <h2 class="kicker">On accuracy</h2>
     <p>
       Facts here are grounded in Anthropic's official documentation. Model IDs,

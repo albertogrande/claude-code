@@ -7,7 +7,7 @@ updated: 2026-07-04
 
 The earlier sections are written for one person at one keyboard. This one is about the process a *team* builds around Claude Code — and here the honest caveat comes first: almost everything documented at the team level traces to Anthropic's own material (the best-practices docs, the "Steering Claude Code" and "How Anthropic teams use Claude Code" posts, the Advanced Patterns deck). It's a strong picture of the practice as *designed and dogfooded*, thinner as independent evidence that the whole industry has adopted it. Read it as the state of the art teams are converging on, not a settled census.
 
-The org-level version of [the one rule](/guide/00-start-here) is the same: **you decide what to build, the agent decides how — but now the "what," the "how it's checked," and the "what must never happen" are shared artifacts, versioned and reviewed like code.**
+The org-level version of [the one rule](/claude-code/guide/00-start-here) is the same: **you decide what to build, the agent decides how — but now the "what," the "how it's checked," and the "what must never happen" are shared artifacts, versioned and reviewed like code.**
 
 ## CLAUDE.md is team infrastructure, not a personal note
 
@@ -52,7 +52,7 @@ The highest-leverage team pattern is separating the writer from the reviewer, be
 Headless mode (`claude -p "…"`) is the seam between Claude Code and your pipeline — CI, pre-commit hooks, or a fan-out that loops over thousands of files with `--allowedTools` scoping what it may touch. On top of it, Anthropic's own teams run genuinely hands-off loops:
 
 - **Issue-to-PR.** The Product Design team files a ticket describing a change and Claude proposes the code — *no one opens Claude Code*. Via GitHub Actions, PR comments (formatting, renames, test refactors) get addressed automatically.
-- **Self-verifying runs.** The Claude Code team sets Claude to run builds, tests, and lints on its own output so it catches its own mistakes before a human looks — the [verification loop](/guide/07-workflows-that-compound) turned into an autonomous cron.
+- **Self-verifying runs.** The Claude Code team sets Claude to run builds, tests, and lints on its own output so it catches its own mistakes before a human looks — the [verification loop](/claude-code/guide/07-workflows-that-compound) turned into an autonomous cron.
 
 One caution for overnight jobs: since 2.1.200, an unanswered `AskUserQuestion` no longer auto-continues — a stalled question is a safer failure mode than a silent guess. Scope unattended work so any reasonable default is harmless, and gate the merge on a real check, not the agent's say-so.
 

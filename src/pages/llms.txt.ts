@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
 import { withBase } from '../lib/site';
+import { getGuideSorted, getPracticesSorted, getWeeklySorted } from '../lib/content';
 
 // llms.txt — a curated, link-first index for agents (https://llmstxt.org).
 // Points at the guide sections, the practices, and the machine endpoints.
@@ -9,15 +9,9 @@ export const GET: APIRoute = async (context) => {
   const site = context.site!;
   const abs = (p: string) => new URL(withBase(p), site).href;
 
-  const guide = (await getCollection('guide')).sort(
-    (a, b) => a.data.order - b.data.order
-  );
-  const practices = (await getCollection('practices')).sort((a, b) =>
-    a.data.section.localeCompare(b.data.section) || a.id.localeCompare(b.id)
-  );
-  const weekly = (await getCollection('weekly')).sort(
-    (a, b) => b.data.date.getTime() - a.data.date.getTime()
-  );
+  const guide = await getGuideSorted();
+  const practices = await getPracticesSorted();
+  const weekly = await getWeeklySorted();
 
   const lines: string[] = [];
   lines.push('# Claude Code — a power-user field guide');

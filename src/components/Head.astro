@@ -1,13 +1,20 @@
 ---
-import { withBase } from '../lib/site';
+import { withBase, isoDate } from '../lib/site';
 
 interface Props {
   title: string;
   description?: string;
+  // 'article' for guide sections, weeklies, and deep dives; 'website' otherwise.
+  type?: 'website' | 'article';
+  published?: Date;
+  updated?: Date;
 }
 const {
   title,
   description = 'The state of the art in Claude Code — models, effort, modes, context, orchestration, and the workflows that compound. Kept current by an autonomous agent.',
+  type = 'website',
+  published,
+  updated,
 } = Astro.props;
 
 const SITE_TITLE = 'Claude Code';
@@ -15,35 +22,68 @@ const fullTitle =
   title === SITE_TITLE ? 'Claude Code — a power-user field guide' : `${title} · ${SITE_TITLE}`;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const feed = withBase('/feed.xml');
+const ogImage = new URL(withBase('/og-default.png'), Astro.site).href;
+
+const jsonLd =
+  type === 'article'
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: title,
+        description,
+        url: canonical,
+        image: ogImage,
+        ...(published ? { datePublished: isoDate(published) } : {}),
+        ...(updated ? { dateModified: isoDate(updated) } : {}),
+        author: { '@type': 'Organization', name: 'Claude Code field guide' },
+      }
+    : {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Claude Code — a power-user field guide',
+        description,
+        url: new URL(withBase('/'), Astro.site).href,
+      };
 ---
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fbfaf8" />
   <script is:inline>
     (function () {
+      var t = 'light';
       try {
-        var t = localStorage.getItem('sota-theme') || 'light';
-        document.documentElement.setAttribute('data-theme', t);
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'light');
-      }
+        t =
+          localStorage.getItem('sota-theme') ||
+          (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light');
+      } catch (e) {}
+      document.documentElement.setAttribute('data-theme', t);
+      var m = document.querySelector('meta[name="theme-color"]');
+      if (m) m.setAttribute('content', t === 'dark' ? '#0d1117' : '#fbfaf8');
     })();
   </script>
 
   <title>{fullTitle}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
+  <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
 
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content={type} />
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
   <meta property="og:site_name" content={SITE_TITLE} />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:image" content={ogImage} />
+  {published && <meta property="article:published_time" content={isoDate(published)} />}
+  {updated && <meta property="article:modified_time" content={isoDate(updated)} />}
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={fullTitle} />
   <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
 import { withBase, isoDate } from '../lib/site';
+import { getGuideSorted } from '../lib/content';
 
 // The evergreen guide, section by section, with raw markdown body — the source
 // the MCP `get_guide_section` / `list_guide_sections` tools read.
@@ -9,9 +9,7 @@ export const GET: APIRoute = async (context) => {
   const site = context.site!;
   const abs = (p: string) => new URL(withBase(p), site).href;
 
-  const guide = (await getCollection('guide')).sort(
-    (a, b) => a.data.order - b.data.order
-  );
+  const guide = await getGuideSorted();
 
   const sections = guide.map((g) => ({
     id: g.id,

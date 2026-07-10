@@ -1,11 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import { withBase, isoDate } from '../../lib/site';
+import TagList from '../../components/TagList.astro';
+import { withBase } from '../../lib/site';
+import { getWeeklySorted } from '../../lib/content';
 
-const weekly = (await getCollection('weekly')).sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime()
-);
+const weekly = await getWeeklySorted();
 ---
 <BaseLayout
   title="The Week"
@@ -32,13 +31,7 @@ const weekly = (await getCollection('weekly')).sort(
               <a href={withBase(`/weekly/${w.id}`)} class="ar-title">{w.data.title}</a>
             </div>
             <span class="ar-meta">{w.data.summary}</span>
-            {w.data.tags.length > 0 && (
-              <ul class="tags" style="margin-top:8px">
-                {w.data.tags.map((t) => (
-                  <li><span class="tag">{t}</span></li>
-                ))}
-              </ul>
-            )}
+            <TagList tags={w.data.tags} style="margin-top:8px" />
           </div>
         </li>
       ))}

@@ -1,26 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
 import { withBase, fmtMed, isoDate } from '../lib/site';
+import { getGuideSorted, getWeeklySorted, getDivesSorted } from '../lib/content';
 
-const weekly = (await getCollection('weekly')).sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime()
-);
+const weekly = await getWeeklySorted();
 const lead = weekly[0];
 const recent = weekly.slice(1, 6);
 
-const guide = (await getCollection('guide')).sort(
-  (a, b) => a.data.order - b.data.order
-);
-
-const dives = (await getCollection('deep-dives')).sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime()
-);
+const guide = await getGuideSorted();
+const dives = await getDivesSorted();
 ---
 <BaseLayout title="Claude Code" home>
   <div class="fm">
     {lead && (
-      <a href={withBase(`/weekly/${lead.id}`)} class="fm-box">
+      <a href={withBase(`/weekly/${lead.id}`)} class="fm-box" data-date={isoDate(lead.data.date)}>
         <span class="fm-legend">THE WEEK</span>
         <div class="fm-kick">
           <span class="amber"># </span><span class="kind-inline">{lead.data.week}</span> · {fmtMed(lead.data.date)}
@@ -70,7 +63,7 @@ const dives = (await getCollection('deep-dives')).sort(
         </div>
         <ul class="fm-list">
           {dives.slice(0, 4).map((d) => (
-            <li class="fm-row">
+            <li class="fm-row" data-date={isoDate(d.data.date)}>
               <span class="fm-ln">{isoDate(d.data.date).slice(5)}</span>
               <div class="fm-rowmain">
                 <a href={withBase(`/deep-dives/${d.id}`)} class="fm-row-t">{d.data.title}</a>
@@ -110,10 +103,11 @@ const dives = (await getCollection('deep-dives')).sort(
     </ul>
 
     <footer class="fm-keys">
-      <a href={withBase('/guide')}><b>g</b> guide</a>
-      <a href={withBase('/weekly')}><b>w</b> the week</a>
-      <a href={withBase('/deep-dives')}><b>d</b> deep dives</a>
-      <a href={withBase('/about')}><b>?</b> about</a>
+      <a href={withBase('/guide')}><b>g&thinsp;g</b> guide</a>
+      <a href={withBase('/weekly')}><b>g&thinsp;w</b> the week</a>
+      <a href={withBase('/deep-dives')}><b>g&thinsp;d</b> deep dives</a>
+      <a href={withBase('/practices')}><b>g&thinsp;p</b> practices</a>
+      <a href={withBase('/about')}><b>g&thinsp;a</b> about</a>
       <a href={withBase('/feed.xml')}><b>≋</b> feed</a>
     </footer>
   </div>
@@ -122,7 +116,7 @@ const dives = (await getCollection('deep-dives')).sort(
     (function () {
       try {
         var KEY = 'sota-seen';
-        var rows = [].slice.call(document.querySelectorAll('.fm-row[data-date]'));
+        var rows = [].slice.call(document.querySelectorAll('[data-date]'));
         if (!rows.length) return;
         var prev = localStorage.getItem(KEY);
         var max = prev || '';

@@ -90,7 +90,9 @@ thing to watch" — a concrete, falsifiable call.>
 
 Hard requirements:
 - Every dated claim verified inside the window.
-- When continuing a thread, link the earlier issue: `as covered [last week](./2026-W27.md)`.
+- When continuing a thread, link the earlier issue with a full site path
+  (base included): `as covered [last week](/claude-code/weekly/2026-W27)`.
+  Relative `./file.md` links break on the built site.
 - `sources` — at least two resolving URLs; prefer primary.
 - Keep it short. This is the pulse, not the archive — the guide is the archive.
 

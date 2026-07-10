@@ -1,11 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
 import { withBase, isoDate } from '../../lib/site';
+import { getGuideSorted } from '../../lib/content';
 
-const guide = (await getCollection('guide')).sort(
-  (a, b) => a.data.order - b.data.order
-);
+const guide = await getGuideSorted();
 ---
 <BaseLayout
   title="Guide"

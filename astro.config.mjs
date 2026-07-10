@@ -10,5 +10,12 @@ export default defineConfig({
   site: 'https://albertogrande.github.io',
   base: '/claude-code',
   trailingSlash: 'ignore',
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx(),
+    sitemap({
+      // Machine endpoints and the 404 aren't crawlable HTML pages.
+      filter: (page) =>
+        !/\.(json|txt|xml)$/.test(new URL(page).pathname) && !page.includes('/404'),
+    }),
+  ],
 });

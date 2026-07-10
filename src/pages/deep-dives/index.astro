@@ -1,11 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import TagList from '../../components/TagList.astro';
 import { withBase, isoDate } from '../../lib/site';
+import { getDivesSorted } from '../../lib/content';
 
-const dives = (await getCollection('deep-dives')).sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime()
-);
+const dives = await getDivesSorted();
 ---
 <BaseLayout
   title="Deep dives"
@@ -32,13 +31,7 @@ const dives = (await getCollection('deep-dives')).sort(
               <a href={withBase(`/deep-dives/${d.id}`)} class="ar-title">{d.data.title}</a>
             </div>
             <span class="ar-meta">{d.data.summary}</span>
-            {d.data.tags.length > 0 && (
-              <ul class="tags" style="margin-top:8px">
-                {d.data.tags.map((t) => (
-                  <li><span class="tag">{t}</span></li>
-                ))}
-              </ul>
-            )}
+            <TagList tags={d.data.tags} style="margin-top:8px" />
           </div>
         </li>
       ))}

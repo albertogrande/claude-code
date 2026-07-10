@@ -60,8 +60,7 @@ export const GET: APIRoute = async (context) => {
     <updated>${stamp(e.date)}</updated>
     <published>${stamp(e.date)}</published>
     <summary>${esc(e.summary)}</summary>
-${e.tags.map((t) => `    <category term="${esc(t)}"/>`).join('\n')}
-  </entry>`
+${e.tags.length ? e.tags.map((t) => `    <category term="${esc(t)}"/>`).join('\n') + '\n' : ''}  </entry>`
     )
     .join('\n');
 

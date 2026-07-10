@@ -1,13 +1,16 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-// Three rendered collections, all frontmatter-driven so the editorial agents
+// Four rendered collections, all frontmatter-driven so the editorial agents
 // can write them deterministically.
 //
 //  guide/    — the evergreen reference. One file per section: NN-slug.md.
 //              This is the product: kept continuously current.
 //  weekly/   — the weekly digest ("The Week"). One file per ISO week:
 //              YYYY-Www.md. A short "what changed" read to stay current.
+//  practices/ — atomic best-practices for agent consumption; rendered for
+//              humans at /practices and served to machines via
+//              /practices.json and the MCP server.
 //  deep-dives/ — long-form researched pieces, commissioned when a thread
 //              earns it. One file per piece: YYYY-MM-DD-slug.md.
 //

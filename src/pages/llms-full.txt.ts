@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
 import { withBase, isoDate } from '../lib/site';
+import { getGuideSorted, getPracticesSorted } from '../lib/content';
 
 // llms-full.txt — the entire guide plus the practices, concatenated as plain
 // markdown, so an agent can pull the whole corpus in one fetch.
@@ -9,12 +9,8 @@ export const GET: APIRoute = async (context) => {
   const site = context.site!;
   const abs = (p: string) => new URL(withBase(p), site).href;
 
-  const guide = (await getCollection('guide')).sort(
-    (a, b) => a.data.order - b.data.order
-  );
-  const practices = (await getCollection('practices')).sort((a, b) =>
-    a.data.section.localeCompare(b.data.section) || a.id.localeCompare(b.id)
-  );
+  const guide = await getGuideSorted();
+  const practices = await getPracticesSorted();
 
   const out: string[] = [];
   out.push('# Claude Code — a power-user field guide (full text)');

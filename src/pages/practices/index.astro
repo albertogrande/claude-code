@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagList from '../../components/TagList.astro';
+import { render } from 'astro:content';
+import { withBase, isoDate } from '../../lib/site';
+import { getGuideSorted, getPracticesSorted } from '../../lib/content';
+
+// The agent-facing corpus, human-readable: every practice, grouped by the
+// guide section it belongs to. Agents read this via /practices.json and the
+// MCP; this page is the same corpus for people (and for site search).
+
+const [guide, practices] = await Promise.all([getGuideSorted(), getPracticesSorted()]);
+
+const groups = [];
+for (const g of guide) {
+  const items = [];
+  for (const p of practices.filter((p) => p.data.section === g.id)) {
+    const { Content } = await render(p);
+    items.push({ p, Content });
+  }
+  if (items.length) groups.push({ id: g.id, title: g.data.title, items });
+}
+---
+<BaseLayout
+  title="Practices"
+  description="Atomic best-practices for Claude Code — when X, do Y, because Z. The corpus agents query through the guide MCP, readable by humans too."
+>
+  <div class="page-head">
+    <div class="kicker"><span class="prompt" aria-hidden="true">&gt;</span> practices</div>
+    <h1 class="page-title">Practices</h1>
+    <p class="dek">
+      Atomic, versioned best-practices — each a <em>when X → do Y (because Z)</em>
+      unit tied to a guide section, with how to verify it still holds. This is
+      the corpus agents query through the
+      <a href={withBase('/about')}>guide MCP</a>; machines read it at
+      <a href={withBase('/practices.json')}><code>/practices.json</code></a>.
+    </p>
+  </div>
+
+  <div data-pagefind-body>
+    {groups.map((g) => (
+      <section class="pr-group">
+        <div class="fm-sec">
+          <span class="amber">##</span>
+          <a class="fm-sec-l" href={withBase(`/guide/${g.id}`)}>{g.title}</a>
+          <span class="fm-rule" aria-hidden="true"></span>
+          <span class="dim">{String(g.items.length).padStart(2, '0')}</span>
+        </div>
+        {g.items.map(({ p, Content }) => (
+          <article class="practice" id={p.id}>
+            <h3 class="practice-h"><a href={`#${p.id}`}>{p.data.title}</a></h3>
+            <dl>
+              <dt>When</dt><dd>{p.data.when}</dd>
+              <dt>Do</dt><dd>{p.data.do}</dd>
+              <dt>Why</dt><dd>{p.data.why}</dd>
+              {p.data.since && <Fragment><dt>Since</dt><dd>Claude Code {p.data.since}</dd></Fragment>}
+              {p.data.verify && <Fragment><dt>Verify</dt><dd>{p.data.verify}</dd></Fragment>}
+            </dl>
+            <div class="practice-note"><Content /></div>
+            <div class="practice-meta">
+              <TagList tags={p.data.tags} />
+              <span class="dim">upd {isoDate(p.data.updated)}</span>
+              {p.data.probe && (
+                <span class="dim" title="Quarterly probe: does a bare model already know this?">
+                  probe: {p.data.probe.status} ({isoDate(p.data.probe.date)})
+                </span>
+              )}
+              {p.data.sources.length > 0 && (
+                <span class="practice-src">
+                  {p.data.sources.map((s, i) => (
+                    <Fragment>
+                      {i > 0 && <span class="dim"> · </span>}
+                      <a href={s.url} rel="noopener">{s.label}</a>
+                    </Fragment>
+                  ))}
+                </span>
+              )}
+            </div>
+          </article>
+        ))}
+      </section>
+    ))}
+  </div>
+</BaseLayout>
