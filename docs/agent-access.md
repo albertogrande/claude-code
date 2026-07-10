@@ -40,7 +40,7 @@ These deploy automatically with the site. Any agent tool can already fetch them.
 ### Layer 2 — the remote MCP server (`mcp/`)
 
 A small server that reads the Layer-1 endpoints from the **live site** (so it's
-always current and stateless) and exposes tools:
+stateless and current within its cache TTL) and exposes tools:
 
 - `search_practices({ query, tags? })` — the primary tool.
 - `list_practices()` — everything, compact.
@@ -54,11 +54,13 @@ The core (fetch guide → tool handlers) is a host-agnostic module; the transpor
 is a thin wrapper.
 
 **Hosting.** A remote server needs a host (GitHub Pages is static-only). Chosen
-host: **Vercel** — it detects `mcp/server.js` as a Node server and runs it,
-redeploying on every push via the GitHub integration, and it's free. The one
-manual step the owner does: import the repo in Vercel with Root Directory `mcp`.
-Any Node/container host (the `Dockerfile`) is the always-warm alternative — same
-code.
+host: **Vercel** — `mcp/vercel.json` pins `api/mcp.js` as an explicit
+`@vercel/node` function (auto-detection of `server.js` failed; see
+`mcp/DEPLOY-STATUS.md` for the archaeology), redeploying on every push via the
+GitHub integration, and it's free. The one manual step the owner does: import
+the repo in Vercel with Root Directory `mcp`. Any Node/container host (the
+`Dockerfile`, which runs `server.js`) is the always-warm alternative — same
+core in `lib.js`, two thin entrypoints.
 
 ### Layer 3 — the "when to consult" logic (a Claude Code plugin)
 
@@ -78,5 +80,5 @@ once at user scope (`~/.claude`), it applies across all the owner's projects.
 
 - The MCP **needs hosting** — the only step that needs the owner's account. Everything else is autonomous.
 - The model **only consults the guide if told when** — Layer 3 is not optional.
-- Keeping the server **stateless over the live endpoints** means always-latest with zero cache-invalidation work; the cost is a fetch per cold start (cheap, cacheable).
+- Keeping the server **stateless over the live endpoints** means zero cache-invalidation work, at the cost of bounded staleness: responses lag the site by up to the server's cache TTL (default 5 min) plus the Pages CDN. Each cold instance pays one upstream fetch, with a timeout and a stale-on-error fallback.
 - Prompt-injection surface is negligible while the content is the owner's own; revisit if this ever goes public.

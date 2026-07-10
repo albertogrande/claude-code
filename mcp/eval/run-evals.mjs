@@ -97,11 +97,39 @@ const main = async () => {
     console.log(`- ${name}: ${r.chars} chars ≈ ${tokens(r.chars)} tokens (${r.ms}ms)`);
   }
 
-  // ── Gate ───────────────────────────────────────────────────────────────────
+  // ── Gates ──────────────────────────────────────────────────────────────────
+  // Three gated properties, so a regression in any of them ships red:
+  //  1. in-domain recall (direct+paraphrase hit@3 ≥ 80%)
+  //  2. off-topic precision — the whole point of the stopword/threshold work:
+  //     ≥ 60% of off-topic queries return "no match", and none dumps > 2
+  //     practices of confident noise
+  //  3. Spanish recall (hit@3 ≥ 66%) — the ES→EN synonym bridge
+  const gates = [];
+
   const gated = rows.filter((r) => r.category === 'direct' || r.category === 'paraphrase');
   const h3 = gated.filter((r) => r.rank >= 1 && r.rank <= 3).length;
-  const ok = h3 / gated.length >= 0.8;
-  console.log(`\nGATE in-domain hit@3 = ${h3}/${gated.length} (threshold 80%) → ${ok ? 'PASS ✓' : 'FAIL ✗'}`);
+  gates.push([`in-domain hit@3 = ${h3}/${gated.length} (threshold 80%)`, gated.length === 0 || h3 / gated.length >= 0.8]);
+
+  const off = rows.filter((r) => r.category === 'offtopic');
+  if (off.length) {
+    const clean = off.filter((r) => r.none).length;
+    const maxNoise = Math.max(0, ...off.filter((r) => !r.none).map((r) => r.titles.length));
+    gates.push([`offtopic clean = ${clean}/${off.length} (threshold 60%)`, clean / off.length >= 0.6]);
+    gates.push([`offtopic max noise = ${maxNoise} practices (threshold ≤ 2)`, maxNoise <= 2]);
+  }
+
+  const es = rows.filter((r) => r.category === 'spanish');
+  if (es.length) {
+    const esH3 = es.filter((r) => r.rank >= 1 && r.rank <= 3).length;
+    gates.push([`spanish hit@3 = ${esH3}/${es.length} (threshold 66%)`, esH3 / es.length >= 0.66]);
+  }
+
+  console.log('');
+  let ok = true;
+  for (const [label, pass] of gates) {
+    console.log(`GATE ${label} → ${pass ? 'PASS ✓' : 'FAIL ✗'}`);
+    if (!pass) ok = false;
+  }
   process.exit(ok ? 0 : 1);
 };
 

@@ -1,32 +1,56 @@
 // The guide MCP server logic — data layer, tools, and a plain Node http server.
 // No side effects on import (server.js is the entrypoint that listens). Reads
-// the live machine endpoints so it is always as current as the guide.
+// the site's machine endpoints, so responses are current within the cache TTL
+// (default 5 min) plus whatever the Pages CDN adds.
 
 import { createServer } from 'node:http';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
+import { validateEndpoint } from './contract.mjs';
 
 // ── Data layer ──────────────────────────────────────────────────────────────
 
 const BASE = (process.env.GUIDE_BASE_URL || 'https://albertogrande.github.io/claude-code').replace(/\/$/, '');
 const TTL_MS = Number(process.env.GUIDE_CACHE_TTL_MS || 5 * 60 * 1000);
-const cache = new Map(); // path -> { at, data }
+const FETCH_TIMEOUT_MS = Number(process.env.GUIDE_FETCH_TIMEOUT_MS || 8000);
+const cache = new Map(); // path -> { at, data } — kept past TTL for stale-on-error
+const inflight = new Map(); // path -> Promise — dedupes concurrent cold fetches
 
 export function baseUrl() {
   return BASE;
 }
 
-async function getJson(path) {
-  const hit = cache.get(path);
-  const now = Date.now();
-  if (hit && now - hit.at < TTL_MS) return hit.data;
+async function fetchFresh(path) {
   const url = `${BASE}${path}`;
-  const res = await fetch(url, { headers: { accept: 'application/json' } });
+  const res = await fetch(url, {
+    headers: { accept: 'application/json' },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
   if (!res.ok) throw new Error(`Fetch ${url} failed: ${res.status} ${res.statusText}`);
   const data = await res.json();
-  cache.set(path, { at: now, data });
+  const problems = validateEndpoint(path, data);
+  if (problems.length) throw new Error(`Contract violation from ${url}: ${problems.slice(0, 3).join('; ')}`);
+  cache.set(path, { at: Date.now(), data });
   return data;
+}
+
+async function getJson(path) {
+  const hit = cache.get(path);
+  if (hit && Date.now() - hit.at < TTL_MS) return hit.data;
+  let pending = inflight.get(path);
+  if (!pending) {
+    pending = fetchFresh(path).finally(() => inflight.delete(path));
+    inflight.set(path, pending);
+  }
+  try {
+    return await pending;
+  } catch (e) {
+    // Stale-on-error: an expired-but-present copy beats failing every tool
+    // for the duration of an upstream blip.
+    if (hit) return hit.data;
+    throw e;
+  }
 }
 
 const getPractices = async () => (await getJson('/practices.json')).practices || [];
@@ -91,29 +115,65 @@ function variantsOf(term) {
   return [...v].filter((t) => t.length >= 3);
 }
 
-function scorePractice(p, query) {
-  const q = query.toLowerCase().trim();
-  if (!q) return 1;
-  const terms = q.split(/\s+/).filter((t) => t.length >= 3 && !STOPWORDS.has(t));
-  if (!terms.length) return 0;
-  const fields = [
-    [p.title, 5],
-    [p.tags?.join(' '), 4],
-    [p.when, 3],
-    [p.do, 3],
-    [p.why, 2],
-    [p.note, 2],
-    [p.section, 1],
-  ];
-  let score = 0;
-  for (const term of terms) {
-    const vars = variantsOf(term);
+// since/verify are indexed too — the corpus's measured edge is versioned
+// facts, so a version string or a verify command must be findable.
+const fieldsOf = (p) => [
+  [p.title, 5],
+  [p.tags?.join(' '), 4],
+  [p.when, 3],
+  [p.do, 3],
+  [p.why, 2],
+  [p.note, 2],
+  [p.since, 2],
+  [p.verify, 2],
+  [p.section, 1],
+];
+
+function queryTermVariants(query) {
+  return (query || '')
+    .toLowerCase()
+    .trim()
+    .split(/\s+/)
+    .filter((t) => t.length >= 3 && !STOPWORDS.has(t))
+    .map(variantsOf);
+}
+
+const matchesAnyField = (p, vars) =>
+  fieldsOf(p).some(([textVal]) => {
+    const t = textVal && textVal.toLowerCase();
+    return t && vars.some((v) => t.includes(v));
+  });
+
+// Corpus-frequency boost per term: rare terms distinguish practices,
+// ubiquitous ones ("run", "session") don't. Bounded to [0.6, 1.6] so it
+// re-ranks without overriding the field-weight base score — the relevance
+// filter thresholds on the unboosted score, keeping its meaning stable as
+// the corpus grows.
+function idfOf(vars, corpus) {
+  const df = corpus.filter((p) => matchesAnyField(p, vars)).length;
+  if (!df) return 1;
+  const raw = Math.log(1 + corpus.length / df);
+  const norm = (raw / Math.log(1 + corpus.length)) * 1.6;
+  return Math.min(1.6, Math.max(0.6, norm));
+}
+
+// Returns { base, ranked }: `base` is the plain field-weight sum (used for
+// the ≥2 relevance filter), `ranked` weights each term by its corpus IDF
+// (used for ordering).
+function scorePractice(p, termVars, idfs) {
+  const fields = fieldsOf(p);
+  let base = 0;
+  let ranked = 0;
+  termVars.forEach((vars, i) => {
+    let termScore = 0;
     for (const [textVal, weight] of fields) {
       const t = textVal && textVal.toLowerCase();
-      if (t && vars.some((v) => t.includes(v))) score += weight;
+      if (t && vars.some((v) => t.includes(v))) termScore += weight;
     }
-  }
-  return score;
+    base += termScore;
+    ranked += termScore * (idfs[i] ?? 1);
+  });
+  return { base, ranked };
 }
 
 function formatPractice(p) {
@@ -148,24 +208,45 @@ export function buildMcpServer() {
       description:
         'Search the field guide for atomic best-practices ("when X, do Y, because Z") on using Claude Code — models/effort, permission modes, context, subagents/workflows, the apps. Use before deciding a model or effort level, a permission mode, a big context operation, or a workflow shape.',
       inputSchema: {
-        query: z.string().describe('What you are trying to decide or do, e.g. "long unattended run model" or "bound workflow spend".'),
-        tags: z.array(z.string()).optional().describe('Optional tag filter, e.g. ["models"] or ["workflow"].'),
+        query: z.string().optional().describe('What you are trying to decide or do, e.g. "long unattended run model" or "bound workflow spend". Omit to browse by tag alone.'),
+        tags: z.array(z.string()).optional().describe('Optional tag filter, e.g. ["models"] or ["workflow"]. An unknown tag returns the valid vocabulary.'),
       },
     },
     async ({ query, tags }) => {
       try {
-        let practices = await getPractices();
+        const all = await getPractices();
+        const vocab = [...new Set(all.flatMap((p) => p.tags || []))].sort();
+        let practices = all;
         if (tags?.length) {
           const want = tags.map((t) => t.toLowerCase());
-          practices = practices.filter((p) => (p.tags || []).some((t) => want.includes(t.toLowerCase())));
+          const unknown = want.filter((t) => !vocab.some((v) => v.toLowerCase() === t));
+          if (unknown.length) {
+            return text(`Unknown tag${unknown.length > 1 ? 's' : ''} ${unknown.join(', ')}. Valid tags: ${vocab.join(', ')}.`);
+          }
+          practices = all.filter((p) => (p.tags || []).some((t) => want.includes(t.toLowerCase())));
         }
-        // Score ≥ 2 = at least a title/tags/when/do/why match; a lone section-name
-        // hit (weight 1) is noise. Top 5 keeps a noisy query from dumping the
-        // whole corpus into the caller's context.
+
+        const termVars = queryTermVariants(query || '');
+        if (!termVars.length) {
+          // Tag-only browse: the filter already narrowed the set, return it.
+          if (tags?.length) {
+            return text(
+              practices.map(formatPractice).join('\n\n') || `No practices tagged ${tags.join(', ')}.`
+            );
+          }
+          return text(`Pass a query, a tag filter, or both. Valid tags: ${vocab.join(', ')}.`);
+        }
+
+        // IDF over the full corpus (not the tag-filtered subset) keeps term
+        // statistics stable regardless of the filter.
+        const idfs = termVars.map((vars) => idfOf(vars, all));
+        // Base score ≥ 2 = at least a title/tags/when/do/why match; a lone
+        // section-name hit (weight 1) is noise. Top 5 keeps a noisy query from
+        // dumping the whole corpus into the caller's context.
         const ranked = practices
-          .map((p) => ({ p, s: scorePractice(p, query) }))
-          .filter((x) => x.s >= 2)
-          .sort((a, b) => b.s - a.s)
+          .map((p) => ({ p, s: scorePractice(p, termVars, idfs) }))
+          .filter((x) => x.s.base >= 2)
+          .sort((a, b) => b.s.ranked - a.s.ranked)
           .slice(0, 5)
           .map((x) => x.p);
         if (!ranked.length) return text(`No practices matched "${query}"${tags?.length ? ` with tags ${tags.join(', ')}` : ''}. Try list_practices to see everything.`);
@@ -301,11 +382,22 @@ export async function handleRequest(req, res) {
 
   if (path === '/mcp' && req.method === 'POST') {
     try {
-      // Vercel may pre-parse JSON into req.body; otherwise read the stream.
+      // Vercel may pre-parse JSON into req.body; otherwise read the stream —
+      // bounded, so the self-hosted path can't be OOMed by a huge body.
+      const MAX_BODY = 1024 * 1024;
       let body = req.body;
       if (body === undefined) {
         const chunks = [];
-        for await (const c of req) chunks.push(c);
+        let size = 0;
+        for await (const c of req) {
+          size += c.length;
+          if (size > MAX_BODY) {
+            res.writeHead(413, { 'content-type': 'application/json' });
+            res.end(JSON.stringify({ jsonrpc: '2.0', error: { code: -32600, message: 'Request body too large' }, id: null }));
+            return;
+          }
+          chunks.push(c);
+        }
         body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : undefined;
       } else if (typeof body === 'string') {
         body = body ? JSON.parse(body) : undefined;
@@ -320,7 +412,15 @@ export async function handleRequest(req, res) {
     return;
   }
 
-  if (path === '/' || path === '/health' || path === '/mcp') {
+  // This server is stateless and doesn't offer a server-initiated SSE stream,
+  // so a non-POST /mcp gets the spec's 405 rather than masquerading as health.
+  if (path === '/mcp') {
+    res.writeHead(405, { 'content-type': 'application/json', allow: 'POST, OPTIONS' });
+    res.end(JSON.stringify({ jsonrpc: '2.0', error: { code: -32000, message: 'Method not allowed — POST JSON-RPC to /mcp' }, id: null }));
+    return;
+  }
+
+  if (path === '/' || path === '/health') {
     res.setHeader('content-type', 'application/json');
     res.end(JSON.stringify({ ok: true, service: 'claude-code-guide-mcp', guide: BASE, endpoint: '/mcp' }));
     return;

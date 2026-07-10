@@ -3,8 +3,10 @@
 A remote [MCP](https://modelcontextprotocol.io) server that exposes this field
 guide to your own Claude Code sessions, so an agent can consult the current
 state of the art instead of guessing. Stateless — it reads the live site's
-machine endpoints (`/practices.json`, `/guide.json`, `/weekly.json`), so it is
-always as current as the guide.
+machine endpoints (`/practices.json`, `/guide.json`, `/weekly.json`), so it
+tracks the guide with bounded staleness: up to the cache TTL (default 5 min,
+`GUIDE_CACHE_TTL_MS`) plus the Pages CDN. Upstream fetches carry a timeout and
+fall back to the last-known-good copy on error.
 
 ## Tools
 

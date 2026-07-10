@@ -4,32 +4,12 @@
 //
 // Run from repo root after `npm run build`, or from mcp/ (it finds ../dist).
 
-import { createServer } from 'node:http';
-import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { dirname, join, extname } from 'node:path';
+import { dirname, join } from 'node:path';
+import { staticDistServer, listen } from './static-dist.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = join(__dirname, '..', 'dist');
-
-const CT = { '.json': 'application/json', '.txt': 'text/plain', '.html': 'text/html' };
-
-function staticServer() {
-  return createServer(async (req, res) => {
-    try {
-      const path = decodeURIComponent((req.url || '/').split('?')[0]);
-      const file = join(DIST, path);
-      const buf = await readFile(file);
-      res.writeHead(200, { 'content-type': CT[extname(file)] || 'application/octet-stream' });
-      res.end(buf);
-    } catch {
-      res.writeHead(404);
-      res.end('not found');
-    }
-  });
-}
-
-const listen = (srv) => new Promise((r) => srv.listen(0, '127.0.0.1', () => r(srv.address().port)));
 
 let failures = 0;
 function check(name, cond, detail = '') {
@@ -42,7 +22,7 @@ function check(name, cond, detail = '') {
 
 const main = async () => {
   // 1. static server over dist/
-  const files = staticServer();
+  const files = staticDistServer(DIST);
   const filesPort = await listen(files);
   process.env.GUIDE_BASE_URL = `http://127.0.0.1:${filesPort}`;
   process.env.GUIDE_CACHE_TTL_MS = '0';
@@ -77,10 +57,34 @@ const main = async () => {
   };
 
   const sp = await call('search_practices', { query: 'long unattended run model' });
-  check('search_practices finds Fable', !sp.isError && /Fable/.test(sp.text));
+  const fableTitle = pj.practices.find((p) => p.id === 'switch-to-fable-for-long-unattended-runs')?.title;
+  check('search_practices ranks Fable practice first', !sp.isError && !!fableTitle && sp.text.startsWith(`### ${fableTitle}`), sp.text.slice(0, 80));
 
-  const spTag = await call('search_practices', { query: 'spend', tags: ['workflow'] });
-  check('search_practices tag filter works', !spTag.isError && /workflow|spend|cap/i.test(spTag.text));
+  // The filter must actually filter: every returned practice carries the tag,
+  // and practices without it are absent. (The old assertion could not fail —
+  // the "no match" message itself contained the word "workflow".)
+  const tagged = pj.practices.filter((p) => (p.tags || []).includes('workflow'));
+  const untagged = pj.practices.filter((p) => !(p.tags || []).includes('workflow'));
+  const spTag = await call('search_practices', { tags: ['workflow'] });
+  check(
+    'tag-only browse returns exactly the tagged practices',
+    !spTag.isError &&
+      tagged.every((p) => spTag.text.includes(p.title)) &&
+      untagged.every((p) => !spTag.text.includes(p.title)),
+    `tagged=${tagged.length}`
+  );
+
+  const spBadTag = await call('search_practices', { query: 'model', tags: ['model'] });
+  check('unknown tag returns the valid vocabulary', !spBadTag.isError && /Valid tags:/.test(spBadTag.text) && /models/.test(spBadTag.text));
+
+  const spEmpty = await call('search_practices', {});
+  check('empty search asks for query or tag', !spEmpty.isError && /Valid tags:/.test(spEmpty.text));
+
+  const withSince = pj.practices.find((p) => p.since);
+  if (withSince) {
+    const spSince = await call('search_practices', { query: `${withSince.since} version` });
+    check('since field is searchable', !spSince.isError && spSince.text.includes(withSince.title), `since=${withSince.since}`);
+  }
 
   const lp = await call('list_practices');
   check('list_practices returns items', !lp.isError && lp.text.split('\n').length >= 5);
@@ -97,9 +101,36 @@ const main = async () => {
   const wn = await call('whats_new');
   check('whats_new returns weekly + updates', !wn.isError && /The Week/.test(wn.text) && /Recently updated/.test(wn.text));
 
+  // Protocol surface: /mcp only speaks POST; health lives on / and /health.
+  const getMcp = await fetch(`http://127.0.0.1:${mcpPort}/mcp`);
+  check('GET /mcp returns 405', getMcp.status === 405, `status=${getMcp.status}`);
+  const health = await (await fetch(`http://127.0.0.1:${mcpPort}/`)).json();
+  check('health served on /', health.ok === true && health.endpoint === '/mcp');
+
+  // Dead upstream with an empty cache → a clear tool error, not a hang.
+  // (?deadUpstream re-evaluates lib.js so it reads the poisoned env and
+  // starts with a fresh cache.)
+  process.env.GUIDE_BASE_URL = 'http://127.0.0.1:9'; // discard port — nothing listens
+  process.env.GUIDE_FETCH_TIMEOUT_MS = '2000';
+  const { createHttpServer: deadServer } = await import('./lib.js?deadUpstream');
+  const dead = deadServer();
+  const deadPort = await listen(dead);
+  const deadClient = new Client({ name: 'test-dead', version: '1.0.0' });
+  await deadClient.connect(new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${deadPort}/mcp`)));
+  const deadCall = await deadClient.callTool({ name: 'list_practices', arguments: {} });
+  check('dead upstream returns isError', !!deadCall.isError && /Could not reach the guide/.test(deadCall.content?.[0]?.text || ''));
+  await deadClient.close();
+  dead.close();
+
+  // Stale-on-error: kill the upstream after a successful fetch; TTL=0 forces
+  // a refetch, which fails — the last-known-good copy must be served.
+  files.closeAllConnections?.();
+  await new Promise((r) => files.close(r));
+  const spStale = await call('search_practices', { query: 'long unattended run model' });
+  check('stale-on-error serves last-known-good corpus', !spStale.isError && /Fable/.test(spStale.text));
+
   await client.close();
   mcp.close();
-  files.close();
 
   console.log(failures === 0 ? '\nAll MCP tests passed ✓' : `\n${failures} test(s) failed ✗`);
   process.exit(failures === 0 ? 0 : 1);

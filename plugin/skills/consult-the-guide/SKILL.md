@@ -30,8 +30,10 @@ new in Claude Code"**, or for a recommended workflow.
 ## How to consult
 
 1. `search_practices({ query, tags? })` — start here. Query with what you're
-   deciding ("long unattended run model", "bound workflow spend"). Tags:
-   `models`, `modes`, `context`, `workflow`, `apps`, `teams`.
+   deciding ("long unattended run model", "bound workflow spend"), or pass
+   `tags` alone to browse. Tags: `models`, `modes`, `context`, `skills`,
+   `plugins`, `mcp`, `hooks`, `workflow`, `subagents`, `apps`, `teams` (an
+   unknown tag returns the valid list).
 2. `get_guide_section({ id })` — pull the full section when you need depth
    beyond a practice (e.g. `01-models-and-effort`, `02-permission-modes`).
 3. `whats_new({ limit? })` — for "what changed lately". Good at session start.
