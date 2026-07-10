@@ -40,7 +40,9 @@ export async function getWeekly() {
   return d.issues || [];
 }
 
-// Simple case-insensitive term scoring over weighted fields.
+// Case-insensitive term scoring over weighted fields. OR-with-ranking: a
+// practice scores for every term it matches, so a multi-term query still
+// surfaces the closest practices instead of requiring all terms to hit one.
 export function scorePractice(p, query) {
   const q = query.toLowerCase().trim();
   if (!q) return 1;
@@ -55,14 +57,11 @@ export function scorePractice(p, query) {
   ];
   let score = 0;
   for (const term of terms) {
-    let hit = 0;
     for (const [text, weight] of fields) {
-      if (text && text.toLowerCase().includes(term)) hit += weight;
+      if (text && text.toLowerCase().includes(term)) score += weight;
     }
-    if (hit === 0) return 0; // every term must match somewhere
-    score += hit;
   }
-  return score;
+  return score; // 0 only if no term matched any field
 }
 
 export function formatPractice(p) {
