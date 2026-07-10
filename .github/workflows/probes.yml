@@ -3,9 +3,10 @@ name: Probes
 # Quarterly marginal-value probes for the guide MCP. Claude Code follows
 # mcp/eval/marginal-probes.md: poses each practice's decision question to a
 # fresh no-tools subagent, grades the answers against the corpus, updates
-# mcp/EVALS.md + the probe history + editorial memory, and runs the retrieval
-# eval against production. Finds practices that have decayed into common
-# knowledge so the corpus keeps earning its tokens.
+# mcp/EVALS.md + the probe history + editorial memory. The retrieval
+# regression eval then runs as a real gated workflow step (hermetic, against
+# this checkout's build — not against production, which lags until Deploy
+# runs). Failures open/comment a pipeline-failure issue.
 #
 # Requires repo secret CLAUDE_CODE_OAUTH_TOKEN (same as Scout/Weekly).
 
@@ -18,28 +19,38 @@ on:
 permissions:
   contents: write
   id-token: write
+  issues: write
+
+concurrency:
+  group: main-writers
+  cancel-in-progress: false
 
 jobs:
   probes:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            mcp/package-lock.json
 
       - name: Run the marginal-value probes
+        id: claude
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: >
             Run the quarterly marginal-value probes following
-            mcp/eval/marginal-probes.md exactly: fetch the current corpus from
-            https://albertogrande.github.io/claude-code/practices.json, pose
-            each practice's decision question (updating the question bank for
-            added/retired practices) to a fresh subagent instructed to use NO
-            tools and answer from its own knowledge, grade AGREE / PARTIAL /
+            mcp/eval/marginal-probes.md exactly: read the current corpus from
+            src/content/practices/ in this checkout, pose each practice's
+            decision question (updating the question bank for added/retired
+            practices) to a fresh subagent instructed to use NO tools and
+            answer from its own knowledge, grade AGREE / PARTIAL /
             DIVERGE-UNKNOWN, then: stamp each practice's frontmatter in
             src/content/practices/ with its verdict (probe: {status:
             agree|partial|diverge, date: <today>}, matching the schema in
@@ -48,25 +59,42 @@ jobs:
             (record which model was probed), and note practices that decayed
             to AGREE in editorial/MEMORY.md under Standing editorial findings
             so the weekly editor retires or refreshes them.
-            Finally run "npm ci && npm run eval" inside mcp/ against
-            production and report if the regression gate fails.
-            Write files only — do not commit or push.
+            The retrieval regression eval runs as a workflow step after you —
+            do not run it yourself. Write files only — do not commit or push.
           show_full_output: true
+          # Sonnet by choice: probing/grading is mechanical, and the probe
+          # subject should be a mainstream model, not the strongest one.
           claude_args: >-
             --model claude-sonnet-5
             --max-turns 60
-            --allowedTools "Task,Agent,WebFetch,Read,Write,Edit,Glob,Grep,Bash(npm *),Bash(node *),Bash(date *),Bash(ls *)"
+            --allowedTools "Task,Agent,WebFetch,Read,Write,Edit,Glob,Grep,Bash(date *),Bash(ls *)"
+
+      - name: Gate — site builds with the stamped practices
+        run: |
+          npm ci
+          npm run build
+
+      - name: Gate — MCP retrieval eval (hermetic, real exit code)
+        working-directory: mcp
+        run: |
+          npm ci
+          node eval/ci.mjs
+
+      - name: Append usage ledger
+        id: ledger
+        env:
+          EXEC_WRITER: ${{ steps.claude.outputs.execution_file }}
+          MODEL: claude-sonnet-5
+        run: |
+          bash scripts/append-ledger.sh
+          echo "today=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
 
       - name: Commit changes
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          git add mcp/ editorial/ src/content/practices/
-          if git diff --cached --quiet; then
-            echo "No changes this run."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Probes: quarterly marginal-value run $(date -u +%Y-%m-%d)"
-          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"
+        uses: ./.github/actions/commit-and-push
+        with:
+          paths: mcp/ editorial/ src/content/practices/ usage/
+          message: "Probes: quarterly marginal-value run ${{ steps.ledger.outputs.today }}"
+
+      - name: Notify on failure
+        if: failure()
+        uses: ./.github/actions/notify-failure

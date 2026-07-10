@@ -1,12 +1,13 @@
 name: Deep Dive
 
-# On-demand deep dive. Claude Code runs the deep-dive skill on a topic you name
-# (or, with no topic, the top deep-dive candidate in editorial memory). Writes a
-# researched essay to src/content/deep-dives/ and updates memory. Commits with
-# the workflow token; Deploy publishes on completion.
+# Deep dive. Claude Code runs the deep-dive skill on a topic you name (or,
+# with no topic, the top deep-dive candidate in editorial memory). Writes a
+# researched essay to src/content/deep-dives/ and updates memory. A
+# fresh-context verification pass and deterministic gates run before the
+# commit; Deploy publishes on completion. Dispatched manually or by the
+# Weekly workflow when the editor commissions a dive.
 #
-# Requires repo secret CLAUDE_CODE_OAUTH_TOKEN. Manual trigger only — the
-# weekly workflow commissions dives on its own when a thread earns one.
+# Requires repo secret CLAUDE_CODE_OAUTH_TOKEN.
 
 on:
   workflow_dispatch:
@@ -19,13 +20,22 @@ on:
 permissions:
   contents: write
   id-token: write
+  issues: write
+
+concurrency:
+  group: main-writers
+  cancel-in-progress: false
 
 jobs:
   deep-dive:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
 
       - name: Write the dive
         id: claude
@@ -38,21 +48,66 @@ jobs:
             Write the essay to src/content/deep-dives/ and update
             editorial/MEMORY.md. Write files only — do not commit or push.
           show_full_output: true
+          # Fable per the site's own switch-to-fable-for-long-unattended-runs
+          # practice: this is a long, unattended writing run.
           claude_args: >-
-            --model claude-sonnet-5
+            --model claude-fable-5
             --max-turns 60
             --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Grep,Bash(date *),Bash(ls *)"
 
-      - name: Commit changes
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Detect content changes
+        id: changes
+        run: echo "n=$(git status --porcelain -- src signals editorial | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+
+      - name: Verify changed claims (fact-integrity pass)
+        id: verify
+        if: steps.changes.outputs.n != '0'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: >
+            You are the fact-integrity gate for this repo's autonomous writer.
+            The previous step wrote a deep-dive essay but nothing is committed
+            yet. Run `git status --porcelain -- src/content` to find the new
+            and edited files and read them in full. For every load-bearing
+            factual claim — version numbers, feature availability, dates,
+            pricing, quotes, shipped-vs-announced status — verify it against a
+            primary public source with WebFetch/WebSearch. Fix what is wrong,
+            revert what cannot be verified, and mark anything
+            kept-but-unverified as such in the text. Do not restyle the prose
+            or change the argument. Write files only — do not commit or push.
+          show_full_output: true
+          claude_args: >-
+            --model claude-sonnet-5
+            --max-turns 25
+            --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Grep,Bash(git status *),Bash(git diff *),Bash(date *),Bash(ls *)"
+
+      - name: Gate — site builds with the new content
+        if: steps.changes.outputs.n != '0'
         run: |
-          git add signals/ editorial/ src/content/
-          if git diff --cached --quiet; then
-            echo "No dive written."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Deep dive: $(date -u +%Y-%m-%d)"
-          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"
+          npm ci
+          npm run build
+
+      - name: Gate — changed sources resolve
+        if: steps.changes.outputs.n != '0'
+        run: node scripts/check-sources.mjs --changed
+
+      - name: Append usage ledger
+        id: ledger
+        env:
+          EXEC_WRITER: ${{ steps.claude.outputs.execution_file }}
+          EXEC_VERIFY: ${{ steps.verify.outputs.execution_file }}
+          MODEL: claude-fable-5
+        run: |
+          bash scripts/append-ledger.sh
+          echo "today=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Commit changes
+        uses: ./.github/actions/commit-and-push
+        with:
+          paths: signals/ editorial/ src/content/ usage/
+          message: "Deep dive: ${{ steps.ledger.outputs.today }}"
+
+      - name: Notify on failure
+        if: failure()
+        uses: ./.github/actions/notify-failure

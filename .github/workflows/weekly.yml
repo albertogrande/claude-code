@@ -2,9 +2,13 @@ name: Weekly
 
 # Weekly digest. Claude Code runs the weekly-digest skill: it reads the week's
 # signals and editorial memory, writes one short "The Week" issue to
-# src/content/weekly/, does a full guide-accuracy pass, updates memory, and — if
-# a thread has earned it — commissions and writes a deep dive in the same
-# session. Commits with the workflow token; Deploy publishes on completion.
+# src/content/weekly/, does a full guide-accuracy pass, distills practices,
+# and updates memory. If the editor commissions a deep dive it writes the
+# topic to editorial/COMMISSION.txt and this workflow dispatches the Deep Dive
+# workflow — its own job, its own timeout — instead of cramming the dive into
+# this session. A fresh-context verification pass and deterministic gates
+# (site build + MCP retrieval eval + source liveness) run before the commit.
+# Failures open/comment a pipeline-failure issue — never silent.
 #
 # Requires repo secret CLAUDE_CODE_OAUTH_TOKEN.
 
@@ -18,13 +22,26 @@ on:
 permissions:
   contents: write
   id-token: write
+  issues: write
+  actions: write # to dispatch the commissioned Deep Dive
+
+concurrency:
+  group: main-writers
+  cancel-in-progress: false
 
 jobs:
   weekly:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            mcp/package-lock.json
 
       - name: Write the week
         id: claude
@@ -34,28 +51,101 @@ jobs:
           prompt: >
             Run the weekly-digest skill (.claude/skills/weekly-digest/SKILL.md)
             for the last completed Monday–Sunday week. Write the issue to
-            src/content/weekly/<WEEK_ID>.md, do the full guide-accuracy pass, and
-            update editorial/MEMORY.md. If — and only if — the weekly step
-            commissions a deep dive, then run the deep-dive skill
-            (.claude/skills/deep-dive/SKILL.md) in this same session on that
-            commissioned topic, reusing the research. Write files only — do not
-            commit or push.
+            src/content/weekly/<WEEK_ID>.md, do the full guide-accuracy pass,
+            distill practices, and update editorial/MEMORY.md. If — and only
+            if — you commission a deep dive, write its topic as the single
+            line of editorial/COMMISSION.txt and record the commission in
+            MEMORY; the workflow dispatches the dive as its own run. Do NOT
+            write the dive in this session. Write files only — do not commit
+            or push.
           show_full_output: true
+          # Fable per the site's own switch-to-fable-for-long-unattended-runs
+          # practice: this is a long, unattended writing run.
           claude_args: >-
-            --model claude-sonnet-5
+            --model claude-fable-5
             --max-turns 60
             --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Grep,Bash(date *),Bash(ls *)"
 
+      - name: Read deep-dive commission
+        id: commission
+        run: |
+          topic=""
+          if [ -f editorial/COMMISSION.txt ]; then
+            topic=$(head -1 editorial/COMMISSION.txt | tr -d '\n')
+            rm editorial/COMMISSION.txt
+          fi
+          echo "topic=$topic" >> "$GITHUB_OUTPUT"
+
+      - name: Detect content changes
+        id: changes
+        run: echo "n=$(git status --porcelain -- src signals editorial mcp | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+
+      - name: Verify changed claims (fact-integrity pass)
+        id: verify
+        if: steps.changes.outputs.n != '0'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: >
+            You are the fact-integrity gate for this repo's autonomous editor.
+            The previous step edited content but nothing is committed yet. Run
+            `git status --porcelain -- src/content signals` to list edited and
+            new files, `git diff -- src/content signals` for the edits, and
+            read new files in full. For every load-bearing factual claim added
+            or changed — version numbers, feature availability, dates, pricing,
+            quotes, shipped-vs-announced status — verify it against a primary
+            public source with WebFetch/WebSearch. Fix what is wrong, revert
+            what cannot be verified, and mark anything kept-but-unverified as
+            such in the text ("reportedly", with its single source). Do not add
+            new stories and do not restyle prose. Write files only — do not
+            commit or push.
+          show_full_output: true
+          # A different, fresh-context model checks the writer's claims.
+          claude_args: >-
+            --model claude-sonnet-5
+            --max-turns 25
+            --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Grep,Bash(git status *),Bash(git diff *),Bash(date *),Bash(ls *)"
+
+      - name: Gate — site builds with the new content
+        if: steps.changes.outputs.n != '0'
+        run: |
+          npm ci
+          npm run build
+
+      - name: Gate — MCP retrieval eval (hermetic)
+        if: steps.changes.outputs.n != '0'
+        working-directory: mcp
+        run: |
+          npm ci
+          node eval/ci.mjs
+
+      - name: Gate — changed sources resolve
+        if: steps.changes.outputs.n != '0'
+        run: node scripts/check-sources.mjs --changed
+
+      - name: Append usage ledger
+        id: ledger
+        env:
+          EXEC_WRITER: ${{ steps.claude.outputs.execution_file }}
+          EXEC_VERIFY: ${{ steps.verify.outputs.execution_file }}
+          MODEL: claude-fable-5
+        run: |
+          bash scripts/append-ledger.sh
+          echo "week=$(date -u +%G-W%V)" >> "$GITHUB_OUTPUT"
+
       - name: Commit changes
+        uses: ./.github/actions/commit-and-push
+        with:
+          paths: signals/ editorial/ src/content/ mcp/eval/queries.json usage/
+          message: "Weekly: digest ${{ steps.ledger.outputs.week }}"
+
+      - name: Dispatch commissioned deep dive
+        if: steps.commission.outputs.topic != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          git add signals/ editorial/ src/content/
-          if git diff --cached --quiet; then
-            echo "No changes this week."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Weekly: digest $(date -u +%G-W%V)"
-          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"
+          TOPIC: ${{ steps.commission.outputs.topic }}
+        run: gh workflow run deep-dive.yml -f topic="$TOPIC"
+
+      - name: Notify on failure
+        if: failure()
+        uses: ./.github/actions/notify-failure

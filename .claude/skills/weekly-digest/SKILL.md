@@ -134,11 +134,15 @@ earned the depth** — it's recurred across several signals/weeks and the guide
 covers it only thinly, or a single story is consequential enough to deserve the
 full treatment. Deep dives are the exception, not a weekly rotation.
 
-State your pick and reasoning. If running as part of the weekly pipeline, the
-`deep-dive` skill runs next in the same session and should reuse this research.
-Prefer topics not already dived (check the coverage index); revisiting a past
-dive is fine if the story moved materially. If nothing earns it this week, say
-so and commission nothing — a skipped dive beats a padded one.
+State your pick and reasoning. If running in the weekly pipeline, write the
+commissioned topic as the **single line** of `editorial/COMMISSION.txt` and
+record the commission (topic + one-line brief) under deep-dive candidates in
+MEMORY — the workflow dispatches the Deep Dive run with its own time budget;
+do **not** write the dive in this session. In an interactive session, just
+state the commission. Prefer topics not already dived (check the coverage
+index); revisiting a past dive is fine if the story moved materially. If
+nothing earns it this week, say so and commission nothing — a skipped dive
+beats a padded one.
 
 ## Step 7 — Update memory
 
