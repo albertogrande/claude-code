@@ -34,19 +34,32 @@ Config via env:
 ## Deploy (the one manual step)
 
 The server needs a host with a public HTTPS URL (GitHub Pages is static-only, so
-it can't run this). The tested path is any **Node/container host**:
+it can't run this).
+
+### Recommended: Vercel (serverless, push-to-deploy)
+
+The stateless server maps cleanly onto a Vercel function — `api/mcp.js` is the
+adapter, `vercel.json` rewrites `/mcp` → `/api/mcp`. Three clicks:
+
+1. Vercel → **Add New… → Project** → import the `albertogrande/claude-code` repo.
+2. Set **Root Directory = `mcp`**. Leave the framework as "Other"; no build
+   command needed. Deploy.
+3. Every push to `main` redeploys automatically (Vercel's GitHub integration).
+
+Your MCP endpoint is then `https://<project>.vercel.app/mcp`.
+
+Optional env (Project → Settings → Environment Variables): `GUIDE_BASE_URL`
+(default `https://albertogrande.github.io/claude-code`), `GUIDE_CACHE_TTL_MS`.
+
+### Alternative: any Node/container host (always-warm, no cold start)
 
 ```bash
 docker build -t guide-mcp mcp/
 docker run -p 8787:8787 guide-mcp
 ```
 
-Then put it behind HTTPS on your host of choice (Render, Railway, Fly.io, a
-small VPS, etc.). The MCP endpoint is `https://<your-host>/mcp`.
-
-> Cloudflare Workers is a good serverless option but needs the SDK's
-> Workers/`fetch` transport adapter, which isn't included here — the Node
-> Streamable-HTTP server above is what's tested.
+Put it behind HTTPS on Render / Railway / Fly.io / a VPS. Endpoint:
+`https://<your-host>/mcp`. Same code as the Vercel path.
 
 ## Connect it to Claude Code
 

@@ -7,7 +7,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node test.mjs"
+    "test": "node test.mjs",
+    "test:vercel": "node test-vercel.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",

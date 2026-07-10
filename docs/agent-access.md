@@ -53,10 +53,12 @@ transport, so it runs locally (testable) and deploys to any Node-capable host.
 The core (fetch guide → tool handlers) is a host-agnostic module; the transport
 is a thin wrapper.
 
-**Hosting.** A remote server needs a host (GitHub Pages is static-only). The
-one manual step the owner does: pick a host and add its deploy secret. Default
-recommendation: **Cloudflare Workers** (first-class MCP support, free tier,
-GitHub-Action deployable). Any Node host (Render/Fly/Railway/VPS) also works.
+**Hosting.** A remote server needs a host (GitHub Pages is static-only). Chosen
+host: **Vercel** — the stateless server maps onto a serverless function
+(`mcp/api/mcp.js` + `mcp/vercel.json`), Vercel's GitHub integration redeploys on
+every push, and it's free. The one manual step the owner does: import the repo
+in Vercel with Root Directory `mcp`. Any Node/container host (the `Dockerfile`)
+is the always-warm alternative — same code.
 
 ### Layer 3 — the "when to consult" logic (a Claude Code plugin)
 
