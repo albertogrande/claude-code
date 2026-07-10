@@ -40,10 +40,14 @@ jobs:
             each practice's decision question (updating the question bank for
             added/retired practices) to a fresh subagent instructed to use NO
             tools and answer from its own knowledge, grade AGREE / PARTIAL /
-            DIVERGE-UNKNOWN, then: update the Eval 1 table and date in
+            DIVERGE-UNKNOWN, then: stamp each practice's frontmatter in
+            src/content/practices/ with its verdict (probe: {status:
+            agree|partial|diverge, date: <today>}, matching the schema in
+            src/content.config.ts), update the Eval 1 table and date in
             mcp/EVALS.md, append a History row in mcp/eval/marginal-probes.md
             (record which model was probed), and note practices that decayed
-            to AGREE in editorial/MEMORY.md under Standing editorial findings.
+            to AGREE in editorial/MEMORY.md under Standing editorial findings
+            so the weekly editor retires or refreshes them.
             Finally run "npm ci && npm run eval" inside mcp/ against
             production and report if the regression gate fails.
             Write files only — do not commit or push.
@@ -57,7 +61,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add mcp/ editorial/
+          git add mcp/ editorial/ src/content/practices/
           if git diff --cached --quiet; then
             echo "No changes this run."
             exit 0

@@ -19,6 +19,13 @@ export const GET: APIRoute = async (context) => {
     when: p.data.when,
     do: p.data.do,
     why: p.data.why,
+    // The body is the practice's one-line editorial nuance — ship it to agents.
+    note: (p.body ?? '').trim() || undefined,
+    since: p.data.since,
+    verify: p.data.verify,
+    probe: p.data.probe
+      ? { status: p.data.probe.status, date: isoDate(p.data.probe.date) }
+      : undefined,
     section: p.data.section,
     section_url: abs(`/guide/${p.data.section}`),
     tags: p.data.tags,

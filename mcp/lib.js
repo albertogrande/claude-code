@@ -102,6 +102,7 @@ function scorePractice(p, query) {
     [p.when, 3],
     [p.do, 3],
     [p.why, 2],
+    [p.note, 2],
     [p.section, 1],
   ];
   let score = 0;
@@ -122,6 +123,9 @@ function formatPractice(p) {
     `- When: ${p.when}`,
     `- Do: ${p.do}`,
     `- Why: ${p.why}`,
+    p.since ? `- Since: Claude Code ${p.since} (a versioned fact — cite it)` : null,
+    p.verify ? `- Verify: ${p.verify}` : null,
+    p.note ? `- Note: ${p.note}` : null,
     `- Section: ${p.section}${p.section_url ? ` (${p.section_url})` : ''}`,
     src ? `- Sources: ${src}` : null,
   ]

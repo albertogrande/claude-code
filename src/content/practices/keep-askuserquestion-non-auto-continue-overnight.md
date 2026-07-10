@@ -5,7 +5,9 @@ do: Leave the default (since 2.1.200 it no longer auto-continues). Only re-enabl
 why: A stalled question is a safer failure mode than Claude silently picking an answer and building a hundred commits on a guess you never saw.
 section: 02-permission-modes
 tags: [modes, apps, workflow]
-updated: 2026-07-09
+since: "2.1.200"
+verify: /config → the AskUserQuestion idle timeout should be off by default.
+updated: 2026-07-10
 sources:
   - label: Claude Code — Permission modes
     url: https://code.claude.com/docs/en/permission-modes

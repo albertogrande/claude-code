@@ -64,6 +64,12 @@ recall was untouched by the fix. Spanish was never really supported — its v1
 Regression gate: in-domain hit@3 ≥ 80% or `npm run eval` exits 1. Run it after
 any change to the search or the corpus.
 
+*2026-07-10, later:* the pipeline audit closed the corpus's production gap —
+the weekly desk now owns distilling practices (Step 5.5) from scout
+`practice-candidate` flags, the schema carries `since`/`verify`/`note`/`probe`,
+and the corpus grew 8 → 11 from this week's own signals. Eval set grew 24 → 30
+queries; in-domain hit@3 22/22, paraphrase hit@1 100%.
+
 ## Eval 3 — Cost & latency: what does a consult cost the session?
 
 Production, 2026-07-10:
@@ -121,9 +127,11 @@ calls. Net: faster, by the boring mechanism of fewer wrong turns.
    + Spanish stopwords in `lib.js`; Spanish hit@3 33% → 100%. Embeddings still
    deliberately skipped (overkill at 8 practices, revisit at ~30+).
 2. **Grow the corpus where the value is** — versioned product facts first
-   (defaults that changed, new settings, current lineup). The probes are the
-   gap-finder: anything a bare model already knows is low-priority to write.
-   Now encoded in `editorial/TASTE.md` so the scout/weekly desks apply it.
+   (defaults that changed, new settings, current lineup). Now *operational*,
+   not just aspirational: the scout flags `practice-candidate` signals, the
+   weekly's Step 5.5 distills them into practices (with `since`/`verify`), and
+   the Probes workflow stamps decay (`probe:`) so stale ones get retired.
+   Ongoing by design — this item stays open as the pipeline's heartbeat.
 3. ~~**Wire the eval into CI**~~ — DONE 2026-07-10: `mcp` job in
    `.github/workflows/ci.yml` runs `npm test` + `eval/ci.mjs` (hermetic:
    local dist as corpus) on every PR and push to main.

@@ -81,11 +81,16 @@ it into fact.
 Add **3–10 lines** under a `## <TODAY>` heading. One line each:
 
 ```markdown
-- [<short headline or thread title>](<url>) — <one clause: what + why it might matter> (<area> · <feature|workflow|tip|discussion>)
+- [<short headline or thread title>](<url>) — <one clause: what + why it might matter> (<area> · <feature|workflow|tip|discussion>[ · practice-candidate])
 ```
 
 - `<area>` from the guide coverage index: `models`, `modes`, `context`,
   `skills/plugins/mcp/hooks`, `subagents/workflows`, `apps`, `teams`, or `meta`.
+- Append ` · practice-candidate` when the signal **changes a decision the
+  reader makes** — a default flipped, a new setting or mode, a model-choice
+  fact — not merely a fact that changed. These become the weekly editor's
+  queue for distilling `src/content/practices/` entries (the corpus agents
+  query over MCP). When in doubt, flag it; the editor decides.
 - Discussions are first-class: an HN thread blowing up about a regression is a
   signal even if no outlet wrote it up — link the thread.
 - Note trajectory when visible ("second day of…", "follow-up to Monday's…").

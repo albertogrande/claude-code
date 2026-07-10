@@ -67,7 +67,38 @@ const practices = defineCollection({
     why: z.string(),
     // The guide section id this belongs to, e.g. "01-models-and-effort".
     section: z.string(),
-    tags: z.array(z.string()).default([]),
+    // Controlled vocabulary — search_practices filters by tag, so drift would
+    // silently break the filter. Extend the enum deliberately, not ad hoc.
+    tags: z
+      .array(
+        z.enum([
+          'models',
+          'modes',
+          'context',
+          'skills',
+          'plugins',
+          'mcp',
+          'hooks',
+          'workflow',
+          'subagents',
+          'apps',
+          'teams',
+        ])
+      )
+      .default([]),
+    // The versioned fact that made this true (e.g. "2.1.200"). The corpus's
+    // measured edge over a bare model is versioned facts — carry the version.
+    since: z.string().optional(),
+    // How to check it still holds (a command, a setting to look at).
+    verify: z.string().optional(),
+    // Stamped by the quarterly Probes workflow: does a bare model already give
+    // this answer? `agree` practices are candidates to retire or refresh.
+    probe: z
+      .object({
+        status: z.enum(['agree', 'partial', 'diverge']),
+        date: z.coerce.date(),
+      })
+      .optional(),
     sources: z
       .array(z.object({ label: z.string(), url: z.string().url() }))
       .default([]),

@@ -107,6 +107,26 @@ topic→section):
 If the week added a whole new evergreen topic that fits no section, note it as a
 deep-dive/guide candidate in MEMORY rather than forcing it in.
 
+## Step 5.5 — Distill practices (the agent-facing corpus)
+
+`src/content/practices/` is what agents query through the MCP — it only grows
+if you grow it. Sweep the week's signals for ` · practice-candidate` flags
+(plus anything that made the digest and changes a user decision):
+
+- **Create or update** a practice per qualifying change: one
+  `when / do / why` unit tied to a guide section, with `since:` (the version
+  that made it true), `verify:` (how to check it still holds), a one-line body
+  note (the editorial nuance), `tags` from the schema enum, and a primary
+  source. Match `src/content.config.ts` exactly.
+- **The bar** (from TASTE.md, measured in `mcp/EVALS.md`): versioned product
+  facts a bare model gets wrong. Timeless good judgment the model already has
+  does not earn a practice.
+- **Retire or refresh** any practice whose `probe:` stamp says `agree` — the
+  models caught up; it's dead weight in every search result.
+- When you add a practice, add 1–2 retrieval queries for it to
+  `mcp/eval/queries.json` so the regression gate covers it.
+- A quiet week adds nothing — 8 sharp practices beat 40 stale ones.
+
 ## Step 6 — Commission a deep dive (only if earned)
 
 Read MEMORY's **deep-dive candidates**. Commission one **only when a thread has

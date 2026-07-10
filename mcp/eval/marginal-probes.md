@@ -18,8 +18,12 @@ release.
 3. Grade each answer against the practice: **AGREE** (matches the
    recommendation), **PARTIAL** (right end-state, missing the versioned
    specifics), **DIVERGE/UNKNOWN** (wrong recommendation or admits ignorance).
-4. Update `mcp/EVALS.md` (Eval 1 table + date), note decayed practices in
-   `editorial/MEMORY.md`, and commit to `main` per repo convention.
+4. Stamp each practice's frontmatter in `src/content/practices/` with the
+   verdict — `probe: { status: agree|partial|diverge, date: <today> }` — so
+   the corpus itself carries its decay state (the weekly editor retires
+   `agree` practices). Then update `mcp/EVALS.md` (Eval 1 table + date), note
+   decayed practices in `editorial/MEMORY.md`, and commit to `main` per repo
+   convention.
 
 Grading guardrails: quote the bare answer's key claim in the table; when in
 doubt between PARTIAL and AGREE, ask "would the user have made the same
