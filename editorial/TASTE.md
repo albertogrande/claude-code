@@ -24,6 +24,13 @@ Wants the state of the art, kept honest.
 - **Sourced.** Every claim traceable to a primary source (docs, changelog,
   release notes) or a linked community thread. Distinguish shipped features
   from research previews.
+- **Versioned facts over timeless advice — especially for practices.** The
+  2026-07-10 evals (`mcp/EVALS.md`, Eval 1) measured it: a bare model already
+  knows the timeless judgment (clear context after failed fixes, split
+  writer/reviewer, delegate boilerplate) but misses or hedges on everything
+  versioned — changed defaults, new settings, the current model lineup. New
+  practices earn their place by encoding what changed and when ("since
+  2.1.200…"), not by restating good engineering sense.
 
 ## Voice
 

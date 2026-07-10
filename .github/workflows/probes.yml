@@ -1,0 +1,68 @@
+name: Probes
+
+# Quarterly marginal-value probes for the guide MCP. Claude Code follows
+# mcp/eval/marginal-probes.md: poses each practice's decision question to a
+# fresh no-tools subagent, grades the answers against the corpus, updates
+# mcp/EVALS.md + the probe history + editorial memory, and runs the retrieval
+# eval against production. Finds practices that have decayed into common
+# knowledge so the corpus keeps earning its tokens.
+#
+# Requires repo secret CLAUDE_CODE_OAUTH_TOKEN (same as Scout/Weekly).
+
+on:
+  schedule:
+    # 06:00 UTC on the 1st of Jan/Apr/Jul/Oct.
+    - cron: "0 6 1 1,4,7,10 *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  probes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run the marginal-value probes
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: >
+            Run the quarterly marginal-value probes following
+            mcp/eval/marginal-probes.md exactly: fetch the current corpus from
+            https://albertogrande.github.io/claude-code/practices.json, pose
+            each practice's decision question (updating the question bank for
+            added/retired practices) to a fresh subagent instructed to use NO
+            tools and answer from its own knowledge, grade AGREE / PARTIAL /
+            DIVERGE-UNKNOWN, then: update the Eval 1 table and date in
+            mcp/EVALS.md, append a History row in mcp/eval/marginal-probes.md
+            (record which model was probed), and note practices that decayed
+            to AGREE in editorial/MEMORY.md under Standing editorial findings.
+            Finally run "npm ci && npm run eval" inside mcp/ against
+            production and report if the regression gate fails.
+            Write files only — do not commit or push.
+          show_full_output: true
+          claude_args: >-
+            --model claude-sonnet-5
+            --max-turns 60
+            --allowedTools "Task,Agent,WebFetch,Read,Write,Edit,Glob,Grep,Bash(npm *),Bash(node *),Bash(date *),Bash(ls *)"
+
+      - name: Commit changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add mcp/ editorial/
+          if git diff --cached --quiet; then
+            echo "No changes this run."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Probes: quarterly marginal-value run $(date -u +%Y-%m-%d)"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"

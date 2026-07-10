@@ -44,7 +44,52 @@ const STOPWORDS = new Set([
   'those', 'as', 'so', 'if', 'then', 'than', 'too', 'can', 'could', 'should',
   'would', 'will', 'just', 'about', 'how', 'what', 'which', 'when', 'where',
   'why', 'who', 'use', 'using', 'after', 'before',
+  // Spanish (the corpus is English; ES terms match via SYNONYMS below)
+  'que', 'qué', 'para', 'una', 'uno', 'unos', 'unas', 'los', 'las', 'del',
+  'con', 'por', 'como', 'cómo', 'mis', 'tus', 'sus', 'son', 'este', 'esta',
+  'estos', 'estas', 'más', 'muy', 'hay', 'ser', 'estar', 'hacer', 'cuál',
+  'cuáles', 'cuándo', 'dónde', 'debo', 'puedo',
 ]);
+
+// ES → EN bridge: the corpus is English but the reader often thinks in
+// Spanish. Each query term also matches through its translations.
+const SYNONYMS = {
+  modelo: ['model'], modelos: ['models'],
+  permiso: ['permission'], permisos: ['permissions'],
+  modo: ['mode'], modos: ['modes'],
+  desatendida: ['unattended'], desatendido: ['unattended'],
+  ejecución: ['run'], ejecucion: ['run'], ejecutar: ['run'],
+  tarea: ['task'], tareas: ['tasks'], larga: ['long'], largo: ['long'],
+  contexto: ['context'], memoria: ['memory'], sesión: ['session'], sesion: ['session'],
+  limpiar: ['clear'], limpio: ['clean', 'fresh'], limpia: ['clean', 'fresh'],
+  revisar: ['review'], revisión: ['review'], revision: ['review'], revisor: ['reviewer'],
+  código: ['code'], codigo: ['code'],
+  coste: ['cost', 'spend'], costo: ['cost', 'spend'], gasto: ['spend'],
+  presupuesto: ['budget'], barato: ['cheap'],
+  flujo: ['workflow'], flujos: ['workflows'],
+  agente: ['agent'], agentes: ['agents'], subagente: ['subagent'], subagentes: ['subagents'],
+  nocturna: ['overnight'], nocturno: ['overnight'], noche: ['overnight'],
+  pregunta: ['question'], preguntas: ['questions'],
+  compartir: ['share'], salida: ['output'], atajo: ['shortcut'],
+  fallo: ['fail'], falla: ['fail'], fallida: ['failed'], fallido: ['failed'],
+  corrección: ['correction'], correccion: ['correction'], corregir: ['correct'],
+  novedades: ['new'], nuevo: ['new'], nueva: ['new'],
+  herramienta: ['tool'], herramientas: ['tools'], equipo: ['team'], equipos: ['teams'],
+  búsqueda: ['search'], busqueda: ['search'], buscar: ['search'], delegar: ['delegate'],
+};
+
+// A term matches through itself, its translations, and a light stem
+// ("correcting" → "correct" ⊂ "correction"; "stalls" → "stall").
+function variantsOf(term) {
+  const v = new Set([term, ...(SYNONYMS[term] || [])]);
+  for (const t of [...v]) {
+    if (t.length < 5) continue;
+    if (t.endsWith('ing')) v.add(t.slice(0, -3));
+    else if (t.endsWith('ed') || t.endsWith('es')) v.add(t.slice(0, -2));
+    else if (t.endsWith('s')) v.add(t.slice(0, -1));
+  }
+  return [...v].filter((t) => t.length >= 3);
+}
 
 function scorePractice(p, query) {
   const q = query.toLowerCase().trim();
@@ -61,8 +106,10 @@ function scorePractice(p, query) {
   ];
   let score = 0;
   for (const term of terms) {
+    const vars = variantsOf(term);
     for (const [textVal, weight] of fields) {
-      if (textVal && textVal.toLowerCase().includes(term)) score += weight;
+      const t = textVal && textVal.toLowerCase();
+      if (t && vars.some((v) => t.includes(v))) score += weight;
     }
   }
   return score;

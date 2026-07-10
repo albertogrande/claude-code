@@ -48,12 +48,12 @@ with ground-truth practice ids — `eval/queries.json`, scored by
 `eval/run-evals.mjs`. The 2026-07-10 run found one real defect and its fix is
 now deployed; both runs shown:
 
-| Category | v1 (before fix) | v2 (stopwords + score≥2 + top-5) |
-|---|---|---|
-| direct hit@1 / hit@3 | 88% / **100%** | 88% / **100%** |
-| paraphrase hit@1 / hit@3 | 75% / **100%** | 88% / **100%** |
-| spanish hit@1 | 67% (substring luck) | 33% (luck removed) |
-| off-topic queries returning noise | **3/5, up to all 8 practices (~1,350 tok)** | 2/5, max **1** practice (~150 tok) |
+| Category | v1 (before fix) | v2 (stopwords + score≥2 + top-5) | v3 (ES synonyms + stemming) |
+|---|---|---|---|
+| direct hit@1 / hit@3 | 88% / **100%** | 88% / **100%** | 88% / **100%** |
+| paraphrase hit@1 / hit@3 | 75% / **100%** | 88% / **100%** | **100%** / **100%** |
+| spanish hit@1 / hit@3 | 67% (substring luck) | 33% (luck removed) | 67% / **100%** |
+| off-topic queries returning noise | **3/5, up to all 8 practices (~1,350 tok)** | 2/5, max **1** practice (~150 tok) | 2/5, max **1** practice |
 
 The defect: stopwords ("a", "with") substring-matched everything, so
 `center a div with css` returned the entire corpus as confident noise. Fixed
@@ -117,18 +117,23 @@ calls. Net: faster, by the boring mechanism of fewer wrong turns.
 
 ## Improvement backlog (from these evals)
 
-1. **Bilingual/robust matching** — Spanish queries score 33%. Cheapest:
-   English+Spanish synonym expansion in `scorePractice`; right: embeddings
-   (overkill at 8 practices, revisit at ~30+).
+1. ~~**Bilingual/robust matching**~~ — DONE 2026-07-10: ES→EN synonym bridge
+   + Spanish stopwords in `lib.js`; Spanish hit@3 33% → 100%. Embeddings still
+   deliberately skipped (overkill at 8 practices, revisit at ~30+).
 2. **Grow the corpus where the value is** — versioned product facts first
    (defaults that changed, new settings, current lineup). The probes are the
    gap-finder: anything a bare model already knows is low-priority to write.
-3. **Wire `npm run eval` into CI** so search/corpus regressions fail a PR,
-   with the harness pointed at a local server (like `npm test`) instead of prod.
-4. **Rerun the marginal-value probes quarterly** — as models absorb 2026
-   facts, practices decay from DIVERGE to AGREE; retire or refresh them.
-5. **Stemming** — "correcting" doesn't match "correction"; a crude
-   plural/suffix trim would lift paraphrase hit@1 further.
+   Now encoded in `editorial/TASTE.md` so the scout/weekly desks apply it.
+3. ~~**Wire the eval into CI**~~ — DONE 2026-07-10: `mcp` job in
+   `.github/workflows/ci.yml` runs `npm test` + `eval/ci.mjs` (hermetic:
+   local dist as corpus) on every PR and push to main.
+4. ~~**Rerun the marginal-value probes quarterly**~~ — DONE 2026-07-10:
+   protocol + question bank in `eval/marginal-probes.md`, scheduled by
+   `.github/workflows/probes.yml` (1st of Jan/Apr/Jul/Oct, manual via
+   workflow_dispatch). As models absorb 2026 facts, practices decay from
+   DIVERGE to AGREE; the run flags them for retirement or refresh.
+5. ~~**Stemming**~~ — DONE 2026-07-10: light suffix trim in `variantsOf()`;
+   paraphrase hit@1 88% → 100%.
 
 ## Re-running
 

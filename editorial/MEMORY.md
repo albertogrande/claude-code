@@ -7,6 +7,13 @@ update after. Keep under ~150 lines — retire dead threads by deleting them
 This is the brain that keeps the **guide** current and decides when a thread
 has earned a **deep dive**. It is internal (not rendered).
 
+## Standing editorial findings
+
+- **2026-07-10, practice-value evals** (`mcp/EVALS.md`): the guide's measured
+  edge over a bare model is versioned product facts only — write practices for
+  those first (see TASTE.md). Probes rerun quarterly (Probes workflow);
+  practices that decay to "model already knows this" get retired or refreshed.
+
 ## Running threads
 
 Each thread carries a momentum tag (`↑` gaining / `→` steady / `↓` stalling)
