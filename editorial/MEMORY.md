@@ -21,10 +21,23 @@ keeps recurring in signals and isn't well covered by the guide is a
   fixed (2.1.203). 07-09: 2.1.205 hardens auto mode (blocks transcript-file
   tampering, asks before `rm -rf` on an unresolved var, notifications state no
   human input occurred — no fabricated approvals); 2.1.204 fixes SessionStart
-  hooks streaming in headless runs (was idle-reaping remote workers). Direction:
+  hooks streaming in headless runs (was idle-reaping remote workers). 07-10:
+  2.1.206 makes background agents upgrade themselves right after you update
+  Claude Code (was: slow stale-version upgrade on attach) and adds an
+  `EnterWorktree` confirmation before entering a worktree outside
+  `.claude/worktrees/` — one more guardrail on unattended fan-out. Direction:
   safer defaults, cost dials, trustworthy background subagents. Guide: covered
   across §05 (subagents), §06 (apps), §08 (teams).
   → [2026-W28](../src/content/weekly/2026-W28.md)
+- **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
+  nation-state security alert. 07-10: China's National Vulnerability Database
+  names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
+  specifically; Anthropic responds that Chinese users "were not supposed to be
+  using it in the first place" and reiterates the tracking code is an
+  anti-distillation measure, not a backdoor. Ecosystem/policy story, not a
+  product change — watching for whether it affects anything shipped. Guide:
+  not covered (out of scope for a practitioner field guide unless it starts
+  changing product behavior).
 - **Cost control as a first-class habit** `↑` — the token meter is now a
   design constraint the reader manages, not an afterthought. W28: delegate
   routine coding to lower-power subagents (Willison); advisory workflow-size
