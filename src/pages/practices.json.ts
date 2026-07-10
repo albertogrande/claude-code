@@ -1,0 +1,40 @@
+import type { APIRoute } from 'astro';
+import { getCollection } from 'astro:content';
+import { withBase, isoDate } from '../lib/site';
+
+// Machine-readable best-practices for agent consumption (and the MCP server).
+// Deterministic: the `updated` field is the newest practice date, not build time.
+
+export const GET: APIRoute = async (context) => {
+  const site = context.site!;
+  const abs = (p: string) => new URL(withBase(p), site).href;
+
+  const practices = (await getCollection('practices')).sort((a, b) =>
+    a.data.section.localeCompare(b.data.section) || a.id.localeCompare(b.id)
+  );
+
+  const items = practices.map((p) => ({
+    id: p.id,
+    title: p.data.title,
+    when: p.data.when,
+    do: p.data.do,
+    why: p.data.why,
+    section: p.data.section,
+    section_url: abs(`/guide/${p.data.section}`),
+    tags: p.data.tags,
+    sources: p.data.sources,
+    updated: isoDate(p.data.updated),
+  }));
+
+  const updated = items.reduce((m, p) => (p.updated > m ? p.updated : m), '1970-01-01');
+
+  const body = JSON.stringify(
+    { title: 'Claude Code field guide — practices', updated, count: items.length, practices: items },
+    null,
+    2
+  );
+
+  return new Response(body, {
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+  });
+};

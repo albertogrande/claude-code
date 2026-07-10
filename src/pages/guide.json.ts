@@ -1,0 +1,37 @@
+import type { APIRoute } from 'astro';
+import { getCollection } from 'astro:content';
+import { withBase, isoDate } from '../lib/site';
+
+// The evergreen guide, section by section, with raw markdown body — the source
+// the MCP `get_guide_section` / `list_guide_sections` tools read.
+
+export const GET: APIRoute = async (context) => {
+  const site = context.site!;
+  const abs = (p: string) => new URL(withBase(p), site).href;
+
+  const guide = (await getCollection('guide')).sort(
+    (a, b) => a.data.order - b.data.order
+  );
+
+  const sections = guide.map((g) => ({
+    id: g.id,
+    title: g.data.title,
+    order: g.data.order,
+    summary: g.data.summary,
+    updated: isoDate(g.data.updated),
+    url: abs(`/guide/${g.id}`),
+    body: g.body ?? '',
+  }));
+
+  const updated = sections.reduce((m, s) => (s.updated > m ? s.updated : m), '1970-01-01');
+
+  const body = JSON.stringify(
+    { title: 'Claude Code field guide — sections', updated, count: sections.length, sections },
+    null,
+    2
+  );
+
+  return new Response(body, {
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+  });
+};

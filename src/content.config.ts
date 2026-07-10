@@ -51,6 +51,30 @@ const weekly = defineCollection({
   }),
 });
 
+// practices/ — atomic, retrievable best-practices for agent consumption (and a
+// human-readable page). Each is a "when X → do Y (because Z)" unit tied to a
+// guide section. Surfaced to agents via /practices.json and the MCP server.
+const practices = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/practices' }),
+  schema: z.object({
+    // Short imperative name, e.g. "Switch to Fable for long unattended runs".
+    title: z.string(),
+    // The trigger condition — when this applies.
+    when: z.string(),
+    // The action to take.
+    do: z.string(),
+    // Why it works / the rationale.
+    why: z.string(),
+    // The guide section id this belongs to, e.g. "01-models-and-effort".
+    section: z.string(),
+    tags: z.array(z.string()).default([]),
+    sources: z
+      .array(z.object({ label: z.string(), url: z.string().url() }))
+      .default([]),
+    updated: z.coerce.date(),
+  }),
+});
+
 const deepDives = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/deep-dives' }),
   schema: z.object({
@@ -71,4 +95,4 @@ const deepDives = defineCollection({
   }),
 });
 
-export const collections = { guide, weekly, 'deep-dives': deepDives };
+export const collections = { guide, weekly, practices, 'deep-dives': deepDives };
