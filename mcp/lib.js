@@ -112,68 +112,85 @@ function variantsOf(term) {
     else if (t.endsWith('ed') || t.endsWith('es')) v.add(t.slice(0, -2));
     else if (t.endsWith('s')) v.add(t.slice(0, -1));
   }
-  return [...v].filter((t) => t.length >= 3);
+  return [...v].filter((t) => t.length >= 3 || SHORT_TERMS.has(t));
 }
 
 // since/verify are indexed too — the corpus's measured edge is versioned
 // facts, so a version string or a verify command must be findable.
-const fieldsOf = (p) => [
-  [p.title, 5],
-  [p.tags?.join(' '), 4],
-  [p.when, 3],
-  [p.do, 3],
-  [p.why, 2],
-  [p.note, 2],
-  [p.since, 2],
-  [p.verify, 2],
-  [p.section, 1],
-];
+// Lowercased once per practice per fetch — scoring reuses the cached form.
+const fieldCache = new WeakMap();
+function fieldsOf(p) {
+  let f = fieldCache.get(p);
+  if (!f) {
+    f = [
+      [p.title, 5],
+      [p.tags?.join(' '), 4],
+      [p.when, 3],
+      [p.do, 3],
+      [p.why, 2],
+      [p.note, 2],
+      [p.since, 2],
+      [p.verify, 2],
+      [p.section, 1],
+    ]
+      .filter(([t]) => t)
+      .map(([t, w]) => [t.toLowerCase(), w]);
+    fieldCache.set(p, f);
+  }
+  return f;
+}
+
+// Real 2-letter technical terms that the min-length filter would otherwise
+// silently drop.
+const SHORT_TERMS = new Set(['ci', 'gh', 'md', 'js', 'ts', 'ui', 'db', 'os']);
 
 function queryTermVariants(query) {
   return (query || '')
     .toLowerCase()
     .trim()
     .split(/\s+/)
-    .filter((t) => t.length >= 3 && !STOPWORDS.has(t))
+    .filter((t) => (t.length >= 3 || SHORT_TERMS.has(t)) && !STOPWORDS.has(t))
     .map(variantsOf);
 }
-
-const matchesAnyField = (p, vars) =>
-  fieldsOf(p).some(([textVal]) => {
-    const t = textVal && textVal.toLowerCase();
-    return t && vars.some((v) => t.includes(v));
-  });
 
 // Corpus-frequency boost per term: rare terms distinguish practices,
 // ubiquitous ones ("run", "session") don't. Bounded to [0.6, 1.6] so it
 // re-ranks without overriding the field-weight base score — the relevance
 // filter thresholds on the unboosted score, keeping its meaning stable as
 // the corpus grows.
-function idfOf(vars, corpus) {
-  const df = corpus.filter((p) => matchesAnyField(p, vars)).length;
+function idfFromDf(df, n) {
   if (!df) return 1;
-  const raw = Math.log(1 + corpus.length / df);
-  const norm = (raw / Math.log(1 + corpus.length)) * 1.6;
+  const norm = (Math.log(1 + n / df) / Math.log(1 + n)) * 1.6;
   return Math.min(1.6, Math.max(0.6, norm));
 }
 
-// Returns { base, ranked }: `base` is the plain field-weight sum (used for
-// the ≥2 relevance filter), `ranked` weights each term by its corpus IDF
-// (used for ordering).
-function scorePractice(p, termVars, idfs) {
-  const fields = fieldsOf(p);
-  let base = 0;
-  let ranked = 0;
-  termVars.forEach((vars, i) => {
-    let termScore = 0;
-    for (const [textVal, weight] of fields) {
-      const t = textVal && textVal.toLowerCase();
-      if (t && vars.some((v) => t.includes(v))) termScore += weight;
-    }
-    base += termScore;
-    ranked += termScore * (idfs[i] ?? 1);
+// One matching pass over the corpus serves both document frequencies and
+// scores. Per practice: termScores[i] = field-weight sum for term i, and
+// `substantive` = some term matched a real content field (weight ≥ 2) —
+// section-name-only hits, even across several terms, are noise.
+function scoreCorpus(corpus, termVars) {
+  const scored = new Map();
+  for (const p of corpus) {
+    const fields = fieldsOf(p);
+    let substantive = false;
+    const termScores = termVars.map((vars) => {
+      let s = 0;
+      for (const [t, weight] of fields) {
+        if (vars.some((v) => t.includes(v))) {
+          s += weight;
+          if (weight >= 2) substantive = true;
+        }
+      }
+      return s;
+    });
+    scored.set(p, { termScores, substantive });
+  }
+  const idfs = termVars.map((_, i) => {
+    let df = 0;
+    for (const { termScores } of scored.values()) if (termScores[i] > 0) df++;
+    return idfFromDf(df, corpus.length);
   });
-  return { base, ranked };
+  return { scored, idfs };
 }
 
 function formatPractice(p) {
@@ -228,25 +245,42 @@ export function buildMcpServer() {
 
         const termVars = queryTermVariants(query || '');
         if (!termVars.length) {
-          // Tag-only browse: the filter already narrowed the set, return it.
+          // A query that reduced to nothing (all stopwords/too short) is not
+          // a browse request — say so instead of dumping the tag set.
+          if ((query || '').trim()) {
+            return text(`The query "${query}" is all stopwords or too-short terms — nothing usable to match on. Try more specific words, or browse with tags alone. Valid tags: ${vocab.join(', ')}.`);
+          }
+          // Tag-only browse: the filter already narrowed the set. Capped so a
+          // broad tag can't dump the whole corpus into the caller's context.
           if (tags?.length) {
+            const CAP = 10;
+            if (!practices.length) return text(`No practices tagged ${tags.join(', ')}.`);
+            const shown = practices.slice(0, CAP);
+            const more = practices.length - shown.length;
             return text(
-              practices.map(formatPractice).join('\n\n') || `No practices tagged ${tags.join(', ')}.`
+              shown.map(formatPractice).join('\n\n') +
+                (more > 0 ? `\n\n(${more} more tagged ${tags.join(', ')} — add a query to narrow.)` : '')
             );
           }
           return text(`Pass a query, a tag filter, or both. Valid tags: ${vocab.join(', ')}.`);
         }
 
-        // IDF over the full corpus (not the tag-filtered subset) keeps term
-        // statistics stable regardless of the filter.
-        const idfs = termVars.map((vars) => idfOf(vars, all));
-        // Base score ≥ 2 = at least a title/tags/when/do/why match; a lone
-        // section-name hit (weight 1) is noise. Top 5 keeps a noisy query from
-        // dumping the whole corpus into the caller's context.
+        // One pass over the full corpus (not the tag-filtered subset) yields
+        // both scores and stable IDF statistics.
+        const { scored, idfs } = scoreCorpus(all, termVars);
+        // Base score ≥ 2 with at least one substantive-field match — a lone
+        // section-name hit (or several of them across terms) is noise. Top 5
+        // keeps a noisy query from dumping the whole corpus into the caller's
+        // context.
         const ranked = practices
-          .map((p) => ({ p, s: scorePractice(p, termVars, idfs) }))
-          .filter((x) => x.s.base >= 2)
-          .sort((a, b) => b.s.ranked - a.s.ranked)
+          .map((p) => {
+            const { termScores, substantive } = scored.get(p);
+            const base = termScores.reduce((a, b) => a + b, 0);
+            const weighted = termScores.reduce((a, b, i) => a + b * idfs[i], 0);
+            return { p, base, weighted, substantive };
+          })
+          .filter((x) => x.base >= 2 && x.substantive)
+          .sort((a, b) => b.weighted - a.weighted)
           .slice(0, 5)
           .map((x) => x.p);
         if (!ranked.length) return text(`No practices matched "${query}"${tags?.length ? ` with tags ${tags.join(', ')}` : ''}. Try list_practices to see everything.`);

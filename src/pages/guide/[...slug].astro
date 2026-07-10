@@ -5,35 +5,53 @@ import { withBase, fmtLong, isoDate } from '../../lib/site';
 import { getGuideSorted, getWeeklySorted, getDivesSorted, getPracticesSorted } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const guide = await getGuideSorted();
+  // Backlinks: the schemas already carry the graph — surface it. Computed
+  // once here (not per page): practices that belong to each section, and
+  // weeklies/dives whose `related` points at it.
+  const [guide, allPractices, weekly, dives] = await Promise.all([
+    getGuideSorted(),
+    getPracticesSorted(),
+    getWeeklySorted(),
+    getDivesSorted(),
+  ]);
+  const stripHash = (h: string) => h.split('#')[0].replace(/\/$/, '');
+  const practicesBySection = new Map<string, typeof allPractices>();
+  for (const p of allPractices) {
+    if (!practicesBySection.has(p.data.section)) practicesBySection.set(p.data.section, []);
+    practicesBySection.get(p.data.section)!.push(p);
+  }
+  const refsBySection = new Map<string, { label: string; href: string }[]>();
+  const addRef = (sectionId: string, ref: { label: string; href: string }) => {
+    if (!refsBySection.has(sectionId)) refsBySection.set(sectionId, []);
+    refsBySection.get(sectionId)!.push(ref);
+  };
+  for (const w of weekly)
+    for (const r of w.data.related) {
+      const m = stripHash(r.href).match(/^\/guide\/(.+)$/);
+      if (m) addRef(m[1], { label: `The Week — ${w.data.title}`, href: `/weekly/${w.id}` });
+    }
+  for (const v of dives)
+    for (const r of v.data.related) {
+      const m = stripHash(r.href).match(/^\/guide\/(.+)$/);
+      if (m) addRef(m[1], { label: `Deep dive — ${v.data.title}`, href: `/deep-dives/${v.id}` });
+    }
+
   return guide.map((entry, i) => ({
     params: { slug: entry.id },
     props: {
       entry,
       prev: i > 0 ? guide[i - 1] : null,
       next: i < guide.length - 1 ? guide[i + 1] : null,
+      practices: practicesBySection.get(entry.id) ?? [],
+      referencedIn: refsBySection.get(entry.id) ?? [],
     },
   }));
 }
 
-const { entry, prev, next } = Astro.props;
+const { entry, prev, next, practices, referencedIn } = Astro.props;
 const { Content } = await render(entry);
 const d = entry.data;
 const stamp = `Section ${String(d.order).padStart(2, '0')}`;
-
-// Backlinks: the schemas already carry the graph — surface it. Practices that
-// belong to this section, and weeklies/dives whose `related` points here.
-const sectionHref = `/guide/${entry.id}`;
-const practices = (await getPracticesSorted()).filter((p) => p.data.section === entry.id);
-const stripHash = (h: string) => h.split('#')[0].replace(/\/$/, '');
-const referencedIn = [
-  ...(await getWeeklySorted())
-    .filter((w) => w.data.related.some((r) => stripHash(r.href) === sectionHref))
-    .map((w) => ({ label: `The Week — ${w.data.title}`, href: `/weekly/${w.id}` })),
-  ...(await getDivesSorted())
-    .filter((v) => v.data.related.some((r) => stripHash(r.href) === sectionHref))
-    .map((v) => ({ label: `Deep dive — ${v.data.title}`, href: `/deep-dives/${v.id}` })),
-];
 ---
 <ReadingLayout title={d.title} description={d.summary} deskLabel="Guide" stamp={stamp} updated={d.updated}>
   <div class="entry-lead" slot="lead">

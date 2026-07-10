@@ -55,35 +55,50 @@ function extractUrls(text) {
   const urls = new Set();
   // frontmatter/source lists: url: https://…
   for (const m of text.matchAll(/\burl:\s*(https?:\/\/\S+)/g)) urls.add(m[1]);
-  // markdown links: [label](https://…)
-  for (const m of text.matchAll(/\]\((https?:\/\/[^)\s]+)\)/g)) urls.add(m[1]);
+  // markdown links: [label](https://…) — one level of balanced parens allowed
+  // (Wikipedia-style /Foo_(bar) URLs must not be truncated at the first ')').
+  for (const m of text.matchAll(/\]\((https?:\/\/(?:[^()\s]|\([^()\s]*\))+)\)/g)) urls.add(m[1]);
   // bare links in signals one-liners
   for (const m of text.matchAll(/(?<![("\]])\bhttps?:\/\/[^\s)"'<>\]]+/g)) urls.add(m[0]);
-  return [...urls].map((u) => u.replace(/[).,;:!?'"]+$/, ''));
+  return [...urls].map((u) => {
+    u = u.replace(/[.,;:!?'"]+$/, '');
+    // Trailing ')' is only cruft when unbalanced — /Foo_(bar) keeps its paren.
+    while (u.endsWith(')') && (u.match(/\(/g) || []).length < (u.match(/\)/g) || []).length) {
+      u = u.slice(0, -1);
+    }
+    return u;
+  });
+}
+
+async function attempt(url, method) {
+  try {
+    const res = await fetch(url, {
+      method,
+      redirect: 'follow',
+      headers: { 'user-agent': UA, accept: '*/*' },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    return { status: res.status, ok: res.ok };
+  } catch (err) {
+    return { error: err?.cause?.code ?? err?.name ?? 'error' };
+  }
 }
 
 async function check(url) {
-  for (const method of ['HEAD', 'GET']) {
-    try {
-      const res = await fetch(url, {
-        method,
-        redirect: 'follow',
-        headers: { 'user-agent': UA, accept: '*/*' },
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-      });
-      if (res.ok) return { url, verdict: 'ok', detail: `${res.status}` };
-      if (res.status === 404 || res.status === 410)
-        return { url, verdict: 'dead', detail: `${res.status}` };
-      if (res.status === 405 && method === 'HEAD') continue; // retry as GET
-      return { url, verdict: 'warn', detail: `${res.status}` };
-    } catch (err) {
-      const code = err?.cause?.code ?? err?.name ?? 'error';
-      if (code === 'ENOTFOUND' || code === 'EAI_AGAIN')
-        return { url, verdict: 'dead', detail: String(code) };
-      if (method === 'GET') return { url, verdict: 'warn', detail: String(code) };
-    }
+  // HEAD is only a fast path: many hosts (S3, some CDNs) 404 or 405 on HEAD
+  // while serving 200 to GET, so a verdict is only reached from GET.
+  const head = await attempt(url, 'HEAD');
+  if (head.ok) return { url, verdict: 'ok', detail: `${head.status}` };
+  const get = await attempt(url, 'GET');
+  if (get.ok) return { url, verdict: 'ok', detail: `${get.status}` };
+  if (get.error) {
+    if (get.error === 'ENOTFOUND' || get.error === 'EAI_AGAIN')
+      return { url, verdict: 'dead', detail: String(get.error) };
+    return { url, verdict: 'warn', detail: String(get.error) };
   }
-  return { url, verdict: 'warn', detail: 'unreachable' };
+  if (get.status === 404 || get.status === 410)
+    return { url, verdict: 'dead', detail: `${get.status}` };
+  return { url, verdict: 'warn', detail: `${get.status}` };
 }
 
 const mode = process.argv.includes('--all') ? 'all' : 'changed';

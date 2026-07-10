@@ -48,7 +48,10 @@ const jsonLd =
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#fbfaf8" />
+  {/* Media-paired metas are the no-JS fallback; the scripts override both
+      with the resolved theme. Colors mirror --bg in main.scss. */}
+  <meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
   <script is:inline>
     (function () {
       var t = 'light';
@@ -60,8 +63,11 @@ const jsonLd =
             : 'light');
       } catch (e) {}
       document.documentElement.setAttribute('data-theme', t);
-      var m = document.querySelector('meta[name="theme-color"]');
-      if (m) m.setAttribute('content', t === 'dark' ? '#0d1117' : '#fbfaf8');
+      var c = t === 'dark' ? '#0d1117' : '#fbfaf8';
+      document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+        m.setAttribute('content', c);
+        m.removeAttribute('media');
+      });
     })();
   </script>
 
@@ -83,7 +89,9 @@ const jsonLd =
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={ogImage} />
 
-  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  {/* <-escape so writer-authored titles/summaries containing "</script"
+      can't close the element early (broken page / injection). */}
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

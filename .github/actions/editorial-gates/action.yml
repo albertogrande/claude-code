@@ -1,0 +1,33 @@
+name: Editorial gates
+description: >-
+  Deterministic pre-commit gates shared by every editorial writer, in one
+  place so they can't drift apart per workflow: the site must build with the
+  new content (npm run build includes check-refs and check-contract), changed
+  source URLs must resolve, and the hermetic MCP retrieval eval must pass.
+
+inputs:
+  run-mcp-eval:
+    description: "'true' to also run the hermetic MCP retrieval eval against this build's dist"
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Gate — site builds with the new content
+      shell: bash
+      run: |
+        npm ci
+        npm run build
+
+    - name: Gate — changed sources resolve
+      shell: bash
+      run: node scripts/check-sources.mjs --changed
+
+    - name: Gate — MCP retrieval eval (hermetic)
+      if: inputs.run-mcp-eval == 'true'
+      shell: bash
+      working-directory: mcp
+      run: |
+        npm ci
+        node eval/ci.mjs

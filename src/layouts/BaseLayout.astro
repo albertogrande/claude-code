@@ -46,8 +46,11 @@ const { title, description, home = false, type, published, updated } = Astro.pro
           try {
             localStorage.setItem('sota-theme', next);
           } catch (e) {}
-          var m = document.querySelector('meta[name="theme-color"]');
-          if (m) m.setAttribute('content', next === 'dark' ? '#0d1117' : '#fbfaf8');
+          var c = next === 'dark' ? '#0d1117' : '#fbfaf8';
+          document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+            m.setAttribute('content', c);
+            m.removeAttribute('media');
+          });
           sync();
         });
       })();

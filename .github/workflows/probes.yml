@@ -69,16 +69,8 @@ jobs:
             --max-turns 60
             --allowedTools "Task,Agent,WebFetch,Read,Write,Edit,Glob,Grep,Bash(date *),Bash(ls *)"
 
-      - name: Gate — site builds with the stamped practices
-        run: |
-          npm ci
-          npm run build
-
-      - name: Gate — MCP retrieval eval (hermetic, real exit code)
-        working-directory: mcp
-        run: |
-          npm ci
-          node eval/ci.mjs
+      - name: Run editorial gates
+        uses: ./.github/actions/editorial-gates
 
       - name: Append usage ledger
         id: ledger

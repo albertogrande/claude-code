@@ -11,15 +11,23 @@ import { getGuideSorted, getPracticesSorted } from '../../lib/content';
 
 const [guide, practices] = await Promise.all([getGuideSorted(), getPracticesSorted()]);
 
-const groups = [];
-for (const g of guide) {
-  const items = [];
-  for (const p of practices.filter((p) => p.data.section === g.id)) {
-    const { Content } = await render(p);
-    items.push({ p, Content });
-  }
-  if (items.length) groups.push({ id: g.id, title: g.data.title, items });
+// One pass to group, renders in parallel — the corpus grows weekly.
+const bySection = new Map<string, typeof practices>();
+for (const p of practices) {
+  if (!bySection.has(p.data.section)) bySection.set(p.data.section, []);
+  bySection.get(p.data.section)!.push(p);
 }
+const groups = await Promise.all(
+  guide
+    .filter((g) => bySection.has(g.id))
+    .map(async (g) => ({
+      id: g.id,
+      title: g.data.title,
+      items: await Promise.all(
+        bySection.get(g.id)!.map(async (p) => ({ p, Content: (await render(p)).Content }))
+      ),
+    }))
+);
 ---
 <BaseLayout
   title="Practices"

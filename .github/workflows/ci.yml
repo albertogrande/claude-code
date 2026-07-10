@@ -28,10 +28,17 @@ jobs:
       # Source liveness on content changed by this PR/push (no-op when the
       # diff touches no content).
       - run: node scripts/check-sources.mjs --changed
+      # The mcp job reuses this dist as its corpus instead of building twice.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 1
 
   # Guards the guide MCP server: e2e tests plus the retrieval-quality eval
-  # (in-domain hit@3 ≥ 80% gate), both hermetic against a local dist build.
+  # (in-domain hit@3 ≥ 80% gate), both hermetic against the build job's dist.
   mcp:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,11 +46,11 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            mcp/package-lock.json
-      - run: npm ci
-      - run: npm run build
+          cache-dependency-path: mcp/package-lock.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
       - run: npm ci
         working-directory: mcp
       - run: npm test

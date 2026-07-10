@@ -106,22 +106,9 @@ jobs:
             --max-turns 25
             --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Grep,Bash(git status *),Bash(git diff *),Bash(date *),Bash(ls *)"
 
-      - name: Gate — site builds with the new content
+      - name: Run editorial gates
         if: steps.changes.outputs.n != '0'
-        run: |
-          npm ci
-          npm run build
-
-      - name: Gate — MCP retrieval eval (hermetic)
-        if: steps.changes.outputs.n != '0'
-        working-directory: mcp
-        run: |
-          npm ci
-          node eval/ci.mjs
-
-      - name: Gate — changed sources resolve
-        if: steps.changes.outputs.n != '0'
-        run: node scripts/check-sources.mjs --changed
+        uses: ./.github/actions/editorial-gates
 
       - name: Append usage ledger
         id: ledger
@@ -139,12 +126,21 @@ jobs:
           paths: signals/ editorial/ src/content/ mcp/eval/queries.json usage/
           message: "Weekly: digest ${{ steps.ledger.outputs.week }}"
 
+      # continue-on-error: the digest is already pushed by now — a failed
+      # dispatch must not fail the run, or Deploy's success gate would leave
+      # the published content unbuilt. The next step raises the alarm instead.
       - name: Dispatch commissioned deep dive
+        id: dispatch
         if: steps.commission.outputs.topic != ''
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           TOPIC: ${{ steps.commission.outputs.topic }}
         run: gh workflow run deep-dive.yml -f topic="$TOPIC"
+
+      - name: Notify on dispatch failure
+        if: steps.dispatch.outcome == 'failure'
+        uses: ./.github/actions/notify-failure
 
       - name: Notify on failure
         if: failure()

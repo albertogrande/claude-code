@@ -28,8 +28,9 @@ async function callTool(name, args = {}) {
   });
   const raw = await res.text();
   const ms = Math.round(performance.now() - t0);
-  // Streamable HTTP answers either SSE ("data: {...}") or plain JSON.
-  const dataLine = raw.split('\n').find((l) => l.startsWith('data: '));
+  // Streamable HTTP answers either SSE ("data: {...}") or plain JSON. Take
+  // the LAST data line — servers may emit notifications before the result.
+  const dataLine = raw.split('\n').filter((l) => l.startsWith('data: ')).pop();
   const payload = JSON.parse(dataLine ? dataLine.slice(6) : raw);
   const text = payload.result?.content?.map((c) => c.text).join('\n') ?? '';
   return { text, ms, chars: text.length, isError: !!payload.result?.isError || !!payload.error };

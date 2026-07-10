@@ -10,19 +10,32 @@ type Dated = { id: string; data: { date: Date } };
 export const entryByDateDesc = (a: Dated, b: Dated) =>
   b.data.date.getTime() - a.data.date.getTime() || b.id.localeCompare(a.id);
 
-export const getGuideSorted = async () =>
-  (await getCollection('guide')).sort((a, b) => a.data.order - b.data.order);
+// Memoized in production builds — a dozen pages and endpoints call these and
+// the collections are immutable within a build. Left un-memoized in dev so
+// hot reload keeps seeing fresh content.
+const memo = <T>(fn: () => Promise<T>): (() => Promise<T>) => {
+  if (!import.meta.env.PROD) return fn;
+  let cached: Promise<T> | undefined;
+  return () => (cached ??= fn());
+};
 
-export const getWeeklySorted = async () =>
-  (await getCollection('weekly')).sort(entryByDateDesc);
+export const getGuideSorted = memo(async () =>
+  (await getCollection('guide')).sort((a, b) => a.data.order - b.data.order)
+);
 
-export const getDivesSorted = async () =>
-  (await getCollection('deep-dives')).sort(entryByDateDesc);
+export const getWeeklySorted = memo(async () =>
+  (await getCollection('weekly')).sort(entryByDateDesc)
+);
 
-export const getPracticesSorted = async () =>
+export const getDivesSorted = memo(async () =>
+  (await getCollection('deep-dives')).sort(entryByDateDesc)
+);
+
+export const getPracticesSorted = memo(async () =>
   (await getCollection('practices')).sort(
     (a, b) => a.data.section.localeCompare(b.data.section) || a.id.localeCompare(b.id)
-  );
+  )
+);
 
 export type TaggedEntry =
   | { kind: 'weekly'; entry: CollectionEntry<'weekly'> }
@@ -30,7 +43,7 @@ export type TaggedEntry =
   | { kind: 'practice'; entry: CollectionEntry<'practices'> };
 
 // tag -> everything carrying it, across the three tagged collections.
-export async function collectByTag(): Promise<Map<string, TaggedEntry[]>> {
+export const collectByTag = memo(async (): Promise<Map<string, TaggedEntry[]>> => {
   const [weekly, dives, practices] = await Promise.all([
     getWeeklySorted(),
     getDivesSorted(),
@@ -45,4 +58,4 @@ export async function collectByTag(): Promise<Map<string, TaggedEntry[]>> {
   for (const entry of dives) for (const t of entry.data.tags) add(t, { kind: 'deep-dive', entry });
   for (const entry of practices) for (const t of entry.data.tags) add(t, { kind: 'practice', entry });
   return map;
-}
+});
