@@ -1,7 +1,4 @@
-# Vercel builds only the serverless function (api/mcp.js). Exclude the
-# standalone Node entry (Docker/local only), the tests, and docs.
-bin/
+# Vercel runs server.js (which imports lib.js). Exclude only dev/docs files.
 test.mjs
-test-vercel.mjs
 Dockerfile
 README.md

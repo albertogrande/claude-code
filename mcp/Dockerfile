@@ -3,9 +3,8 @@ FROM node:20-alpine
 WORKDIR /app
 COPY package.json ./
 RUN npm install --omit=dev
-COPY src ./src
-COPY bin ./bin
+COPY lib.js server.js ./
 ENV PORT=8787
 # GUIDE_BASE_URL defaults to the live site; override to point at a fork/staging.
 EXPOSE 8787
-CMD ["node", "bin/serve.js"]
+CMD ["node", "server.js"]

@@ -36,10 +36,11 @@ Config via env:
 The server needs a host with a public HTTPS URL (GitHub Pages is static-only, so
 it can't run this).
 
-### Recommended: Vercel (serverless, push-to-deploy)
+### Recommended: Vercel (push-to-deploy)
 
-The stateless server maps cleanly onto a Vercel function — `api/mcp.js` is the
-adapter, `vercel.json` rewrites `/mcp` → `/api/mcp`. Three clicks:
+Vercel detects `server.js` as a Node server and runs it (it listens on the
+injected `PORT` and handles routing itself — `POST /mcp`, `GET /` health). Three
+clicks:
 
 1. Vercel → **Add New… → Project** → import the `albertogrande/claude-code` repo.
 2. Set **Root Directory = `mcp`**. Leave the framework as "Other"; no build

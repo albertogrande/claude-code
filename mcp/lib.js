@@ -1,13 +1,6 @@
-// The guide MCP server — single self-contained module.
-//
-// Consolidated into one file under api/ so Vercel builds exactly one function
-// and never treats a src/ file as a stray entrypoint. Exposes:
-//   - default export: the Vercel serverless handler
-//   - buildMcpServer(): the MCP server with the guide tools (reused by tests)
-//   - createHttpServer(): a plain Node http server (Docker/local; see bin/serve.js)
-//
-// Stateless: reads the live machine endpoints (/practices.json, /guide.json,
-// /weekly.json), so it is always as current as the guide.
+// The guide MCP server logic — data layer, tools, and a plain Node http server.
+// No side effects on import (server.js is the entrypoint that listens). Reads
+// the live machine endpoints so it is always as current as the guide.
 
 import { createServer } from 'node:http';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -206,10 +199,16 @@ export function buildMcpServer() {
   return server;
 }
 
-// ── Transport plumbing ──────────────────────────────────────────────────────
+// ── HTTP server ─────────────────────────────────────────────────────────────
 
-// Stateless: a fresh server + transport per request (works for a long-running
-// Node process and for a serverless invocation alike).
+function cors(res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'content-type, accept, authorization, mcp-session-id, mcp-protocol-version');
+  res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
+}
+
+// Stateless: a fresh server + transport per request.
 async function dispatch(req, res, body) {
   const server = buildMcpServer();
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
@@ -221,51 +220,30 @@ async function dispatch(req, res, body) {
   await transport.handleRequest(req, res, body);
 }
 
-function health(res) {
-  res.setHeader('content-type', 'application/json');
-  res.end(JSON.stringify({ ok: true, service: 'claude-code-guide-mcp', guide: BASE, endpoint: '/mcp' }));
-}
-
-// Vercel serverless handler (default export). Vercel pre-parses JSON into
-// req.body; fall back to reading the stream for other harnesses.
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'content-type, accept, authorization, mcp-session-id, mcp-protocol-version');
-  res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
-
-  if (req.method === 'OPTIONS') {
-    res.statusCode = 204;
-    res.end();
-    return;
-  }
-  if (req.method === 'GET') return health(res);
-  if (req.method !== 'POST') {
-    res.statusCode = 405;
-    res.end('Method Not Allowed');
-    return;
-  }
-
-  let body = req.body;
-  if (body === undefined) {
-    const chunks = [];
-    for await (const c of req) chunks.push(c);
-    body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : undefined;
-  } else if (typeof body === 'string') {
-    body = body ? JSON.parse(body) : undefined;
-  }
-  await dispatch(req, res, body);
-}
-
-// Plain Node http server for Docker / any always-warm host (see bin/serve.js).
+// Returns a Node http server that answers POST /mcp (MCP) and GET / (health).
+// Used both by the standalone/Vercel entrypoint and by the tests.
 export function createHttpServer() {
   return createServer(async (req, res) => {
+    cors(res);
     const path = (req.url || '/').split('?')[0];
+
+    if (req.method === 'OPTIONS') {
+      res.statusCode = 204;
+      res.end();
+      return;
+    }
+
     if (path === '/mcp' && req.method === 'POST') {
       try {
-        const chunks = [];
-        for await (const c of req) chunks.push(c);
-        const body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : undefined;
+        // Vercel may pre-parse JSON into req.body; otherwise read the stream.
+        let body = req.body;
+        if (body === undefined) {
+          const chunks = [];
+          for await (const c of req) chunks.push(c);
+          body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : undefined;
+        } else if (typeof body === 'string') {
+          body = body ? JSON.parse(body) : undefined;
+        }
         await dispatch(req, res, body);
       } catch (e) {
         if (!res.headersSent) {
@@ -275,7 +253,13 @@ export function createHttpServer() {
       }
       return;
     }
-    if (path === '/health' || path === '/') return health(res);
+
+    if (path === '/' || path === '/health' || path === '/mcp') {
+      res.setHeader('content-type', 'application/json');
+      res.end(JSON.stringify({ ok: true, service: 'claude-code-guide-mcp', guide: BASE, endpoint: '/mcp' }));
+      return;
+    }
+
     res.writeHead(404, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ error: 'not found' }));
   });

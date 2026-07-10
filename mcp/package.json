@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "description": "Remote MCP server exposing the Claude Code field guide (practices, sections, what's new) to agent sessions.",
+  "main": "server.js",
   "scripts": {
-    "start": "node bin/serve.js",
-    "test": "node test.mjs",
-    "test:vercel": "node test-vercel.mjs"
+    "start": "node server.js",
+    "test": "node test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
