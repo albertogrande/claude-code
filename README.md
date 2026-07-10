@@ -45,11 +45,19 @@ src/
   content.config.ts  # collection schemas (zod)
   layouts/           # BaseLayout + ReadingLayout
   components/         # Chrome (nav), Head, Footer, Shortcuts (⌘K palette)
+    practices/       # atomic best-practices — {when, do, why, section} — feed the agent endpoints
+  content.config.ts  # collection schemas (zod)
+  layouts/           # BaseLayout + ReadingLayout
+  components/         # Chrome (nav), Head, Footer, Shortcuts (⌘K palette)
   pages/             # index, guide/, weekly/, deep-dives/, about, feed.xml.ts
+                     #  + machine endpoints: llms.txt, llms-full.txt, practices.json, guide.json, weekly.json
   styles/main.scss   # design system, inherited from The Wire
   lib/site.ts        # base-path + date helpers
 signals/             # raw daily capture, one file per ISO week (internal, not rendered)
 editorial/           # MEMORY.md (threads, coverage, dive candidates) + TASTE.md (reader) — internal
+mcp/                 # remote MCP server exposing the guide to your own sessions
+plugin/skills/       # consult-the-guide — tells sessions when to query the MCP
+docs/agent-access.md # design doc for the agent-access model
 .claude/skills/      # daily-scout, weekly-digest, deep-dive — the autonomous desks
 .github/workflows/   # scout (daily), weekly (Mondays), deep-dive (on demand), deploy (Pages), ci (build check)
 ```
@@ -64,6 +72,16 @@ The autonomous desks need a Claude Code OAuth token:
 4. The Scout runs daily at 05:00 UTC and the Weekly on Mondays at 07:00 UTC; both can be triggered manually (Actions → Scout / Weekly → Run workflow). Deep Dive is manual-only, or the Weekly commissions one when a thread earns it.
 
 Run the desks in an interactive session too: `/daily-scout`, `/weekly-digest`, `/deep-dive [topic]`. Interactive runs write files without committing — you decide.
+
+## Use the guide from your own sessions
+
+The guide is also a **source agents can query**, not just a site to read. It
+publishes machine endpoints (`/llms.txt`, `/llms-full.txt`, `/practices.json`,
+`/guide.json`, `/weekly.json`) and ships a small **remote MCP server** (`mcp/`)
+that lets your own Claude Code sessions consult the current state of the art
+before deciding a model, a permission mode, a context operation, or a workflow.
+See [`mcp/README.md`](mcp/README.md) to run/deploy/connect it and
+[`docs/agent-access.md`](docs/agent-access.md) for the design.
 
 ## License
 
