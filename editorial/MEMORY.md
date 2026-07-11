@@ -32,8 +32,14 @@ keeps recurring in signals and isn't well covered by the guide is a
   2.1.206 makes background agents upgrade themselves right after you update
   Claude Code (was: slow stale-version upgrade on attach) and adds an
   `EnterWorktree` confirmation before entering a worktree outside
-  `.claude/worktrees/` — one more guardrail on unattended fan-out. Direction:
-  safer defaults, cost dials, trustworthy background subagents. Guide: covered
+  `.claude/worktrees/` — one more guardrail on unattended fan-out. 07-11:
+  2.1.207 turns auto mode default-on for Bedrock/Vertex/Foundry (was opt-in
+  via env var) and moves the `autoMode` toggle out of repo-resident
+  `.claude/settings.local.json` into user-only `~/.claude/settings.json` — a
+  repo can no longer switch auto mode on for you; same release closes a gap
+  where non-interactive runs (`claude -p`, SDK) recorded remote managed
+  settings as consented without showing the security dialog. Direction: safer
+  defaults, cost dials, trustworthy background subagents. Guide: covered
   across §05 (subagents), §06 (apps), §08 (teams).
   → [2026-W28](../src/content/weekly/2026-W28.md)
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
