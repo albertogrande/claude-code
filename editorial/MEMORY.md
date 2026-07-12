@@ -38,9 +38,16 @@ keeps recurring in signals and isn't well covered by the guide is a
   `.claude/settings.local.json` into user-only `~/.claude/settings.json` — a
   repo can no longer switch auto mode on for you; same release closes a gap
   where non-interactive runs (`claude -p`, SDK) recorded remote managed
-  settings as consented without showing the security dialog. Direction: safer
-  defaults, cost dials, trustworthy background subagents. Guide: covered
-  across §05 (subagents), §06 (apps), §08 (teams).
+  settings as consented without showing the security dialog. 07-12: same
+  2.1.207 release also fixes an agent-teams mailbox crash loop, Remote
+  Control losing task-status updates on reconnect and not showing
+  desktop-hosted progress on mobile/web, and stops plugin option values
+  (`pluginConfigs`) from being read out of repo-committed
+  `.claude/settings.json` — same pattern as `autoMode`'s move to
+  `~/.claude/settings.json`: trust-sensitive config pulled out of files a repo
+  can silently ship. Direction: safer defaults, cost dials, trustworthy
+  background subagents. Guide: covered across §05 (subagents), §06 (apps),
+  §08 (teams).
   → [2026-W28](../src/content/weekly/2026-W28.md)
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
@@ -54,7 +61,12 @@ keeps recurring in signals and isn't well covered by the guide is a
 - **Cost control as a first-class habit** `↑` — the token meter is now a
   design constraint the reader manages, not an afterthought. W28: delegate
   routine coding to lower-power subagents (Willison); advisory workflow-size
-  cap. Guide: §01 (models & effort), §05. Deep-dive candidate if a real
+  cap. 07-12: the May-13 50%-weekly-limit boost (Pro/Max/Team/seat-based
+  Enterprise) reverts July 13 6PM PDT — not yet on a claude.com page, sourced
+  to the ClaudeDevs post and corroborating trackers; possibly the same
+  deadline behind 07-11's vanished "Fable 5 in your weekly limit" banner.
+  Watch July 13 for confirmation and for what (if anything) the baseline
+  becomes. Guide: §01 (models & effort), §05. Deep-dive candidate if a real
   (enforced) spend ceiling ships.
 
 ## Deep-dive candidates
