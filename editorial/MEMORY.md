@@ -61,13 +61,27 @@ keeps recurring in signals and isn't well covered by the guide is a
 - **Cost control as a first-class habit** `↑` — the token meter is now a
   design constraint the reader manages, not an afterthought. W28: delegate
   routine coding to lower-power subagents (Willison); advisory workflow-size
-  cap. 07-12: the May-13 50%-weekly-limit boost (Pro/Max/Team/seat-based
-  Enterprise) reverts July 13 6PM PDT — not yet on a claude.com page, sourced
-  to the ClaudeDevs post and corroborating trackers; possibly the same
-  deadline behind 07-11's vanished "Fable 5 in your weekly limit" banner.
-  Watch July 13 for confirmation and for what (if anything) the baseline
-  becomes. Guide: §01 (models & effort), §05. Deep-dive candidate if a real
-  (enforced) spend ceiling ships.
+  cap. 07-12: signal (unconfirmed at the time) that the May-13 50%-weekly-limit
+  boost reverts July 13. 07-13: resolved — it didn't revert. Anthropic's
+  official support article confirms a third extension, through **July 19,
+  2026, 11:59:59 PM PT**, covering the 50% weekly-limit boost and Fable 5's
+  plan-included access together (Pro/Max/Team/seat-based Enterprise, all
+  platforms; 5-hour limits unaffected). After the window closes, Fable 5 usage
+  runs on prepaid credits at $10/$50 per Mtok (2× Opus 4.8) with no grace
+  period or auto-fallback if credits aren't funded first. Guide: §01 (models &
+  effort), §05. Deep-dive candidate if a real (enforced) spend ceiling ships,
+  or if the rolling-extension pattern itself becomes the story (three
+  extensions in five weeks now).
+
+- **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
+  the reader controls): the fixed token cost Claude Code's own system prompt
+  and tool schemas add before a prompt is even read. 07-09: aihero.dev piece
+  on trimming system-prompt overhead. 07-13: a 571-point HN thread
+  (systima.ai) measures it directly — ~33k tokens of overhead on a fresh,
+  MCP-free Claude Code session (~6.5k system prompt + ~24k across 27 tool
+  schemas) vs OpenCode's ~7k (~2k + ~4.8k across 10 tools). Guide §03 covers
+  CLAUDE.md bloat but not this harness-fixed cost — thin coverage, recurring
+  topic. Deep-dive candidate.
 
 ## Deep-dive candidates
 
@@ -83,6 +97,10 @@ it thinly. The weekly desk commissions from this list.
   one paragraph (§02 "Auto mode, briefly"); a dive on the real safety model of a
   walk-away run — what's screened, what still gets through, how to scope
   "trusted" — is close to ripe. Candidate for the next weekly.
+- **Harness-side context overhead** — see the running thread above. Fixed
+  system-prompt/tool-schema token cost, distinct from CLAUDE.md bloat; guide
+  §03 doesn't cover it at all yet. Watching for a third data point before
+  promoting further.
 
 ## Guide coverage index
 
