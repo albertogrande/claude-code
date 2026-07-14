@@ -45,9 +45,13 @@ keeps recurring in signals and isn't well covered by the guide is a
   (`pluginConfigs`) from being read out of repo-committed
   `.claude/settings.json` — same pattern as `autoMode`'s move to
   `~/.claude/settings.json`: trust-sensitive config pulled out of files a repo
-  can silently ship. Direction: safer defaults, cost dials, trustworthy
-  background subagents. Guide: covered across §05 (subagents), §06 (apps),
-  §08 (teams).
+  can silently ship. 07-14: 2.1.208 fixes background-session attach failing
+  permanently after updates and lost replies to background agents (delivery
+  failures now save-and-resend on restart); 2.1.209 same-day follow-up
+  reverts an overly broad guard that had blocked `/model` and other dialogs
+  inside `claude agents` background sessions. Direction: safer defaults, cost
+  dials, trustworthy background subagents. Guide: covered across §05
+  (subagents), §06 (apps), §08 (teams).
   → [2026-W28](../src/content/weekly/2026-W28.md)
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
@@ -79,9 +83,12 @@ keeps recurring in signals and isn't well covered by the guide is a
   on trimming system-prompt overhead. 07-13: a 571-point HN thread
   (systima.ai) measures it directly — ~33k tokens of overhead on a fresh,
   MCP-free Claude Code session (~6.5k system prompt + ~24k across 27 tool
-  schemas) vs OpenCode's ~7k (~2k + ~4.8k across 10 tools). Guide §03 covers
-  CLAUDE.md bloat but not this harness-fixed cost — thin coverage, recurring
-  topic. Deep-dive candidate.
+  schemas) vs OpenCode's ~7k (~2k + ~4.8k across 10 tools). 07-14: 2.1.208
+  caches MCP tool-pool assembly for up to 7x faster tool rounds at high tool
+  counts — relief on the *CPU/latency* side of many-MCP-tool sessions, but
+  doesn't touch the ~24k-token schema cost itself; the token-overhead gap vs
+  OpenCode stands. Guide §03 covers CLAUDE.md bloat but not this harness-fixed
+  cost — thin coverage, recurring topic. Deep-dive candidate.
 
 ## Deep-dive candidates
 
