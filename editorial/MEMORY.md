@@ -51,7 +51,15 @@ keeps recurring in signals and isn't well covered by the guide is a
   reverts an overly broad guard that had blocked `/model` and other dialogs
   inside `claude agents` background sessions. Direction: safer defaults, cost
   dials, trustworthy background subagents. Guide: covered across §05
-  (subagents), §06 (apps), §08 (teams).
+  (subagents), §06 (apps), §08 (teams). 07-15: 2.1.210 closes two more trust
+  gaps in unattended/fan-out work — `isolation: 'worktree'` subagents could
+  run git-mutating commands against the *main* checkout instead of their own
+  worktree, and the `ultracode` workflow opt-in could fire from
+  non-human-originated input (webhook payloads, relayed PR comments), not
+  just a person typing it; same release hardens the Agent tool against
+  indirect prompt injection from subagent-read content. Same day: `claude
+  attach` "job not found"/stuck-starting errors fixed, and killed background
+  sessions no longer leave permanent `git worktree lock`s.
   → [2026-W28](../src/content/weekly/2026-W28.md)
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database

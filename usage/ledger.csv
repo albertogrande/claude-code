@@ -7,3 +7,5 @@ date,workflow,run_id,step,model,cost_usd,duration_ms,turns
 2026-07-13,Scout,29234533885,verify,claude-sonnet-5,1.0207068000000004,393634,28
 2026-07-14,Scout,29313419998,writer,claude-sonnet-5,0.4935435,99417,16
 2026-07-14,Scout,29313419998,verify,claude-sonnet-5,0.4935435,99417,16
+2026-07-15,Scout,29396379340,writer,claude-sonnet-5,0.8852884999999999,311631,20
+2026-07-15,Scout,29396379340,verify,claude-sonnet-5,0.8852884999999999,311631,20
