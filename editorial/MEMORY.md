@@ -59,7 +59,15 @@ keeps recurring in signals and isn't well covered by the guide is a
   just a person typing it; same release hardens the Agent tool against
   indirect prompt injection from subagent-read content. Same day: `claude
   attach` "job not found"/stuck-starting errors fixed, and killed background
-  sessions no longer leave permanent `git worktree lock`s.
+  sessions no longer leave permanent `git worktree lock`s. 07-16: 2.1.211
+  closes the week's trust gaps further — a PreToolUse hook's `ask` decision
+  can no longer be silently overridden by the auto-mode classifier for
+  unsandboxed Bash; background agent status checks now wait for real
+  completion instead of fabricating a result; "always allow" permission
+  rules save at the repo root so a worktree-granted approval persists across
+  sibling worktrees; and permission previews relayed to chat channels are
+  hardened against bidi-override/zero-width/look-alike-quote spoofing of the
+  approval text.
   → [2026-W28](../src/content/weekly/2026-W28.md)
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
@@ -83,7 +91,12 @@ keeps recurring in signals and isn't well covered by the guide is a
   period or auto-fallback if credits aren't funded first. Guide: §01 (models &
   effort), §05. Deep-dive candidate if a real (enforced) spend ceiling ships,
   or if the rolling-extension pattern itself becomes the story (three
-  extensions in five weeks now).
+  extensions in five weeks now). 07-16: 2.1.211 fixes a silent prompt-caching
+  regression on Bedrock/Vertex/Mantle/Foundry billing the trailing
+  system-context block as fresh input tokens every request — same shape as
+  the 2.1.181 fix for custom `ANTHROPIC_BASE_URL`/Foundry setups; same
+  release also makes `/clear` reset the statusline's cost counter (was
+  silently carrying over spend from before the clear).
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
