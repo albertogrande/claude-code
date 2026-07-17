@@ -67,7 +67,19 @@ keeps recurring in signals and isn't well covered by the guide is a
   rules save at the repo root so a worktree-granted approval persists across
   sibling worktrees; and permission previews relayed to chat channels are
   hardened against bidi-override/zero-width/look-alike-quote spoofing of the
-  approval text.
+  approval text. 07-17: 2.1.212 is the week's biggest single release on this
+  thread — `/fork` redesigned to copy a conversation into a new background
+  session (`claude agents` row) while the old in-session-subagent behavior
+  moves to `/subtask`; new session-wide hard caps (200 subagent spawns, 200
+  WebSearch calls, both `/clear`-resettable, both env-configurable) sit
+  alongside the existing 16-concurrent/1,000-per-run caps — guide §05 patched,
+  it had called the old caps "the only real backstop"; MCP tool calls over 2
+  minutes now auto-background; Task tool's `mode` parameter is deprecated,
+  subagents just inherit the parent session's permissions; worktree creation
+  no longer follows a repo-committed symlink at `.claude/worktrees` (same
+  isolation-escape class as 07-15's fix); and plan mode no longer auto-runs
+  file-modifying Bash without a prompt, closing a gap practitioners have
+  documented since early on (GH #6716).
   → [2026-W28](../src/content/weekly/2026-W28.md)
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
@@ -108,8 +120,11 @@ keeps recurring in signals and isn't well covered by the guide is a
   caches MCP tool-pool assembly for up to 7x faster tool rounds at high tool
   counts — relief on the *CPU/latency* side of many-MCP-tool sessions, but
   doesn't touch the ~24k-token schema cost itself; the token-overhead gap vs
-  OpenCode stands. Guide §03 covers CLAUDE.md bloat but not this harness-fixed
-  cost — thin coverage, recurring topic. Deep-dive candidate.
+  OpenCode stands. 07-17: 2.1.212 cuts inter-agent token usage by removing
+  `SendMessage` body duplication — another partial, adjacent relief (fan-out
+  messaging overhead, not the fixed per-session schema cost). Guide §03
+  covers CLAUDE.md bloat but not this harness-fixed cost — thin coverage,
+  recurring topic. Deep-dive candidate.
 
 ## Deep-dive candidates
 
