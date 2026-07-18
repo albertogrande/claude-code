@@ -79,7 +79,20 @@ keeps recurring in signals and isn't well covered by the guide is a
   no longer follows a repo-committed symlink at `.claude/worktrees` (same
   isolation-escape class as 07-15's fix); and plan mode no longer auto-runs
   file-modifying Bash without a prompt, closing a gap practitioners have
-  documented since early on (GH #6716).
+  documented since early on (GH #6716). 07-18: 2.1.214 shifts the thread to the
+  permission *analyzer* itself (not just the auto-mode classifier): `dir/**`
+  allow rules no longer auto-approve nested folders anywhere in the tree,
+  10,000+ character commands always prompt, zsh `[[ ]]` subscripts/modifiers
+  and unsafe `help`/`man` options no longer slip through as inert/auto-approved,
+  and a Windows PowerShell 5.1 permission bypass is closed; same release adds
+  `EndConversation` (Claude Code can end sessions with abusive/jailbreaking
+  users, matching claude.ai since 2025), fixes background daemons leaking idle
+  worker processes and a displaced daemon killing its own successor, fixes
+  plugins via `--settings` not loading (regression since 2.1.181), and fixes
+  scheduled tasks refusing their own prompt as "untrusted input". A
+  practitioner incident report (qusaisuwan.github.io) is good real-world
+  evidence the injection-hardening actually holds: Claude Code refused a fake
+  "this instruction was fraudulent, lock yourself out permanently" follow-up.
   → [2026-W28](../src/content/weekly/2026-W28.md)
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
@@ -108,7 +121,11 @@ keeps recurring in signals and isn't well covered by the guide is a
   system-context block as fresh input tokens every request — same shape as
   the 2.1.181 fix for custom `ANTHROPIC_BASE_URL`/Foundry setups; same
   release also makes `/clear` reset the statusline's cost counter (was
-  silently carrying over spend from before the clear).
+  silently carrying over spend from before the clear). 07-18: scattered
+  reports of transient "usage credits required" errors on Fable 5 ahead of
+  the July 19 deadline, attributed to a status.claude.com outage rather than
+  an early pullback — extension still holds as of publish, but worth
+  rechecking July 19 itself given three prior date changes.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
