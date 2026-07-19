@@ -93,7 +93,18 @@ keeps recurring in signals and isn't well covered by the guide is a
   practitioner incident report (qusaisuwan.github.io) is good real-world
   evidence the injection-hardening actually holds: Claude Code refused a fake
   "this instruction was fraudulent, lock yourself out permanently" follow-up.
-  → [2026-W28](../src/content/weekly/2026-W28.md)
+  07-19: 2.1.215 stops auto-running the `/verify` and `/code-review` skills —
+  they now only run when explicitly invoked, closing a silent-autonomy gap
+  the guide's own review workflow (§07/§08) already assumed didn't exist;
+  2.1.214's full notes (published a day after the version shipped) add a
+  hooks fix in the same vein — a hook's exit-code-2 `ask`/`deny` no longer
+  silently fails to block when its stdout JSON fails schema validation. Also
+  07-19: a 218-point HN guide (ykdojo.github.io) on dedicating a spare Mac to
+  Claude Code — SSH + persistent `tmux` for computer-use display access,
+  Tailscale, phone-driven via Remote Control — a concrete isolation pattern
+  for unattended runs on the mac/iOS reader's own hardware, distinct from the
+  product-side hardening above but same underlying concern (trusting
+  unattended agents). → [2026-W28](../src/content/weekly/2026-W28.md)
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
@@ -125,7 +136,15 @@ keeps recurring in signals and isn't well covered by the guide is a
   reports of transient "usage credits required" errors on Fable 5 ahead of
   the July 19 deadline, attributed to a status.claude.com outage rather than
   an early pullback — extension still holds as of publish, but worth
-  rechecking July 19 itself given three prior date changes.
+  rechecking July 19 itself given three prior date changes. 07-19: rechecked,
+  and the two promotions **decouple** — official support article (retitled
+  "May–August 2026") extends the 50% weekly-limit boost a fourth time, to
+  August 19, but drops all mention of Fable 5; Fable 5's plan-included access
+  ends on schedule July 19, 11:59:59 PM PT, reverting July 20 to prepaid
+  credits at $10/$50 per Mtok, no grace period. Read this as: the general
+  usage-limit boost keeps getting extended: Fable 5's free window, unlike the
+  last two rounds, was not bundled into this one. Worth confirming July 20
+  whether the revert actually lands this time.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
