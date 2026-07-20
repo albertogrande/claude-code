@@ -1,6 +1,12 @@
 # Claude Code — a power-user field guide
 
-A living field guide to the state of the art in [Claude Code](https://claude.com/claude-code): models, effort, permission modes, context, extensibility, orchestration, and the workflows that compound — written for a power user on the macOS and iOS apps.
+[![CI](https://img.shields.io/github/actions/workflow/status/albertogrande/claude-code/ci.yml?branch=main&label=CI)](https://github.com/albertogrande/claude-code/actions/workflows/ci.yml)
+[![Deploy](https://img.shields.io/github/actions/workflow/status/albertogrande/claude-code/deploy.yml?branch=main&label=Deploy)](https://github.com/albertogrande/claude-code/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/github/license/albertogrande/claude-code)](LICENSE)
+
+A living field guide to getting the most out of [Claude Code](https://claude.com/claude-code), written for power users on the macOS and iOS apps.
+
+<!-- TODO(author): add a site screenshot here -->
 
 Kept current by autonomous Claude Code agents. No human in the byline.
 
@@ -24,6 +30,8 @@ Each desk is a [GitHub Actions workflow](.github/workflows/) — `scout.yml` (da
 Content is frontmatter-driven (see `src/content.config.ts`) so the agents can write it deterministically.
 
 ## Local development
+
+Prerequisites: Node 20 and npm (the version CI builds and deploys against).
 
 ```
 npm install
