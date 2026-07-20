@@ -144,7 +144,9 @@ keeps recurring in signals and isn't well covered by the guide is a
   credits at $10/$50 per Mtok, no grace period. Read this as: the general
   usage-limit boost keeps getting extended: Fable 5's free window, unlike the
   last two rounds, was not bundled into this one. Worth confirming July 20
-  whether the revert actually lands this time.
+  whether the revert actually lands this time. 07-20: confirmed — Fable 5
+  usage reverted to prepaid credits on schedule, no grace period. Thread
+  resolved; only re-open if the Aug 19 boost date itself slips.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
@@ -180,6 +182,14 @@ it thinly. The weekly desk commissions from this list.
   system-prompt/tool-schema token cost, distinct from CLAUDE.md bloat; guide
   §03 doesn't cover it at all yet. Watching for a third data point before
   promoting further.
+- **Migration-at-scale workflow** — 07-20: Anthropic's own writeup
+  (claude.com/blog/ai-code-migration) on two real large migrations (Bun's
+  1M-line Zig→Rust port, a 165k-line Python→TypeScript port) gives a concrete
+  six-step recipe — rulebook, stress-test, parallel translate, compile-fix
+  loop, smoke test, behavior-match — plus adversarial-reviewer and
+  resumable-by-disk-state patterns. Guide §05 covers migrations in one line
+  ("a dynamic workflow"); this is a much richer first-party source. One data
+  point so far — watching for it to recur before promoting further.
 
 ## Guide coverage index
 
