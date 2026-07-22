@@ -104,7 +104,13 @@ keeps recurring in signals and isn't well covered by the guide is a
   Tailscale, phone-driven via Remote Control — a concrete isolation pattern
   for unattended runs on the mac/iOS reader's own hardware, distinct from the
   product-side hardening above but same underlying concern (trusting
-  unattended agents). → [2026-W28](../src/content/weekly/2026-W28.md)
+  unattended agents). 07-21: 2.1.217 adds a third fan-out lever — a default
+  20-concurrent-subagent cap (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`) alongside
+  the existing 1,000-per-run and 200-per-session caps, and flips nested
+  subagent spawning to off-by-default (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`
+  re-enables depth) — same release finally makes `--max-budget-usd` actually
+  halt already-running background subagents, not just block new spawns. Guide
+  §05 patched (had called 16-concurrent a hard, unconfigurable cap). → [2026-W28](../src/content/weekly/2026-W28.md)
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
@@ -163,6 +169,18 @@ keeps recurring in signals and isn't well covered by the guide is a
   messaging overhead, not the fixed per-session schema cost). Guide §03
   covers CLAUDE.md bloat but not this harness-fixed cost — thin coverage,
   recurring topic. Deep-dive candidate.
+
+- **The desktop app grows device panes** `↑` new — 07-21: the iOS Simulator
+  pane ships in public beta (Pro/Max/Team, not Enterprise) — Claude
+  builds/runs/checks an iOS app and the simulator opens live next to the
+  conversation, driven directly (no computer-use/Accessibility permissions),
+  up to 4 devices per session, org-disable via `disableMobileSimulatorTools`.
+  Same shape as Artifacts (§06) landing on desktop: a dedicated pane instead
+  of terminal text. Squarely the mac/iOS reader's territory and guide §06
+  doesn't mention it yet — not patched today (nothing existing to disprove,
+  it's a pure addition), but a strong candidate for the next weekly's
+  guide-accuracy pass. Watching for an Android-simulator follow-up
+  (Anthropic has said it's in the works).
 
 ## Deep-dive candidates
 
