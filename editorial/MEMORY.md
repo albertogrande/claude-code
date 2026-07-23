@@ -110,7 +110,21 @@ keeps recurring in signals and isn't well covered by the guide is a
   subagent spawning to off-by-default (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`
   re-enables depth) — same release finally makes `--max-budget-usd` actually
   halt already-running background subagents, not just block new spawns. Guide
-  §05 patched (had called 16-concurrent a hard, unconfigurable cap). → [2026-W28](../src/content/weekly/2026-W28.md)
+  §05 patched (had called 16-concurrent a hard, unconfigurable cap). 07-23:
+  2.1.218 continues on two fronts — a second silent-autonomy skill fix
+  (`/deep-research` joins `/verify`/`/code-review` as explicit-invoke-only, and
+  `/code-review` itself now runs as a background subagent instead of filling
+  the conversation) — but also a notable *loosening* of dialog friction: auto
+  mode's dangerous-`rm`/background-`&`/suspicious-path checks and plan mode's
+  can't-prove-read-only Bash prompts no longer open a permission dialog at
+  all, handed instead to the auto-mode classifier's judgment. Same release
+  makes forked skills (`context: fork`) background-by-default like subagents,
+  requires an agent file's own folder to have accepted workspace trust before
+  its hooks run, and narrows which managed-settings pushes trigger an
+  approval prompt. Direction is bifurcating: fewer silent auto-runs, but also
+  fewer dialogs on the classifier-adjudicated path — worth the "what auto mode
+  actually does" dive resolving whether that nets out safer or just relocates
+  risk. → [2026-W28](../src/content/weekly/2026-W28.md)
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
