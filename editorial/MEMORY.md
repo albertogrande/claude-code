@@ -166,7 +166,11 @@ keeps recurring in signals and isn't well covered by the guide is a
   last two rounds, was not bundled into this one. Worth confirming July 20
   whether the revert actually lands this time. 07-20: confirmed — Fable 5
   usage reverted to prepaid credits on schedule, no grace period. Thread
-  resolved; only re-open if the Aug 19 boost date itself slips.
+  resolved; only re-open if the Aug 19 boost date itself slips. 07-24: adjacent
+  cost-dial fact, same family — Opus 4.7's fast mode (deprecated since June 25)
+  was removed on schedule today; `/fast` on 4.7 now errors instead of falling
+  back to standard speed, migrate to Opus 4.8. Guide §01 patched (had listed
+  fast mode as "Opus 4.8 / 4.7", now 4.8-only).
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
@@ -209,7 +213,16 @@ it thinly. The weekly desk commissions from this list.
   guard + no-fabricated-approval notifications (2.1.205). The guide covers it in
   one paragraph (§02 "Auto mode, briefly"); a dive on the real safety model of a
   walk-away run — what's screened, what still gets through, how to scope
-  "trusted" — is close to ripe. Candidate for the next weekly.
+  "trusted" — is close to ripe. Candidate for the next weekly. Primary source
+  ready when commissioned: Anthropic engineering's "How we built Claude Code
+  auto mode" (anthropic.com/engineering/claude-code-auto-mode, 2026-03-25) —
+  two-layer classifier (input-side injection probe + output-side transcript
+  classifier that sees only user messages and tool calls, not assistant text),
+  file reads/in-project edits bypass it entirely, and it publishes real numbers:
+  0.4% false-positive rate (n=10,000 internal traffic), 17% false-negative on
+  real overeager actions (n=52), 5.7% false-negative on synthetic exfiltration
+  tests — Anthropic's own "not a drop-in replacement for careful human review
+  on high-stakes infrastructure" caveat is the honest hook for the piece.
 - **Harness-side context overhead** — see the running thread above. Fixed
   system-prompt/tool-schema token cost, distinct from CLAUDE.md bloat; guide
   §03 doesn't cover it at all yet. Watching for a third data point before

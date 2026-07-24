@@ -2,7 +2,7 @@
 title: 'Models & effort: the control panel'
 order: 1
 summary: The four models, the low→max effort ladder, fast mode, and the two keywords worth memorizing — plus quick picks by task.
-updated: 2026-07-04
+updated: 2026-07-24
 ---
 
 Two dials govern intelligence-per-token: **which model** and **how much effort** it spends thinking. The single cheapest upgrade to your output is learning to move them per task instead of leaving them parked.
@@ -39,7 +39,9 @@ Set it with `/effort xhigh`.
 
 ## Fast mode — same brain, quicker hands
 
-Fast mode runs **Opus at a faster output speed** — it is *not* a downgrade to a smaller model. Same intelligence, meaningfully higher tokens-per-second, at a premium price. Available on Opus 4.8 / 4.7; toggle with `/fast`. Reach for it when Opus is producing a lot of output and you're waiting on the stream, not on the thinking.
+Fast mode runs **Opus at a faster output speed** — it is *not* a downgrade to a smaller model. Same intelligence, meaningfully higher tokens-per-second, at a premium price. Toggle with `/fast`. Reach for it when Opus is producing a lot of output and you're waiting on the stream, not on the thinking.
+
+Fast mode is Opus 4.8 only now. Opus 4.7's fast mode was removed July 24, 2026 (deprecated since June 25) — requests for fast mode on 4.7 now return an error instead of falling back to standard speed. The 4.7 model itself still works at standard speed; migrate to Opus 4.8 to keep the speedup.
 
 ## Quick picks by task
 
