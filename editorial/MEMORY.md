@@ -186,7 +186,13 @@ keeps recurring in signals and isn't well covered by the guide is a
   `SendMessage` body duplication — another partial, adjacent relief (fan-out
   messaging overhead, not the fixed per-session schema cost). Guide §03
   covers CLAUDE.md bloat but not this harness-fixed cost — thin coverage,
-  recurring topic. Deep-dive candidate.
+  recurring topic. Deep-dive candidate. 07-25: first-party confirmation of the
+  07-21 Willison claim — Anthropic's "new rules of context engineering for
+  Claude 5-generation models" post and a same-day Claude Code team post both
+  say the system prompt shrank **>80%** for Opus 5/Fable 5 by cutting examples
+  and "do not" rules in favor of model judgment; if that holds, the 07-13
+  33k-token overhead measurement is now stale and worth re-running as the
+  dive's opening data point.
 
 - **The desktop app grows device panes** `↑` new — 07-21: the iOS Simulator
   pane ships in public beta (Pro/Max/Team, not Enterprise) — Claude
@@ -199,6 +205,22 @@ keeps recurring in signals and isn't well covered by the guide is a
   it's a pure addition), but a strong candidate for the next weekly's
   guide-accuracy pass. Watching for an Android-simulator follow-up
   (Anthropic has said it's in the works).
+
+- **Opus 5 launches, becomes Claude Code's default Opus** `↑` new — 07-24/07-25:
+  Claude Opus 5 (`claude-opus-5`) ships (1,481-pt/814-comment HN thread, #1 on
+  the Artificial Analysis leaderboard) — same $5/$25-per-Mtok pricing as Opus
+  4.8, 1M context as the only size, thinking on by default, Anthropic's own
+  benchmarks put it within 0.5% of Fable 5's coding results at half Fable 5's
+  price. Claude Code v2.1.219 (same day) makes it the default Opus model,
+  extends fast mode to it ($10/$50/Mtok, Claude-API-only research preview,
+  same release that fully drops Opus 4.7 from fast mode), and ships three
+  unrelated defaults-flips in the same version: dynamic workflows now default
+  to the medium size guideline (was unset), and nested subagent spawning —
+  turned off by default just one week earlier in 2.1.217 — flips back on to
+  depth 3. Opus 4.8 remains available for anyone pinned to it. Guide §01, §05
+  patched same day. Worth the weekly asking whether "thinking on by default"
+  and "verify less, Opus 5 already self-verifies" (both from Anthropic's own
+  Opus 5 migration notes) change any guide advice beyond the model table.
 
 ## Deep-dive candidates
 
