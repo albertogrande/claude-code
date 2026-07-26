@@ -221,6 +221,11 @@ keeps recurring in signals and isn't well covered by the guide is a
   patched same day. Worth the weekly asking whether "thinking on by default"
   and "verify less, Opus 5 already self-verifies" (both from Anthropic's own
   Opus 5 migration notes) change any guide advice beyond the model table.
+  07-26: v2.1.220 (07-25) confirmed a day later as bug-fixes-only with no
+  itemized notes ever published — quietest release of the run; status.claude.com
+  logged two short elevated-errors blips across Opus 5/Fable 5/Mythos 5/Haiku 4.5
+  on launch day, both resolved within the hour, general API reliability not a
+  Claude Code issue.
 
 ## Deep-dive candidates
 
