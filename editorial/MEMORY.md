@@ -225,7 +225,18 @@ keeps recurring in signals and isn't well covered by the guide is a
   itemized notes ever published — quietest release of the run; status.claude.com
   logged two short elevated-errors blips across Opus 5/Fable 5/Mythos 5/Haiku 4.5
   on launch day, both resolved within the hour, general API reliability not a
-  Claude Code issue.
+  Claude Code issue. 07-27: still v2.1.220, three days quiet — but a third
+  Opus-5-linked status.claude.com incident opened 08:16 UTC (still open at
+  sweep time), and Anthropic's "Prompting Claude Opus 5" doc answers the
+  07-24 open question directly: Opus 5 "verifies its own work without being
+  told to" and explicit verification/re-check instructions now cause
+  *over*-verification (remove them, don't add them); same doc says Opus 5
+  "delegates to subagents more readily than prior models" and tells harness
+  builders to cap it explicitly — the likely real story behind a disputed
+  27-pt HN/Reddit claim today of a literal Claude-Code-side block on Opus 5
+  subagents (multiple commenters reported Opus 5 using subagents fine).
+  Worth the weekly folding "verify less, delegate more carefully" into
+  practice advice for Opus 5 specifically.
 
 ## Deep-dive candidates
 
