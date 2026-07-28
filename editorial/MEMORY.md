@@ -236,7 +236,17 @@ keeps recurring in signals and isn't well covered by the guide is a
   27-pt HN/Reddit claim today of a literal Claude-Code-side block on Opus 5
   subagents (multiple commenters reported Opus 5 using subagents fine).
   Worth the weekly folding "verify less, delegate more carefully" into
-  practice advice for Opus 5 specifically.
+  practice advice for Opus 5 specifically. 07-28: that 07-27 incident
+  resolved same day, under an hour — but the first real practitioner
+  friction on the default-flip surfaces in HN comments: reports of Opus 5
+  code review turning "overly pedantic" (fix-then-relitigate loops) and some
+  reverting to Opus 4.8/Fable 5 for coding, against others reporting improved
+  agent-to-agent communication. Tension: Anthropic's own "verify less" guidance
+  (07-27) and practitioner reports of an over-eager reviewer model may be the
+  same trait read two ways — worth the weekly resolving whether "pedantic
+  review" is Opus 5 correctly not under-verifying, or a real regression.
+  Still v2.1.220, now four days quiet — longest gap since the 2.1.20x cadence
+  began.
 
 ## Deep-dive candidates
 
