@@ -246,7 +246,21 @@ keeps recurring in signals and isn't well covered by the guide is a
   same trait read two ways — worth the weekly resolving whether "pedantic
   review" is Opus 5 correctly not under-verifying, or a real regression.
   Still v2.1.220, now four days quiet — longest gap since the 2.1.20x cadence
-  began.
+  began. 07-29: fifth quiet day, still v2.1.220; the pedantic-review complaint
+  gets its first concrete anecdote (HN, SlopCodeBench thread) — a simple SQL
+  migration script reportedly ballooned to 200+ lines over repeated
+  fix-then-relitigate review cycles — still one data point, not yet enough to
+  call regression vs. correctly-less-permissive review.
+
+- **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
+  since launch — stateless request/response core (serverless/edge-deployable
+  servers), a versioned `Tasks` extension for long-running work, and
+  OAuth/OIDC hardening for enterprise identity providers. Anthropic's own post
+  confirms rollout "across Claude products" but doesn't name Claude Code or
+  give a version/date. Guide §04 describes MCP servers/OAuth in general terms
+  that still hold; not patched, nothing yet confirms Claude Code's own MCP
+  client changed behavior. Watching for a Claude Code changelog line
+  confirming adoption before treating this as a guide fact.
 
 ## Deep-dive candidates
 
