@@ -133,7 +133,13 @@ keeps recurring in signals and isn't well covered by the guide is a
   anti-distillation measure, not a backdoor. Ecosystem/policy story, not a
   product change — watching for whether it affects anything shipped. Guide:
   not covered (out of scope for a practitioner field guide unless it starts
-  changing product behavior).
+  changing product behavior). 07-30: Axios' "Anthropic's lonely island" —
+  Anthropic alone among frontier labs in declining to sign the Nvidia-led
+  open-weights letter — surfaces a July 22 claim from White House science
+  advisor Michael Kratsios that Moonshot's K3 model was built by distilling
+  Fable while evading detection; adjacent corroboration for the
+  anti-distillation-tracking explanation Anthropic gave China's backdoor claim,
+  still policy/ecosystem not a product change.
 - **Cost control as a first-class habit** `↑` — the token meter is now a
   design constraint the reader manages, not an afterthought. W28: delegate
   routine coding to lower-power subagents (Willison); advisory workflow-size
@@ -170,7 +176,12 @@ keeps recurring in signals and isn't well covered by the guide is a
   cost-dial fact, same family — Opus 4.7's fast mode (deprecated since June 25)
   was removed on schedule today; `/fast` on 4.7 now errors instead of falling
   back to standard speed, migrate to Opus 4.8. Guide §01 patched (had listed
-  fast mode as "Opus 4.8 / 4.7", now 4.8-only).
+  fast mode as "Opus 4.8 / 4.7", now 4.8-only). 07-30: a third-party entrant
+  joins the thread — Tokenless (YC S26) launched on HN (59 pts), auto-routing
+  requests (including Claude Code's) across models by task to cut spend; same
+  problem the guide already answers natively via model/effort choice and
+  workflow-size caps, but a sign the cost-dial pain is real enough to spawn a
+  startup around it.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
@@ -250,7 +261,14 @@ keeps recurring in signals and isn't well covered by the guide is a
   gets its first concrete anecdote (HN, SlopCodeBench thread) — a simple SQL
   migration script reportedly ballooned to 200+ lines over repeated
   fix-then-relitigate review cycles — still one data point, not yet enough to
-  call regression vs. correctly-less-permissive review.
+  call regression vs. correctly-less-permissive review. 07-30: still v2.1.220,
+  sixth quiet day; reliability wobbles continue on two fronts — a 261-pt HN
+  thread covers a brief (41-min) elevated-errors incident across *all* models
+  July 29, no root cause given, and a fresh incident opened 05:57 UTC today is
+  still unresolved at sweep time with Opus 5 specifically named as the
+  straggler ("all models except Opus 5 have recovered") — the most
+  Opus-5-specific outage language yet, worth the weekly asking whether these
+  are capacity growing pains or something about Opus 5 serving specifically.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
