@@ -181,7 +181,12 @@ keeps recurring in signals and isn't well covered by the guide is a
   requests (including Claude Code's) across models by task to cut spend; same
   problem the guide already answers natively via model/effort choice and
   workflow-size caps, but a sign the cost-dial pain is real enough to spawn a
-  startup around it.
+  startup around it. 07-31: a vivid real-world data point (Tom's Hardware et
+  al.) — an internal Amazon tool burned $1.8M on Claude Sonnet (860% over
+  budget, ~600B tokens, uncaught for 5 months), two more Amazon tools
+  separately overran by $541K and $134K; not confirmed as Claude-Code-specific
+  usage, but a concrete argument for the spend-ceiling advice the guide
+  already gives — worth citing if the weekly revisits cost control.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
@@ -203,7 +208,15 @@ keeps recurring in signals and isn't well covered by the guide is a
   say the system prompt shrank **>80%** for Opus 5/Fable 5 by cutting examples
   and "do not" rules in favor of model judgment; if that holds, the 07-13
   33k-token overhead measurement is now stale and worth re-running as the
-  dive's opening data point.
+  dive's opening data point. 07-31: a third data point, but a different axis —
+  a practitioner pulled real token counts from local session logs
+  (`~/.claude/projects/`) across 32 sessions/2,478 tool calls and found 96.8%
+  of tokens go to re-reading tool-output history (63.3% full webpage fetches,
+  13.0% file reads), vs 0.01% user input. That's *usage-pattern* overhead
+  (what the agent chooses to fetch), distinct from the *fixed* system-prompt/
+  schema cost the 07-13/07-25 measurements cover — both belong in the dive,
+  as separate levers (what Claude Code loads by default vs what a session
+  accumulates by choice).
 
 - **The desktop app grows device panes** `↑` new — 07-21: the iOS Simulator
   pane ships in public beta (Pro/Max/Team, not Enterprise) — Claude
@@ -269,6 +282,16 @@ keeps recurring in signals and isn't well covered by the guide is a
   straggler ("all models except Opus 5 have recovered") — the most
   Opus-5-specific outage language yet, worth the weekly asking whether these
   are capacity growing pains or something about Opus 5 serving specifically.
+  07-31: seventh quiet day, still v2.1.220. Yesterday's open incident
+  (`fsh2zzzl2c4l`) resolved, but two more followed — Opus 4.8 degraded
+  13:43–14:24 UTC 07-30, Sonnet 5 degraded 06:18–07:04 UTC today — reliability
+  wobbles now span the model line, not just Opus 5, weakening the
+  Opus-5-specific framing. Separately, Anthropic disclosed (Reuters, 07-30)
+  that Claude models hacked three companies during cyber-eval testing after a
+  sandbox misconfiguration let evals reach the live internet — an evals
+  story, not a Claude Code bug, but the sharpest real-world case yet for
+  scoping "trusted" narrowly on any agent with real network access; ties into
+  the auto-mode deep-dive candidate below.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
@@ -305,8 +328,11 @@ it thinly. The weekly desk commissions from this list.
   on high-stakes infrastructure" caveat is the honest hook for the piece.
 - **Harness-side context overhead** — see the running thread above. Fixed
   system-prompt/tool-schema token cost, distinct from CLAUDE.md bloat; guide
-  §03 doesn't cover it at all yet. Watching for a third data point before
-  promoting further.
+  §03 doesn't cover it at all yet. 07-31: third data point landed (32-session
+  token audit, 96.8% to history re-reads) — ripe to promote; the dive now has
+  two clean angles (fixed harness cost vs accumulated tool-output cost) and a
+  practical recommendation (grep over full-file/full-page fetches) to anchor
+  reader-facing advice.
 - **Migration-at-scale workflow** — 07-20: Anthropic's own writeup
   (claude.com/blog/ai-code-migration) on two real large migrations (Bun's
   1M-line Zig→Rust port, a 165k-line Python→TypeScript port) gives a concrete
