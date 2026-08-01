@@ -186,7 +186,15 @@ keeps recurring in signals and isn't well covered by the guide is a
   budget, ~600B tokens, uncaught for 5 months), two more Amazon tools
   separately overran by $541K and $134K; not confirmed as Claude-Code-specific
   usage, but a concrete argument for the spend-ceiling advice the guide
-  already gives — worth citing if the weekly revisits cost control.
+  already gives — worth citing if the weekly revisits cost control. 08-01: two
+  more entrants — Anthropic's own pricing docs confirm Sonnet 5's $2/$10-per-Mtok
+  introductory API pricing expires August 31, 2026, jumping 50% to $3/$15 on
+  September 1 (API/Bedrock/Foundry billing, not the flat-rate subscription
+  meter) — a real date to plan around, first one on this thread with a hard
+  deadline; separately, a retrospective surfaces *Kahn v. Anthropic* (filed
+  June 14, 2026), alleging Max plans underdeliver their advertised 5x/20x
+  multiples — a legal angle on "check your own usage meter," not a product
+  change.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
@@ -216,7 +224,11 @@ keeps recurring in signals and isn't well covered by the guide is a
   (what the agent chooses to fetch), distinct from the *fixed* system-prompt/
   schema cost the 07-13/07-25 measurements cover — both belong in the dive,
   as separate levers (what Claude Code loads by default vs what a session
-  accumulates by choice).
+  accumulates by choice). 08-01: a practitioner tool answers the "how would you
+  actually check" question the 07-31 data point raised — an `lnav` format file
+  that parses local `~/.claude/projects/*.jsonl` transcripts into a queryable
+  table (tool-failure/token/cache-hit breakdowns); worth citing in the dive as
+  the concrete how-to alongside the audit's findings.
 
 - **The desktop app grows device panes** `↑` new — 07-21: the iOS Simulator
   pane ships in public beta (Pro/Max/Team, not Enterprise) — Claude
@@ -291,7 +303,10 @@ keeps recurring in signals and isn't well covered by the guide is a
   sandbox misconfiguration let evals reach the live internet — an evals
   story, not a Claude Code bug, but the sharpest real-world case yet for
   scoping "trusted" narrowly on any agent with real network access; ties into
-  the auto-mode deep-dive candidate below.
+  the auto-mode deep-dive candidate below. 08-01: eighth quiet release day,
+  still v2.1.220; yesterday's Sonnet 5 incident resolved same-day (46 min),
+  no new status.claude.com incidents overnight — first fully quiet 24h on the
+  reliability front since the Opus 5 launch window opened July 24.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
