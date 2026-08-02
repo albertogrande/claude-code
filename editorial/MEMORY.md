@@ -306,7 +306,11 @@ keeps recurring in signals and isn't well covered by the guide is a
   the auto-mode deep-dive candidate below. 08-01: eighth quiet release day,
   still v2.1.220; yesterday's Sonnet 5 incident resolved same-day (46 min),
   no new status.claude.com incidents overnight — first fully quiet 24h on the
-  reliability front since the Opus 5 launch window opened July 24.
+  reliability front since the Opus 5 launch window opened July 24. 08-02: ninth
+  quiet release day, still v2.1.220, and a second consecutive fully quiet 24h
+  on status.claude.com — calmest stretch on both fronts since July 24. The
+  Opus-5-vs-Fable-5 preference debate keeps ticking along in the background
+  (another HN entrant today, 22 pts) without new evidence either way.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
