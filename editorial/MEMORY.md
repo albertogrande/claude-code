@@ -194,7 +194,17 @@ keeps recurring in signals and isn't well covered by the guide is a
   deadline; separately, a retrospective surfaces *Kahn v. Anthropic* (filed
   June 14, 2026), alleging Max plans underdeliver their advertised 5x/20x
   multiples — a legal angle on "check your own usage meter," not a product
-  change.
+  change. 08-03: the Fable 5 revert (07-20) gets its cushion confirmed —
+  existing Pro/Team-Standard subscribers as of the July 19 cutoff got a
+  one-time $100 usage credit (any model) to soften the pay-as-you-go switch;
+  claim window closed today, Aug 2 11:59 PM PT, credit expires Sept 17;
+  Cowork's own limit is separately boosted 100% through Aug 5 (narrower than
+  Claude Code's Aug-19 weekly boost — two different boost windows on two
+  different products, easy to conflate). Also 08-03: a third local-transcript
+  spend-audit tool (`Gauge`, reads `~/.claude/projects`) joins `lnav` (08-01)
+  and the manual audit (07-31) — this sub-thread (practitioners building their
+  own usage dashboards from local logs) is now three data points and could
+  fold into the harness-overhead dive as the "how to check yourself" section.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
@@ -310,7 +320,21 @@ keeps recurring in signals and isn't well covered by the guide is a
   quiet release day, still v2.1.220, and a second consecutive fully quiet 24h
   on status.claude.com — calmest stretch on both fronts since July 24. The
   Opus-5-vs-Fable-5 preference debate keeps ticking along in the background
-  (another HN entrant today, 22 pts) without new evidence either way.
+  (another HN entrant today, 22 pts) without new evidence either way. 08-03:
+  tenth quiet release day, still v2.1.220, third straight fully quiet 24h on
+  status.claude.com. The 07-30/07-31 cyber-eval disclosure gets an
+  accountability coda (CNBC/The Hill/CBS): the incident helped prompt a
+  1,000+-employee cross-lab petition asking government to help slow releases
+  of the most capable models, Dario Amodei among the signers — still not a
+  Claude Code product fact, but strengthens the "scope trust narrowly" case
+  for the auto-mode dive. Separately, a vivid unattended-run anecdote from
+  inside Anthropic itself: Boris Cherny set Claude Tag (Slack) plus a GitHub
+  macOS runner to rewrite the Electron Claude desktop app natively in Swift,
+  pixel-diffing against the original — still running after 14–15 days per
+  Daring Fireball, probably stalled on a design (not framework) problem. His
+  own framing is a clean pull-quote for the walk-away-workflow dive: give
+  Claude a task "a little too hard," and "verification is probably the single
+  most important thing."
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
