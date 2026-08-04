@@ -124,7 +124,23 @@ keeps recurring in signals and isn't well covered by the guide is a
   approval prompt. Direction is bifurcating: fewer silent auto-runs, but also
   fewer dialogs on the classifier-adjudicated path — worth the "what auto mode
   actually does" dive resolving whether that nets out safer or just relocates
-  risk. → [2026-W28](../src/content/weekly/2026-W28.md)
+  risk. → [2026-W28](../src/content/weekly/2026-W28.md) 08-04: 2.1.221 (the
+  first release in ten days) adds the thread's biggest trust-completing fix
+  yet — background sessions now commit and push automatically to preserve
+  work, open a draft PR only when warranted, follow CLAUDE.md git
+  instructions, and report where the work lives (previously a killed/lost
+  background session's work could just vanish); same release gives `/fork`
+  sessions their own new worktree instead of reusing the original session's
+  checkout, and closes two more permission-checker bypasses (zsh `[[ ]]`
+  regex conditionals, Windows PowerShell quoted paths). Separately, an HN
+  gist audit of 149 public `.claude/settings.json` files found 16% have at
+  least one `deny`/`allow` path rule written as `Write()`/`Glob()`/
+  `NotebookEdit()`/legacy `MultiEdit()` — none of which Claude Code actually
+  matches (only `Edit()`/`Read()` are checked) — half of the fully-dead rules
+  targeting credential paths (`.ssh`, `.aws`, `.kube`, `*.pem`); a real,
+  version-current practice ("audit your deny rules for the right verb") for
+  the reader's own config, adjacent to but distinct from the auto-mode
+  classifier this thread otherwise tracks.
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
@@ -205,6 +221,13 @@ keeps recurring in signals and isn't well covered by the guide is a
   and the manual audit (07-31) — this sub-thread (practitioners building their
   own usage dashboards from local logs) is now three data points and could
   fold into the harness-overhead dive as the "how to check yourself" section.
+  08-04: a fourth entrant, TokenMaxxer (opt-in-public leaderboard across 18
+  coding tools, local-only parsing) — and 2.1.221 ships two first-party cost-
+  visibility moves the same day: the Stats panel now breaks out cache
+  read/write tokens in its totals, and auto mode's own permission-classifier
+  calls now reuse the cached conversation prefix, cutting the cost of running
+  auto mode itself. Together, first-party tooling is starting to answer the
+  question the third-party trackers exist to answer.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
@@ -322,7 +345,8 @@ keeps recurring in signals and isn't well covered by the guide is a
   Opus-5-vs-Fable-5 preference debate keeps ticking along in the background
   (another HN entrant today, 22 pts) without new evidence either way. 08-03:
   tenth quiet release day, still v2.1.220, third straight fully quiet 24h on
-  status.claude.com. The 07-30/07-31 cyber-eval disclosure gets an
+  status.claude.com (correction, 08-04: not actually fully quiet — see
+  below). The 07-30/07-31 cyber-eval disclosure gets an
   accountability coda (CNBC/The Hill/CBS): the incident helped prompt a
   1,000+-employee cross-lab petition asking government to help slow releases
   of the most capable models, Dario Amodei among the signers — still not a
@@ -334,7 +358,22 @@ keeps recurring in signals and isn't well covered by the guide is a
   Daring Fireball, probably stalled on a design (not framework) problem. His
   own framing is a clean pull-quote for the walk-away-workflow dive: give
   Claude a task "a little too hard," and "verification is probably the single
-  most important thing."
+  most important thing." 08-04: the ten-day quiet stretch ends —
+  **v2.1.221** ships, the biggest single release since the launch window
+  (see the supervised-background-run and cost-control threads above for the
+  contents; not primarily an Opus-5 release, no model-lineup change). Also
+  08-04: yesterday's "third straight fully quiet 24h" read on
+  status.claude.com turns out to be wrong — it actually logged two brief
+  incidents 08-03 (multi-model errors 12:52–14:17 UTC, Sonnet 5 degraded
+  15:13–15:29 UTC) plus a third today (Sonnet 5 elevated errors, 06:16–06:55
+  UTC) — all resolved inside an hour, so "brief and self-resolving" still
+  holds, but the consecutive-quiet-day count doesn't; worth double-checking
+  status.claude.com's own history view rather than a same-day read going
+  forward. An open, unconfirmed GH issue (#83510) claims a BullshitBench
+  regression across all three gen-5 models (nonsense-prompt detection down
+  from 0.87 to 0.52, ~2x verbosity) plus Fable 5 allegedly silently rerouting
+  to Opus 4.8 mid-session — flagged, no replication or Anthropic response yet,
+  watching before treating as fact.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
