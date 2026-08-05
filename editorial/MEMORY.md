@@ -140,7 +140,21 @@ keeps recurring in signals and isn't well covered by the guide is a
   targeting credential paths (`.ssh`, `.aws`, `.kube`, `*.pem`); a real,
   version-current practice ("audit your deny rules for the right verb") for
   the reader's own config, adjacent to but distinct from the auto-mode
-  classifier this thread otherwise tracks.
+  classifier this thread otherwise tracks. 08-05: **2.1.222** ships same-day
+  as 2.1.221 — the first back-to-back-same-day release of the run — and adds
+  three more entries: worktree isolation now covers file edits and Bash in
+  *every* session type (previously the destructive-git-command gap; same
+  escape class as 07-15/07-17), a PreToolUse auto-allow-hook bypass in
+  background agent tasks (summaries/compaction/renames) is closed, and
+  `SendMessage` to other agent sessions now passes through the auto-mode
+  permission classifier before dispatch. Same release moves Remote Control's
+  auto-start toggle out of repo-local settings into user-scope `/config`
+  (repo can still disable, not enable) — same pattern as `autoMode` (07-11)
+  and `pluginConfigs` (07-12). Also 08-05, unrelated to trust-hardening: the
+  `/ultraplan` cloud-planning feature (research preview since 2.1.101) is
+  removed outright with no changelog deprecation note — guide never covered
+  it, nothing to patch, but a real feature-removal worth knowing if it was in
+  anyone's workflow.
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
@@ -227,7 +241,11 @@ keeps recurring in signals and isn't well covered by the guide is a
   read/write tokens in its totals, and auto mode's own permission-classifier
   calls now reuse the cached conversation prefix, cutting the cost of running
   auto mode itself. Together, first-party tooling is starting to answer the
-  question the third-party trackers exist to answer.
+  question the third-party trackers exist to answer. 08-05: a fifth entrant,
+  CostClaw (barely any HN traction, 1 pt) — the count of independent
+  local-transcript spend tools is now the story more than any single one of
+  them; strong "how to audit your own spend" section for the cost-control
+  dive if it gets commissioned.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
@@ -373,7 +391,14 @@ keeps recurring in signals and isn't well covered by the guide is a
   regression across all three gen-5 models (nonsense-prompt detection down
   from 0.87 to 0.52, ~2x verbosity) plus Fable 5 allegedly silently rerouting
   to Opus 4.8 mid-session — flagged, no replication or Anthropic response yet,
-  watching before treating as fact.
+  watching before treating as fact. 08-05: status.claude.com history fills in
+  two more Aug 4 incidents the same-day read missed (Sonnet 5 11:27–11:52
+  UTC; a broader OAuth-login/multi-model error incident 20:48–21:59 UTC), and
+  a new incident opens today 07:05 UTC hitting Mythos 5, Fable 5, and Opus 5
+  together (cause identified, unresolved at sweep) — reinforces the 07-31
+  read that reliability wobbles span the whole gen-5 line, not an Opus-5-only
+  problem, and that a same-day status read keeps undercounting vs. checking
+  the reviewed history a day later.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
