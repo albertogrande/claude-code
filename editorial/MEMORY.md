@@ -154,7 +154,25 @@ keeps recurring in signals and isn't well covered by the guide is a
   `/ultraplan` cloud-planning feature (research preview since 2.1.101) is
   removed outright with no changelog deprecation note — guide never covered
   it, nothing to patch, but a real feature-removal worth knowing if it was in
-  anyone's workflow.
+  anyone's workflow. 08-06: **2.1.223** adds four more entries — a Bash
+  permission-check bypass (crafted commands hiding parts of themselves) and a
+  tab/invisible-Unicode command-padding bypass are closed (same bypass class
+  as 07-18/08-04), workflow scripts can no longer use dynamic `import()` to
+  escape the workflow sandbox, and agent-definition `bypassPermissions` mode
+  can no longer ignore an org's bypass-permissions disable policy. Same
+  release: `/review` becomes an alias of `/code-review`, `/code-review` with
+  no effort level reuses your last-typed level, `CLAUDE_CODE_DISABLE_1M_CONTEXT`
+  now auto-compacts every native-1M model to 200K (was a fixed list) with a
+  new startup warning if compaction isn't actually holding the line, and a
+  `/teleport` hint appears in cloud sessions for `claude --teleport <session
+  id>` local handoff. A closer re-read of 2.1.221/2.1.222's full notes (not
+  just the trust-hardening subset captured 08-04/08-05) surfaces two misses:
+  2.1.221 shipped a VS Code Focus view (`Ctrl+Alt+F`, collapses tool activity
+  into an expandable per-turn summary) and sandbox credential-file
+  `mode: "mask"` on Linux/WSL; 2.1.222 fixed org-restricted subagent/teammate
+  model aliases dropping straight to the parent model instead of stepping
+  down within the family — worth reading full changelog text going forward,
+  not just the headline items.
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
@@ -398,7 +416,10 @@ keeps recurring in signals and isn't well covered by the guide is a
   together (cause identified, unresolved at sweep) — reinforces the 07-31
   read that reliability wobbles span the whole gen-5 line, not an Opus-5-only
   problem, and that a same-day status read keeps undercounting vs. checking
-  the reviewed history a day later.
+  the reviewed history a day later. 08-06: that 07:05 UTC incident resolved
+  14:14 UTC, but a second, Opus-5-only incident followed the same day
+  (elevated errors 13:51–14:34 UTC) — second straight day with more than one
+  incident, wobbles not yet settling.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
