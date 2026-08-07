@@ -2,7 +2,7 @@
 title: 'Subagents, parallelism & workflows'
 order: 5
 summary: Three tiers of fan-out — background-by-default subagents, parallel worktrees, and dynamic multi-agent workflows — and when each earns its cost.
-updated: 2026-07-25
+updated: 2026-08-07
 ---
 
 When one context window and one thread aren't enough, Claude Code fans out. Three tiers, escalating in power and cost.
@@ -28,7 +28,7 @@ For genuinely large work — a framework migration, a codebase-wide audit — Cl
 
 **Opting in.** Workflows are powerful and can burn a lot of tokens, so they're explicit opt-in. Add the keyword `ultracode` to a substantive request, or ask directly: "use a workflow to migrate our test suite from Jest to Vitest across all packages." For anything smaller, a single session or a couple of subagents is the cheaper right answer.
 
-**Bounding the size.** As of 2.1.202, a **Dynamic workflow size** setting in `/config` (`unrestricted`/`small`/`medium`/`large`) tells Claude to aim for a smaller agent count — small means under 5, medium under 15, large under 50 — when it writes the script. As of 2.1.219, **medium is the default** guideline for new sessions (was unset), settable from any settings file via the `workflowSizeGuideline` key. It's advice sent to the model, not an enforced ceiling, so a broad enough prompt can still override it; the runtime's hard caps are the real backstop: within a single workflow, concurrent `agent()` calls are capped at min(16, CPU cores − 2) and total agents per run at 1,000. As of 2.1.212, there's a session-wide cap too: subagent spawns cap at 200 per session by default (raise it with `CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION`; `/clear` resets the count). As of 2.1.217, a separate session-wide concurrency cap also applies — 20 subagents running at once by default (raise it with `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`). Nested subagent spawning, which 2.1.217 turned off by default, was reversed three days later: as of 2.1.219, subagents can spawn nested subagents up to depth 3 by default (set `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1` to disable nesting again). Gauge cost on a narrow slice before widening the setting or the prompt.
+**Bounding the size.** As of 2.1.202, a **Dynamic workflow size** setting in `/config` (`unrestricted`/`small`/`medium`/`large`) tells Claude to aim for a smaller agent count — small means under 5, medium under 15, large under 50 — when it writes the script. As of 2.1.219, **medium is the default** guideline for new sessions (was unset), settable from any settings file via the `workflowSizeGuideline` key. It's advice sent to the model, not an enforced ceiling, so a broad enough prompt can still override it; the runtime's hard caps are the real backstop: within a single workflow, concurrent `agent()` calls are capped at min(16, CPU cores − 2) and total agents per run at 1,000. As of 2.1.217, a session-wide concurrency cap also applies — 20 subagents running at once by default (raise it with `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`). A separate 200-subagent-per-session spawn cap (added 2.1.212) was removed in 2.1.224 — the concurrency cap and the nested-spawn depth cap (below) are now the only session-wide backstops. Nested subagent spawning, which 2.1.217 turned off by default, was reversed three days later: as of 2.1.219, subagents can spawn nested subagents up to depth 3 by default (set `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1` to disable nesting again). Gauge cost on a narrow slice before widening the setting or the prompt.
 
 ## Choosing a tier
 

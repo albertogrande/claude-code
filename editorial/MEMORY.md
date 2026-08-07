@@ -172,7 +172,27 @@ keeps recurring in signals and isn't well covered by the guide is a
   `mode: "mask"` on Linux/WSL; 2.1.222 fixed org-restricted subagent/teammate
   model aliases dropping straight to the parent model instead of stepping
   down within the family — worth reading full changelog text going forward,
-  not just the headline items.
+  not just the headline items. 08-07: **2.1.224** is the thread's biggest
+  feature release since 2.1.221/2.1.222 — `claude self-hosted-runner`
+  (Team/Enterprise) runs sessions on your own infra; an `archive` plugin
+  source installs from a zip over HTTPS with SHA-256 pinning; and
+  cross-session `SendMessage`/`ListAgents` land on macOS/Linux, letting one
+  session message another by name. Same release **removes the
+  200-subagent-per-session spawn cap** added 2.1.212 outright (guide §05
+  patched, had called it a permanent session-wide backstop) — the
+  20-concurrent (2.1.217) and 1,000-per-run caps are now the only session-wide
+  limits left; worth the weekly asking whether cap *removal* fits the
+  "fewer dialogs, more classifier judgment" bifurcation flagged 07-23. Sandbox
+  credential masking also gains `decode: "jwt"` and AWS SigV4 re-signing
+  (2.1.221's `mode: "mask"` gets more granular), and `SendMessage` falsely
+  reporting delivery success is fixed same-day cross-session messaging ships —
+  good timing given the new feature's blast radius. Separately, Uber
+  open-sourced **ADR** (Agentic AI Detection and Response), a production
+  security-monitoring layer it runs over Claude Code/Cursor/Codex sessions
+  (300+-task, 133-MCP-server attack benchmark; open-source part is
+  observability/benchmarking only, blocking stays internal) — first
+  enterprise-scale evidence for the auto-mode dive's "scope trust narrowly"
+  case from outside Anthropic itself.
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
@@ -419,7 +439,9 @@ keeps recurring in signals and isn't well covered by the guide is a
   the reviewed history a day later. 08-06: that 07:05 UTC incident resolved
   14:14 UTC, but a second, Opus-5-only incident followed the same day
   (elevated errors 13:51–14:34 UTC) — second straight day with more than one
-  incident, wobbles not yet settling.
+  incident, wobbles not yet settling. 08-07: first fully quiet 24h on
+  status.claude.com since 08-06's incidents — all systems operational,
+  no new incidents logged.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
