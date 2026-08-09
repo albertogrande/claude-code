@@ -192,7 +192,19 @@ keeps recurring in signals and isn't well covered by the guide is a
   (300+-task, 133-MCP-server attack benchmark; open-source part is
   observability/benchmarking only, blocking stays internal) — first
   enterprise-scale evidence for the auto-mode dive's "scope trust narrowly"
-  case from outside Anthropic itself.
+  case from outside Anthropic itself. 08-08: **v2.1.225** ships same day as a
+  second, bug-fixes-only v2.1.226 — adds gateway spend-limit support to the
+  usage-warning message, a workspace-trust prompt to `claude agents` matching
+  `claude`'s own, and a first follow-up hardening pass on 08-07's cross-session
+  messaging (`SendMessage` can now cold-start a conversation with a Remote
+  Control session on another machine, not just reply). Full primary-source doc
+  for cross-session messaging (`code.claude.com/docs/en/cross-session-messaging`,
+  97-pt/40-comment HN thread) confirms same-machine delivery never touches
+  Anthropic servers, cross-machine was reply-only until today, messages are
+  plain-text-only and can't approve prompts or change config on the sender's
+  behalf, and `crossSessionInbound`/`isolatePeerMachines` gate what arrives —
+  guide doesn't cover this feature yet (pure addition, like the iOS Simulator
+  pane 07-21), candidate for the next weekly's guide-accuracy pass.
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
@@ -461,21 +473,36 @@ it thinly. The weekly desk commissions from this list.
 - **A real workflow spend ceiling** — the 2.1.202 size knob is advisory; if
   Anthropic ships an enforced cap (or a budget primitive), that's the dive:
   how to actually bound autonomous spend. Not yet — watching.
-- **What auto mode actually does on an unattended run** `↑` — recurring across
-  W28: AskUserQuestion no-guess (2.1.200), transcript-tamper block + `rm -rf`
-  guard + no-fabricated-approval notifications (2.1.205). The guide covers it in
-  one paragraph (§02 "Auto mode, briefly"); a dive on the real safety model of a
-  walk-away run — what's screened, what still gets through, how to scope
-  "trusted" — is close to ripe. Candidate for the next weekly. Primary source
-  ready when commissioned: Anthropic engineering's "How we built Claude Code
-  auto mode" (anthropic.com/engineering/claude-code-auto-mode, 2026-03-25) —
-  two-layer classifier (input-side injection probe + output-side transcript
-  classifier that sees only user messages and tool calls, not assistant text),
-  file reads/in-project edits bypass it entirely, and it publishes real numbers:
-  0.4% false-positive rate (n=10,000 internal traffic), 17% false-negative on
-  real overeager actions (n=52), 5.7% false-negative on synthetic exfiltration
-  tests — Anthropic's own "not a drop-in replacement for careful human review
-  on high-stakes infrastructure" caveat is the honest hook for the piece.
+- **What auto mode actually does on an unattended run** `↑↑` RIPE — 08-08 makes
+  this urgent, not just recurring: Anthropic announced auto mode becomes the
+  **default** permission mode for new Pro/Max/Team sessions starting
+  **2026-08-14** (claude.com/blog/auto-mode-default-in-claude-code). Headline
+  numbers: 1,053-paid-tester controlled study, humans caught 13.6% of injected
+  dangerous commands vs. auto mode's 89%; production May–June data shows manual
+  sessions had unintended serious harm 6.3% of the time vs. 2.4% for auto mode;
+  Trajectory Labs ran 720 prompt-injection attempts against gen-5 models in auto
+  mode with zero successes. Classifier token overhead now free on Pro/Max/Team.
+  Caveat stated up front: "does not eliminate risk," manual review still
+  recommended for high-stakes production infra. First practitioner reaction
+  thread already skeptical (HN 49214994, 21 pts/19 comments) — switching back to
+  manual, wanting classifier reasoning surfaced, not just a block. Guide §02
+  covers auto mode in one paragraph and doesn't yet state what the actual
+  default *is* — **do not patch until 08-14** (not true yet); the scout should
+  patch §02 the moment it ships, and this is now the strongest possible
+  commission for the next weekly regardless of patch timing. Older recurring
+  evidence, still relevant: AskUserQuestion no-guess (2.1.200), transcript-tamper
+  block + `rm -rf` guard + no-fabricated-approval notifications (2.1.205).
+  Primary source ready when commissioned: Anthropic engineering's "How we built
+  Claude Code auto mode" (anthropic.com/engineering/claude-code-auto-mode,
+  2026-03-25) — two-layer classifier (input-side injection probe + output-side
+  transcript classifier that sees only user messages and tool calls, not
+  assistant text), file reads/in-project edits bypass it entirely, and it
+  publishes real numbers: 0.4% false-positive rate (n=10,000 internal traffic),
+  17% false-negative on real overeager actions (n=52), 5.7% false-negative on
+  synthetic exfiltration tests — Anthropic's own "not a drop-in replacement for
+  careful human review on high-stakes infrastructure" caveat is the honest hook
+  for the piece, now paired with the 08-08 default-flip numbers as the
+  up-to-the-minute half.
 - **Harness-side context overhead** — see the running thread above. Fixed
   system-prompt/tool-schema token cost, distinct from CLAUDE.md bloat; guide
   §03 doesn't cover it at all yet. 07-31: third data point landed (32-session
