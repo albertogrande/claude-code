@@ -473,10 +473,16 @@ it thinly. The weekly desk commissions from this list.
 - **A real workflow spend ceiling** — the 2.1.202 size knob is advisory; if
   Anthropic ships an enforced cap (or a budget primitive), that's the dive:
   how to actually bound autonomous spend. Not yet — watching.
-- **What auto mode actually does on an unattended run** `↑↑` RIPE — 08-08 makes
-  this urgent, not just recurring: Anthropic announced auto mode becomes the
-  **default** permission mode for new Pro/Max/Team sessions starting
-  **2026-08-14** (claude.com/blog/auto-mode-default-in-claude-code). Headline
+- **What auto mode actually does on an unattended run** `↑↑` RIPE, SHIPPED —
+  no scout ran 08-09 through 08-17 (gap in the run); confirmed 08-18 that the
+  default flip **landed on schedule 2026-08-14** as v2.1.233, same release
+  also disabling task-tracking tools (TaskCreate/TodoWrite) by default on
+  Opus 4.8/Sonnet 5/Fable 5/Mythos 5+. Guide §02 patched 08-18. An open,
+  unconfirmed GH issue (#33587, filed against the much older v2.1.74) reports
+  auto mode unreachable via toggle/setting — unclear if still current, recheck
+  before treating as a live rollout bug. This is now the single strongest
+  weekly commission on the docket: the rollout, its reception, and the
+  practitioner-skepticism thread (HN 49214994) all need synthesis. Headline
   numbers: 1,053-paid-tester controlled study, humans caught 13.6% of injected
   dangerous commands vs. auto mode's 89%; production May–June data shows manual
   sessions had unintended serious harm 6.3% of the time vs. 2.4% for auto mode;
@@ -485,11 +491,7 @@ it thinly. The weekly desk commissions from this list.
   Caveat stated up front: "does not eliminate risk," manual review still
   recommended for high-stakes production infra. First practitioner reaction
   thread already skeptical (HN 49214994, 21 pts/19 comments) — switching back to
-  manual, wanting classifier reasoning surfaced, not just a block. Guide §02
-  covers auto mode in one paragraph and doesn't yet state what the actual
-  default *is* — **do not patch until 08-14** (not true yet); the scout should
-  patch §02 the moment it ships, and this is now the strongest possible
-  commission for the next weekly regardless of patch timing. Older recurring
+  manual, wanting classifier reasoning surfaced, not just a block. Older recurring
   evidence, still relevant: AskUserQuestion no-guess (2.1.200), transcript-tamper
   block + `rm -rf` guard + no-fabricated-approval notifications (2.1.205).
   Primary source ready when commissioned: Anthropic engineering's "How we built

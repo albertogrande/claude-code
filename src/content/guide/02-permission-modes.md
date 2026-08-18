@@ -2,10 +2,12 @@
 title: 'The permission dial: five ways to run'
 order: 2
 summary: Manual, accept-edits, plan, auto, and bypass — what each does, when to reach for it, and why plan mode is the highest-leverage habit.
-updated: 2026-07-04
+updated: 2026-08-18
 ---
 
 On desktop, cycle permission modes with the mode button or **`Shift+Tab`**. Each trades friction for autonomy. Match the mode to how much you trust the task, not out of habit.
+
+**As of August 14, 2026, auto is the built-in default mode for new sessions on Pro, Max, and Team plans** (requires Claude Code v2.1.228 or later; v2.1.233 or later on native Windows) — manual (previously the default) is still one tap away on the mode toggle. Enterprise, the Claude API, and cloud-partner deployments (Bedrock, Vertex, Foundry) stay opt-in for now, with Anthropic targeting all of them within a month. If you'd already set your own default, it persists through the switch; org-managed defaults are untouched.
 
 ## The five modes
 
