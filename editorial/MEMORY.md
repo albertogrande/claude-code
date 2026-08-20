@@ -204,7 +204,17 @@ keeps recurring in signals and isn't well covered by the guide is a
   plain-text-only and can't approve prompts or change config on the sender's
   behalf, and `crossSessionInbound`/`isolatePeerMachines` gate what arrives —
   guide doesn't cover this feature yet (pure addition, like the iOS Simulator
-  pane 07-21), candidate for the next weekly's guide-accuracy pass.
+  pane 07-21), candidate for the next weekly's guide-accuracy pass. 08-18/19/20:
+  three more releases keep the cadence going — 2.1.235 fixes a real permission
+  bug (Shift+Tab in the comment field was approving the edit + granting
+  session-wide edit permission); 2.1.236 is the biggest auto-mode release since
+  the default flip, closing a `status.showUntrackedFiles=no` clean-tree bypass,
+  bringing Monitor commands under the same classifier review as Bash, and
+  matching Bedrock/Vertex/Foundry auto-mode classifier defaults to the Claude
+  API's (severity-scored classification) — same bypass-closing pattern as the
+  whole-month thread; 2.1.237 (08-20) adds a built-in "Concise" output style
+  (skip preamble/narration) and fixes gateway/custom-base-URL prompt caching.
+  Not guide-patched — additive/refinement, nothing existing disproved.
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
@@ -329,7 +339,12 @@ keeps recurring in signals and isn't well covered by the guide is a
   actually check" question the 07-31 data point raised — an `lnav` format file
   that parses local `~/.claude/projects/*.jsonl` transcripts into a queryable
   table (tool-failure/token/cache-hit breakdowns); worth citing in the dive as
-  the concrete how-to alongside the audit's findings.
+  the concrete how-to alongside the audit's findings. 08-19: a small practitioner
+  tool (`only-cli/oc`) wraps token-heavy websites as thin CLIs returning
+  structured text instead of full HTML — a direct response to the 07-31
+  finding that 63% of session tokens go to full webpage fetches; minor (4 pts)
+  but a concrete instance of the "grep over full-fetch" advice the dive would
+  give.
 
 - **The desktop app grows device panes** `↑` new — 07-21: the iOS Simulator
   pane ships in public beta (Pro/Max/Team, not Enterprise) — Claude
@@ -453,7 +468,14 @@ keeps recurring in signals and isn't well covered by the guide is a
   (elevated errors 13:51–14:34 UTC) — second straight day with more than one
   incident, wobbles not yet settling. 08-07: first fully quiet 24h on
   status.claude.com since 08-06's incidents — all systems operational,
-  no new incidents logged.
+  no new incidents logged. 08-18/19: two more brief incidents — multi-model
+  degraded performance (Opus 5, Sonnet 5, Fable 5, Mythos 5, Haiku 4.5)
+  16:20–19:01 UTC 08-18, then Opus 5 + Haiku 4.5 elevated errors 09:42–11:02
+  UTC 08-19 — both resolved within hours, consistent with "brief and
+  self-resolving, spans the whole gen-5 line." Separately, a 176-pt HN thread
+  (GH #77136, "Opus 5.0 drives incoherence into the stratosphere") turns out on
+  read to be mostly about **Opus 4.8's** verbose/jargon writing style, not an
+  Opus 5 defect — the title overstates the body; no maintainer response yet.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
