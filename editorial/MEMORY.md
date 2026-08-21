@@ -214,7 +214,15 @@ keeps recurring in signals and isn't well covered by the guide is a
   API's (severity-scored classification) — same bypass-closing pattern as the
   whole-month thread; 2.1.237 (08-20) adds a built-in "Concise" output style
   (skip preamble/narration) and fixes gateway/custom-base-URL prompt caching.
-  Not guide-patched — additive/refinement, nothing existing disproved.
+  Not guide-patched — additive/refinement, nothing existing disproved. 08-21:
+  **2.1.238** ships hours after 2.1.237 the same day — extends the cross-session-
+  messaging trust surface (08-08) so a refused or dropped inbound message now
+  reports failure to the sender instead of vanishing silently; adds
+  `headersHelper` (mints short-lived HTTP headers for plugin-marketplace/MCP
+  fetches, gated behind the folder's trust dialog, runs without inherited
+  credential env vars) as a new trust-relevant extensibility primitive not yet
+  in guide §04; and gives `self-hosted-runner` a graceful-shutdown window and
+  per-connection proxy-auth headers. Not guide-patched — all additive.
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
@@ -344,7 +352,13 @@ keeps recurring in signals and isn't well covered by the guide is a
   structured text instead of full HTML — a direct response to the 07-31
   finding that 63% of session tokens go to full webpage fetches; minor (4 pts)
   but a concrete instance of the "grep over full-fetch" advice the dive would
-  give.
+  give. 08-21: **2.1.238** fixes unbounded memory growth in long interactive
+  sessions — subagent tool results were accumulating for the life of the
+  session, now released once they scroll out of the recent display window.
+  Distinct from the token-overhead measurements above (host-process RAM, not
+  tokens billed/sent to the model) but same underlying pathology — the harness
+  holding onto more than it needs on long-running work — worth a line in the
+  dive as the "even the client itself wasn't bounded" coda.
 
 - **The desktop app grows device panes** `↑` new — 07-21: the iOS Simulator
   pane ships in public beta (Pro/Max/Team, not Enterprise) — Claude
@@ -476,6 +490,8 @@ keeps recurring in signals and isn't well covered by the guide is a
   (GH #77136, "Opus 5.0 drives incoherence into the stratosphere") turns out on
   read to be mostly about **Opus 4.8's** verbose/jargon writing style, not an
   Opus 5 defect — the title overstates the body; no maintainer response yet.
+  08-21: status.claude.com logs one more brief, unnamed-model elevated-errors
+  incident (19:16–19:42 UTC, 26 min) — pattern holds, nothing new to add.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
