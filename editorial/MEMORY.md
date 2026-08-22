@@ -358,7 +358,11 @@ keeps recurring in signals and isn't well covered by the guide is a
   Distinct from the token-overhead measurements above (host-process RAM, not
   tokens billed/sent to the model) but same underlying pathology — the harness
   holding onto more than it needs on long-running work — worth a line in the
-  dive as the "even the client itself wasn't bounded" coda.
+  dive as the "even the client itself wasn't bounded" coda. 08-22: **2.1.239**
+  fixes a second instance the very next day — `WebFetch` was retaining expired
+  page content in memory for the whole session instead of clearing it after
+  its stated 15-minute cache. Same pathology twice in two releases is enough
+  to call this its own mini-pattern within the dive, not a one-off.
 
 - **The desktop app grows device panes** `↑` new — 07-21: the iOS Simulator
   pane ships in public beta (Pro/Max/Team, not Enterprise) — Claude
@@ -492,6 +496,8 @@ keeps recurring in signals and isn't well covered by the guide is a
   Opus 5 defect — the title overstates the body; no maintainer response yet.
   08-21: status.claude.com logs one more brief, unnamed-model elevated-errors
   incident (19:16–19:42 UTC, 26 min) — pattern holds, nothing new to add.
+  08-22: fully quiet since — no incidents 08-21 (after the morning blip) or
+  08-22, longest clean stretch since 08-07.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
