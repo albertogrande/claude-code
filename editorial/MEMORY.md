@@ -222,7 +222,14 @@ keeps recurring in signals and isn't well covered by the guide is a
   fetches, gated behind the folder's trust dialog, runs without inherited
   credential env vars) as a new trust-relevant extensibility primitive not yet
   in guide §04; and gives `self-hosted-runner` a graceful-shutdown window and
-  per-connection proxy-auth headers. Not guide-patched — all additive.
+  per-connection proxy-auth headers. Not guide-patched — all additive. 08-21:
+  **2.1.239** (large, mostly-fixes release) extends cross-session messaging
+  parity to Windows (macOS/Linux since 2.1.224/08-07) and adds a `/goal`
+  check-in backoff for long background runs (30 min → 1 h → every 2 h, was a
+  flat 30 min) plus goal-restore on `--resume`; not guide-patched, additive to
+  §05/§07. 08-22/08-23: **2.1.240**/**2.1.241** ship as bug-fixes-only with no
+  itemized notes at sweep time — same quiet-release pattern as 2.1.220's late-
+  July stretch.
 - **China's 'backdoor' warning on Claude Code** `→` — 07-09: China issues a
   nation-state security alert. 07-10: China's National Vulnerability Database
   names it a "built-in monitoring mechanism" and flags versions 2.1.91–2.1.196
@@ -497,7 +504,14 @@ keeps recurring in signals and isn't well covered by the guide is a
   08-21: status.claude.com logs one more brief, unnamed-model elevated-errors
   incident (19:16–19:42 UTC, 26 min) — pattern holds, nothing new to add.
   08-22: fully quiet since — no incidents 08-21 (after the morning blip) or
-  08-22, longest clean stretch since 08-07.
+  08-22, longest clean stretch since 08-07. 08-23: still fully quiet through
+  today — four clean days running. Separately, a single-source (X/HN, 177
+  pts/163 comments, unconfirmed by Anthropic) claim surfaces that a server-side
+  experiment on Claude Code 2.1.236+ shrinks Fable 5's effort scale so "high"
+  now behaves like the old "low," while Opus 5 sessions and older clients are
+  untouched — echoes the March 4→April 7 default-effort walk-back the guide
+  already knows about; watching for either a changelog line or an Anthropic
+  denial before treating as fact.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
