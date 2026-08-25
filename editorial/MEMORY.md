@@ -511,7 +511,22 @@ keeps recurring in signals and isn't well covered by the guide is a
   now behaves like the old "low," while Opus 5 sessions and older clients are
   untouched — echoes the March 4→April 7 default-effort walk-back the guide
   already knows about; watching for either a changelog line or an Anthropic
-  denial before treating as fact.
+  denial before treating as fact. 08-24: the four-day clean stretch ends —
+  elevated errors across Opus 5/Fable 5/Mythos 5/Opus 4.8 overnight (~04:50–
+  07:36 UTC) plus two brief claude.ai/Claude Code login-error incidents
+  (16:02–16:08, 20:00–20:08 UTC), all resolved same-day; separately, TechTimes
+  (citing third-party IncidentHub tracking, methodology unconfirmed) frames the
+  day as commercial Claude's "28th disruption in 30 days" against Claude for
+  Government's zero in 90 days — a vivid aggregation, not an Anthropic figure,
+  watching before treating as a real reliability-gap fact rather than a
+  framing choice. 08-25: fully quiet again — yesterday reads as a one-day
+  blip, not a reversal of the pattern. Separately, v2.1.245 (GH-releases-only
+  at sweep time, not yet on the docs changelog) fixes a startup crash on Linux
+  glibc 2.44 (Arch, CachyOS, Fedora Rawhide) — minor, not thread-relevant, but
+  the docs-changelog lag itself matches the 2.1.214 precedent; also, no
+  itemized notes found for v2.1.242–244 — GH releases jumps straight from
+  2.1.241 to 2.1.245, worth checking next sweep whether those numbers were
+  skipped or just undocumented.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
