@@ -320,7 +320,10 @@ keeps recurring in signals and isn't well covered by the guide is a
   CostClaw (barely any HN traction, 1 pt) — the count of independent
   local-transcript spend tools is now the story more than any single one of
   them; strong "how to audit your own spend" section for the cost-control
-  dive if it gets commissioned.
+  dive if it gets commissioned. 08-26: first-party answers a bit more of the
+  third-party tools' own question — 2.1.246 adds a **Loops breakdown to
+  `/usage`** (per-loop run count, total tokens, last run), narrowing the gap
+  that spawned Gauge/TokenMaxxer/CostClaw.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
@@ -526,7 +529,16 @@ keeps recurring in signals and isn't well covered by the guide is a
   the docs-changelog lag itself matches the 2.1.214 precedent; also, no
   itemized notes found for v2.1.242–244 — GH releases jumps straight from
   2.1.241 to 2.1.245, worth checking next sweep whether those numbers were
-  skipped or just undocumented.
+  skipped or just undocumented. 08-26: **2.1.246** (large release) ships — a
+  `/permissions` Auto mode tab now surfaces and lets you edit the background
+  classifier's own rules, the first concrete answer to the 08-18 HN pushback
+  ("wanting classifier reasoning surfaced, not just a block"); also fixes
+  auto mode wrongly denying tool calls as "temporarily unavailable" on large
+  sessions, and fixes a telemetry request that leaked the user's API key to
+  third-party gateways — same trust-hardening vein as the whole thread.
+  v2.1.245's glibc fix is now itemized on the docs changelog too (resolves
+  08-25's publish-lag flag); 2.1.242–244 remain unlisted on both GH and
+  docs, gap still open. status.claude.com fully quiet 08-25 and 08-26.
 
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
