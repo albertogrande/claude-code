@@ -323,7 +323,11 @@ keeps recurring in signals and isn't well covered by the guide is a
   dive if it gets commissioned. 08-26: first-party answers a bit more of the
   third-party tools' own question — 2.1.246 adds a **Loops breakdown to
   `/usage`** (per-loop run count, total tokens, last run), narrowing the gap
-  that spawned Gauge/TokenMaxxer/CostClaw.
+  that spawned Gauge/TokenMaxxer/CostClaw. 08-28: 2.1.251 adds a spend-limit
+  bar directly to `/usage` and a per-session prompt-cache line to `/cost`;
+  09-03's 2.1.260 adds prompt-cache-miss diagnostics to `/cost` (flags tool-
+  definition changes, session staleness, TTL expiry) — first-party spend
+  visibility keeps compounding, one release at a time.
 
 - **Harness-side context overhead** `→` — distinct from CLAUDE.md bloat (which
   the reader controls): the fixed token cost Claude Code's own system prompt
@@ -539,7 +543,34 @@ keeps recurring in signals and isn't well covered by the guide is a
   v2.1.245's glibc fix is now itemized on the docs changelog too (resolves
   08-25's publish-lag flag); 2.1.242–244 remain unlisted on both GH and
   docs, gap still open. status.claude.com fully quiet 08-25 and 08-26.
+  No scout ran 08-27 through 09-04 (second gap this run, after 08-09–08-17)
+  — 09-05 catch-up sweep covers 08-27–09-04 in signals/2026-W35.md (08-27–30)
+  and 2026-W36.md (08-31–09-04), full detail there. Headline adds: 2.1.248
+  (08-27) ships **`--restricted` mode** for eval harnesses/shared machines
+  (strips exec/WebFetch tools, ignores repo-committed settings, refuses
+  `bypassPermissions`) — a new, narrower trust boundary than any existing
+  permission mode, guide §02 doesn't cover it yet; 2.1.251 (08-28) closes
+  another symlink-swap permission bypass (same isolation-escape class as
+  07-15/07-17/08-05) and adds `PreModelSwitch`/`PostModelSwitch` hooks;
+  2.1.257 (09-01, same day as the Fable 5.1 launch below) adds a Containment
+  Escape rule to auto mode specifically for cloud metadata-credential
+  fetches; 2.1.259 (09-02) closes yet another `Read()` deny-rule gap
+  (option values/git operands) in the same bypass-closing thread as
+  07-18/08-04/08-06/08-27 — but 2.1.260 (09-03) **reverts** that exact
+  change one day later, a same-week flip-flop worth watching for a
+  follow-up fix rather than treating either version's behavior as settled.
 
+- **Fable 5.1 launches, replaces Fable 5 as default Fable model** `→` new —
+  09-01: Anthropic ships Claude Fable 5.1 (`claude-fable-5-1`) alongside
+  Mythos 5.1 — same $10/$50-per-Mtok pricing as Fable 5 but cache reads drop
+  75% (up to 45% cheaper on highly agentic work), gets further into a long
+  task before needing input, better at flagging when it's stuck, ~60% fewer
+  cybersecurity false positives, can now find (not exploit) vulnerabilities.
+  Claude Code v2.1.257 ships it as the default Fable model same-day. Guide
+  §01 patched (Fable 5 → Fable 5.1 in the model table and quick-picks row).
+  Status.claude.com logs brief multi-model incidents touching Fable 5.1
+  09-03 alongside Mythos 5.1/Opus 5/Opus 4.8/Opus 4.6 — same "brief,
+  self-resolving, spans the gen-5 line" pattern as the Opus 5 launch window.
 - **MCP 2026-07-28 spec finalized** `→` new — 07-29: the biggest MCP revision
   since launch — stateless request/response core (serverless/edge-deployable
   servers), a versioned `Tasks` extension for long-running work, and
@@ -596,7 +627,13 @@ it thinly. The weekly desk commissions from this list.
   token audit, 96.8% to history re-reads) — ripe to promote; the dive now has
   two clean angles (fixed harness cost vs accumulated tool-output cost) and a
   practical recommendation (grep over full-file/full-page fetches) to anchor
-  reader-facing advice.
+  reader-facing advice. 09-05: a fourth, high-traction data point — Spotify
+  engineering's "Portal" post (118 pts/55 comments HN) claims a 90% cut to
+  Claude Code token usage; unread in full at sweep time, but this plus
+  2.1.261's `bashOutputMaxChars`/`taskOutputMaxChars` (same-day, trims
+  tool-output bloat at the harness level) and 2.1.260's `/cost` cache-miss
+  diagnostics make three practical levers landing in the same week — strong
+  case to commission this dive next.
 - **Migration-at-scale workflow** — 07-20: Anthropic's own writeup
   (claude.com/blog/ai-code-migration) on two real large migrations (Bun's
   1M-line Zig→Rust port, a 165k-line Python→TypeScript port) gives a concrete

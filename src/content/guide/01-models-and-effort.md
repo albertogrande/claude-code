@@ -2,7 +2,7 @@
 title: 'Models & effort: the control panel'
 order: 1
 summary: The four models, the low→max effort ladder, fast mode, and the two keywords worth memorizing — plus quick picks by task.
-updated: 2026-07-25
+updated: 2026-09-05
 ---
 
 Two dials govern intelligence-per-token: **which model** and **how much effort** it spends thinking. The single cheapest upgrade to your output is learning to move them per task instead of leaving them parked.
@@ -11,12 +11,14 @@ Two dials govern intelligence-per-token: **which model** and **how much effort**
 
 | Model | Model ID | Sweet spot | Context |
 | --- | --- | --- | --- |
-| **Fable 5** | `claude-fable-5` | The hardest problems and multi-hour autonomous runs — investigates, acts, then verifies itself. Never the default. | 1M |
+| **Fable 5.1** | `claude-fable-5-1` | The hardest problems and multi-hour autonomous runs — investigates, acts, then verifies itself. Never the default. | 1M |
 | **Opus 5** | `claude-opus-5` | Complex agentic coding: deep debugging, multi-file refactors, architecture. Your heavy-lifting model. | 1M |
 | **Sonnet 5** | `claude-sonnet-5` | The daily driver. Best speed-to-intelligence balance; the right default for most feature work. | 1M |
 | **Haiku 4.5** | `claude-haiku-4-5` | Fast and cheap, near-frontier. Mechanical edits, renames, high-volume or subagent grunt work. | 200k |
 
 Opus 5 replaced Opus 4.8 as the default Opus model on July 24, 2026 (2.1.219) — same $5/$25-per-Mtok pricing as 4.8, but Anthropic's own benchmarks put it within 0.5% of Fable 5's coding results at half Fable 5's price, plus thinking on by default. Opus 4.8 (`claude-opus-4-8`) still works if you pin to it. Switch anytime with `/model` (opens a picker) or `/model opus`. On Max-tier accounts Opus is the default; on Pro/Team-standard it's Sonnet 5. There's also `/model opusplan` — Opus reasons through the plan, then hands execution to Sonnet.
+
+Fable 5.1 (`claude-fable-5-1`) replaced Fable 5 as the default Fable model on September 1, 2026 (2.1.257) — same $10/$50-per-Mtok pricing, but cache reads drop 75%, it gets further into a long task before it needs your input, and it's more willing to say when it's stuck.
 
 ## The effort ladder
 
@@ -50,7 +52,7 @@ Fast mode now covers Opus 5 and Opus 4.8 — Opus 4.7 was dropped from fast mode
 | Typo, rename, one-line fix | Haiku 4.5 | `low` |
 | Standard feature / everyday coding | Sonnet 5 | `high` |
 | Deep debug, multi-file refactor | Opus 5 | `xhigh` |
-| Architecture, long autonomous session | Fable 5 | `xhigh` |
+| Architecture, long autonomous session | Fable 5.1 | `xhigh` |
 | Bulk / CI / subagent labour | Haiku 4.5 | `low` |
 
 Start from your account default, then profile the task and move the dials. Log the expensive models to high-value work; let Haiku carry the mechanical volume.
